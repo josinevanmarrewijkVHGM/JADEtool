@@ -60,6 +60,7 @@ def process_data(debiet_file, temperature_file, start_date, end_date):
     df_temp = read_and_prepare(temperature_file, 'Temperature')
     df_temp.replace(-999, np.nan, inplace=True)    
     final_df = pd.merge(df_debiet, df_temp, left_index=True, right_index=True, how='outer')
+    final_df.columns = ['debiet', 'temperatuur'] + list(final_df.columns[2:])
 
     try:
         start_date = pd.to_datetime(start_date)
