@@ -137,7 +137,7 @@ def calculate_temperature_adjustments_month(df, threshold_temp_month, min_dif, d
 
 
 
-def add_logo(fig, logo_path, position=(0.95, 0.95), zoom=0.05):
+def add_logo(fig, logopath, position=(0.95, 0.95), zoom=0.05):
     """
     Add a logo to the plot.
 
@@ -153,7 +153,7 @@ def add_logo(fig, logo_path, position=(0.95, 0.95), zoom=0.05):
     """
     import matplotlib.image as mpimg
 
-    logo = mpimg.imread(logo_path)
+    logo = mpimg.imread(logopath)
     imagebox = OffsetImage(logo, zoom=zoom)
     ab = AnnotationBbox(imagebox, position, xycoords='figure fraction', frameon=False)
     fig.add_artist(ab)
