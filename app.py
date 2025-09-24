@@ -1,6 +1,6 @@
 import streamlit as st
 import pandas as pd
-from utils import load_data, calculate_output, process_data
+from utils import process_data
 
 st.title("Water Temperature & Discharge Analysis Tool")
 
@@ -37,8 +37,6 @@ if use_monthly_loz:
 else:
     loz_temp = st.number_input("Minimum loz temperature for the whole year", min_value=0, max_value=40, value=20)
     min_loz_month = [loz_temp] * 12
-
-
 
 
 
