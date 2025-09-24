@@ -8,6 +8,8 @@ import matplotlib.pyplot as plt
 from matplotlib.colors import to_rgb
 from matplotlib.offsetbox import OffsetImage, AnnotationBbox
 
+import os
+import matplotlib.image as mpimg
 # from matplotlib.offsetbox import OffsetImage, AnnotationBbox
 
 # Set the font to Tahoma
@@ -137,24 +139,27 @@ def calculate_temperature_adjustments_month(df, threshold_temp_month, min_dif, d
 
 
 
-def add_logo(fig, logopath, position=(0.95, 0.95), zoom=0.05):
+
+
+def add_logo(fig, logo_path="assets/logo.png", fallback_path="assets/fallback_logo.png", position=(0.85, 0.85), zoom=0.1):
     """
-    Add a logo to the plot.
-
-    Parameters:
-    fig (matplotlib.figure.Figure): The figure object to add the logo to.
-    logo_path (str): Path to the logo image file.
-    position (tuple): Position of the logo in figure coordinates (0 to 1).
-    zoom (float): Zoom factor for the logo image.
-
-    Returns:
-        
-    None
+    Voeg een logo toe aan een matplotlib figuur.
+    Als het logo niet gevonden wordt, gebruik dan een fallback-logo.
     """
-    import matplotlib.image as mpimg
+    # Controleer of het opgegeven logo bestaat
+    if not os.path.exists(logo_path):
+        print(f"⚠️ Logo niet gevonden op pad: {logo_path}. Fallback-logo wordt gebruikt.")
+        logo_path = fallback_path
 
-    logo = mpimg.imread(logopath)
-    imagebox = OffsetImage(logo, zoom=zoom)
-    ab = AnnotationBbox(imagebox, position, xycoords='figure fraction', frameon=False)
-    fig.add_artist(ab)
+    # Controleer of fallback bestaat
+    if not os.path.exists(logo_path):
+        print(f"❌ Geen logo beschikbaar. Controleer pad: {logo_path}")
+        return  # Stop zonder fout
+
+    # Lees en voeg logo toe
+    logo = mpimg.imread(logo_path)
+    ax_logo = fig.add_axes([position[0], position[1], zoom, zoom], anchor='NE', zorder=1)
+    ax_logo.imshow(logo)
+    ax_logo.axis('off')
+
     
