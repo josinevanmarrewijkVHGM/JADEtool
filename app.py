@@ -1,6 +1,6 @@
 import streamlit as st
 import pandas as pd
-from utils import load_data, calculate_output
+from utils import load_data, calculate_output, process_data
 
 st.title("Water Temperature & Discharge Analysis Tool")
 
