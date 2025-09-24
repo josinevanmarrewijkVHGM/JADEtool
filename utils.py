@@ -55,9 +55,6 @@ def process_data(debiet_file, temperature_file, start_date, end_date):
     df_debiet = read_and_prepare(debiet_file, 'Debiet')
     df_temp = read_and_prepare(temperature_file, 'Temperature')
     df_temp.replace(-999, np.nan, inplace=True)    
-    print(df_debiet)
-    print(df_temp)
-
     final_df = pd.merge(df_debiet, df_temp, left_index=True, right_index=True, how='outer')
 
     try:
@@ -70,3 +67,100 @@ def process_data(debiet_file, temperature_file, start_date, end_date):
 
     print('Final df columns:', final_df.columns)
     return final_df
+
+
+
+def calculate_temperature_adjustments_month(df, threshold_temp_month, min_dif, delta_T, min_loz_month, max_deltaT, method=None):
+    """
+    Calculate temperature adjustments based on threshold temperature and other parameters.
+    Returns: df_hourly, monthly_summary, yearly_summary
+    """
+    if method == 'estimation':
+        df_hourly = df.resample('H').interpolate(method='linear')
+    else:
+        df_hourly = df.resample('H').mean()
+
+    df_hourly['Month'] = df_hourly.index.month
+    df_hourly['Year'] = df_hourly.index.year
+
+    threshold_temp_map = {month: temp for month, temp in enumerate(threshold_temp_month, start=1)}
+    df_hourly['Threshold_Temperature'] = df_hourly['Month'].map(threshold_temp_map)
+
+    df_hourly['Above_Threshold'] = (df_hourly['temperatuur'] > df_hourly['Threshold_Temperature']).astype(int)
+    df_hourly['Above_Threshold'] = df_hourly['Above_Threshold'].rolling(window=2, min_periods=2).sum().shift(-1).fillna(0).astype(int)
+    df_hourly['Above_Threshold'] = (df_hourly['Above_Threshold'] == 2).astype(int)
+
+    min_loz_map = {month: temp for month, temp in enumerate(min_loz_month, start=1)}
+    df_hourly['Min_Lozingstemperatuur'] = df_hourly['Month'].map(min_loz_map)
+    df_hourly['Average_bron'] = np.where(df_hourly['Above_Threshold'] == 1, df_hourly['temperatuur'], np.nan)
+
+    df_hourly['Temp_Difference'] = np.where(df_hourly['Above_Threshold'] == 1, df_hourly['temperatuur'] - df_hourly['Min_Lozingstemperatuur'], np.nan)
+    df_hourly['Temp_Difference'] = df_hourly['Temp_Difference'].clip(upper=delta_T)
+    df_hourly['Lozingstemperatuur'] = np.where(df_hourly['Above_Threshold'] == 1, df_hourly['temperatuur'] - df_hourly['Temp_Difference'], np.nan)
+
+    df_hourly['Yearly_Avg_delta_T'] = df_hourly.groupby(df_hourly.index.year)['Temp_Difference'].transform('mean')
+    df_hourly['Draaiuren'] = df_hourly.groupby('Year')['Above_Threshold'].cumsum()
+
+    # Maandelijkse samenvatting
+    df_hourly['YearMonth'] = df_hourly.index.to_period('M')
+    non_zero = df_hourly[df_hourly['Temp_Difference'].notna()]
+    monthly_summary = non_zero.groupby('YearMonth').agg(
+        Count=('Temp_Difference', 'size'),
+        Hours=('Above_Threshold', 'sum'),
+        Avg_del_T=('Temp_Difference', 'mean')
+    ).reset_index()
+    
+    # Energie en vollasturen berekenen (stel Q = 1 voor demo, pas aan indien nodig)
+    # Q = 1.0
+    # monthly_summary['Energie_onttrokken_GJ'] = monthly_summary['Hours'] * monthly_summary['Avg_del_T'] * Q * 998 * 4180 * 1e-9
+    monthly_summary['Vollast_uren'] = (monthly_summary['Avg_del_T'] / delta_T) * monthly_summary['Hours']
+    monthly_summary = monthly_summary.round({"Avg_del_T": 2, "Vollast_uren": 2})
+
+    
+    if max_deltaT is None:
+        max_deltaT = delta_T
+    # Maandelijkse samenvatting
+    df_hourly['YearMonth'] = df_hourly.index.to_period('Y')
+    non_zero = df_hourly[df_hourly['Temp_Difference'].notna()]
+    yearly_summary = non_zero.groupby('YearMonth').agg(
+        Count=('Temp_Difference', 'size'),
+        Hours=('Above_Threshold', 'sum'),
+        Avg_del_T=('Temp_Difference', 'mean')
+    ).reset_index()
+    yearly_summary['Vollast_uren'] = (yearly_summary['Avg_del_T'] / delta_T) * yearly_summary['Hours']
+    yearly_summary = yearly_summary.round({"Avg_del_T": 2, "Vollast_uren": 2})
+    
+    fig1, ax1 = plt.subplots(figsize=(14, 5))
+    positions_year = np.arange(len(yearly_summary))
+    bar_width = 0.4
+    
+    # Bar voor vollasturen
+    bars_draaiuren = ax1.bar(positions_year, yearly_summary['Hours'], bar_width, label='Draaiuren', color=red, edgecolor='black', alpha=0.7)
+    bars_vollasturen = ax1.bar(positions_year+ bar_width, yearly_summary['Vollast_uren'], bar_width, label='Vollast uren', color=blue, edgecolor='black', alpha=0.7)
+    ax1.set_ylabel('Vollasturen (uren)', color=blue, fontsize=14)
+    ax1.tick_params(axis='y', labelcolor=blue)
+    
+    # Lijn voor gemiddelde temperatuur
+    ax2 = ax1.twinx()
+    ax2.plot(positions_year + bar_width / 2, yearly_summary['Avg_del_T'], color=red, marker='o', label='Gemiddelde temperatuur')
+    ax2.set_ylabel('Gemiddelde temperatuur (°C)', color=red, fontsize=14)
+    ax2.tick_params(axis='y', labelcolor=red)
+    
+    ax1.set_xlabel('Jaar', fontsize=14)
+    ax1.set_title('Jaarlijkse samenvatting: Vollasturen en temperatuur', fontsize=16)
+    ax1.set_xticks(positions_year + bar_width / 2)
+    ax1.set_xticklabels(yearly_summary['YearMonth'], fontsize=12)
+    
+    # Datalabels
+    for bar in bars_vollasturen:
+        yval = bar.get_height()
+        ax1.text(bar.get_x() + bar.get_width()/2, yval + 10, f'{yval:.0f}', ha='center', va='bottom', fontsize=13, color='black')
+    for bar in bars_draaiuren:
+        yval = bar.get_height()
+        ax1.text(bar.get_x()+bar.get_width()/2, yval + 10, f'{yval:.0f}', ha='center', va='bottom', fontsize=13, color='black')
+        
+    for x, y in zip(positions_year + bar_width / 2, yearly_summary['Avg_del_T']):
+        ax2.text(x, y, f'{y:.1f}°C', ha='center', va='bottom', fontsize=13, color='black')
+    
+    fig1.tight_layout()
+    return df_hourly, monthly_summary, yearly_summary 
