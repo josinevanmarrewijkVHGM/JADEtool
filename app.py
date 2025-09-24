@@ -56,6 +56,7 @@ else:
     min_loz_month = [loz_temp] * 12
 
 threshold_temp_month = [temp + min_dif for temp in min_loz_month]
+
 # Optionele figuren
 show_fig1 = st.checkbox("Toon visualisatie van de debiet en temperatuur data", value=True)
 show_fig2 = st.checkbox(f"Toon resultaten data analyse tussen {start_date_str} en {end_date_str}", value=True)
