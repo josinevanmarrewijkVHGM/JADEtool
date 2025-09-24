@@ -10,11 +10,11 @@ temp_file = st.file_uploader("Upload Water Temperature CSV", type="csv")
 discharge_file = st.file_uploader("Upload Discharge CSV", type="csv")
 
 ### Laad het CSV file met
-temperature_file = r"C:\Users\JosinevanMarrewijk\OneDrive - vhgm.nl\Aquathermie sharepoint\2. O&O aquathermie\Temperatuurdata Rijkswaterstaat\Maas (Heuvelland)\20250918_105\Temperatuur_Maas.csv"
-debiet_file = r"C:\Users\JosinevanMarrewijk\OneDrive - vhgm.nl\Aquathermie sharepoint\2. O&O aquathermie\Temperatuurdata Rijkswaterstaat\Maas (Heuvelland)\20250918_106\Debiet_Maas.csv"
+# temperature_file = r"C:\Users\JosinevanMarrewijk\OneDrive - vhgm.nl\Aquathermie sharepoint\2. O&O aquathermie\Temperatuurdata Rijkswaterstaat\Maas (Heuvelland)\20250918_105\Temperatuur_Maas.csv"
+# debiet_file = r"C:\Users\JosinevanMarrewijk\OneDrive - vhgm.nl\Aquathermie sharepoint\2. O&O aquathermie\Temperatuurdata Rijkswaterstaat\Maas (Heuvelland)\20250918_106\Debiet_Maas.csv"
 
-temp_file = temperature_file
-debiet_file = discharge_file
+# temp_file = temperature_file
+# debiet_file = discharge_file
 
 start_date = '01-01-2020'
 end_date = '01-01-2025'
@@ -43,4 +43,5 @@ else:
 
 # Run analysis
 if temp_file and discharge_file:
-    final_df = process_data(debiet_file,temperature_file, start_date,end_date)
+    # final_df = process_data(debiet_file,temperature_file, start_date,end_date)
+    final_df = process_data(discharge_file,temp_file, start_date,end_date)
