@@ -18,32 +18,26 @@ blue = to_rgb('#003d73')
 # image_path = r"C:\Users\JosinevanMarrewijk\OneDrive - vhgm.nl\Aquathermie sharepoint\Afbeeldingen\Schermafbeelding 2024-09-05 080412.png"  # Replace with your image file path
 # img = mpimg.imread(image_path)
 
-
 ### Berekening temperatuurwinst 
 # standaardwaarden
 rhow = 998 #kg/m3
 cp = 4185 # warmtecoefficient water J/ (kg*K)
 cp_adjusted = 4200 * 1000/3600 # warmtecoefficient water kWh/(m^3 K)  
 
-# def load_data(temp_file, discharge_file):
-#     temp_df = pd.read_csv(temp_file)
-#     discharge_df = pd.read_csv(discharge_file)
-#     return temp_df, discharge_df
-
-# def calculate_output(temp_df, discharge_df, threshold):
-#     # Example logic: filter and merge
-#     temp_filtered = temp_df[temp_df['temperature'] > threshold]
-#     merged = pd.merge(temp_filtered, discharge_df, on='timestamp')
-#     return merged
-
 def process_data(debiet_file, temperature_file, start_date, end_date):
     def read_and_prepare(file_path, file_type):
         df = pd.read_csv(file_path, delimiter=';', encoding='ISO-8859-1')
         print(f'{file_type} columns:', df.columns)
 
+
         for col in df.columns:
             if col != 'DateTime':
                 df[col] = pd.to_numeric(df[col], errors='coerce')
+                # Outlier removal: z-score methode
+                col_mean = df[col].mean()
+                col_std = df[col].std()
+                # Houd alleen waarden binnen 3 standaarddeviaties
+                df = df[(df[col] - col_mean).abs() <= 10 * col_std]
 
         if 'DateTime' in df.columns:
             try:
@@ -57,9 +51,13 @@ def process_data(debiet_file, temperature_file, start_date, end_date):
         df = df.resample('H').mean()
 
         return df
+
     df_debiet = read_and_prepare(debiet_file, 'Debiet')
     df_temp = read_and_prepare(temperature_file, 'Temperature')
     df_temp.replace(-999, np.nan, inplace=True)    
+    print(df_debiet)
+    print(df_temp)
+
     final_df = pd.merge(df_debiet, df_temp, left_index=True, right_index=True, how='outer')
 
     try:
