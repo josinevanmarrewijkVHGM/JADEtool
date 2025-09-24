@@ -8,7 +8,7 @@ from matplotlib.colors import to_rgb
 import os
 red = to_rgb('#ee1c25')
 blue = to_rgb('#003d73')
-logopath = "Afbeeldingen/logo VHGM.png"
+logopath = "assets/logo.png"
 
 print("Bestaat bestand?", os.path.exists(logopath))
 
