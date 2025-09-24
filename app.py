@@ -5,10 +5,13 @@ import matplotlib.pyplot as plt
 from datetime import datetime
 import numpy as np
 from matplotlib.colors import to_rgb
-
+import os
 red = to_rgb('#ee1c25')
 blue = to_rgb('#003d73')
-logopath = r"C:\Users\JosinevanMarrewijk\Github\JADEtool\Afbeeldingen\logo VHGM.png"
+logopath = "Afbeeldingen/logo VHGM.png"
+
+print("Bestaat bestand?", os.path.exists(logopath))
+
 st.title("Water Temperature & Discharge Analysis Tool")
 
 # File upload
