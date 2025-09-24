@@ -137,7 +137,7 @@ def calculate_temperature_adjustments_month(df, threshold_temp_month, min_dif, d
 
 
 
-def add_logo(fig, logo_path, position=(0.95, 0.95), zoom=0.08):
+def add_logo(fig, logo_path, position=(0.95, 0.95), zoom=0.05):
     """
     Add a logo to the plot.
 
@@ -148,6 +148,7 @@ def add_logo(fig, logo_path, position=(0.95, 0.95), zoom=0.08):
     zoom (float): Zoom factor for the logo image.
 
     Returns:
+        
     None
     """
     import matplotlib.image as mpimg
@@ -156,3 +157,8 @@ def add_logo(fig, logo_path, position=(0.95, 0.95), zoom=0.08):
     imagebox = OffsetImage(logo, zoom=zoom)
     ab = AnnotationBbox(imagebox, position, xycoords='figure fraction', frameon=False)
     fig.add_artist(ab)
+    
+
+logopath = r"C:\Users\JosinevanMarrewijk\Github\JADEtool\Afbeeldingen\logo VHGM.png"
+fig, ax =  plt.subplots(figsize=(10, 4))
+add_logo(fig, logopath)
