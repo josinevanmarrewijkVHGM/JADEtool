@@ -6,6 +6,8 @@ import matplotlib.pyplot as plt
 # from matplotlib.dates import MonthLocator, date2num
 # import os
 from matplotlib.colors import to_rgb
+from matplotlib.offsetbox import OffsetImage, AnnotationBbox
+
 # from matplotlib.offsetbox import OffsetImage, AnnotationBbox
 
 # Set the font to Tahoma
@@ -130,37 +132,27 @@ def calculate_temperature_adjustments_month(df, threshold_temp_month, min_dif, d
     yearly_summary['Vollast_uren'] = (yearly_summary['Avg_del_T'] / delta_T) * yearly_summary['Hours']
     yearly_summary = yearly_summary.round({"Avg_del_T": 2, "Vollast_uren": 2})
     
-    fig1, ax1 = plt.subplots(figsize=(14, 5))
-    positions_year = np.arange(len(yearly_summary))
-    bar_width = 0.4
-    
-    # Bar voor vollasturen
-    bars_draaiuren = ax1.bar(positions_year, yearly_summary['Hours'], bar_width, label='Draaiuren', color=red, edgecolor='black', alpha=0.7)
-    bars_vollasturen = ax1.bar(positions_year+ bar_width, yearly_summary['Vollast_uren'], bar_width, label='Vollast uren', color=blue, edgecolor='black', alpha=0.7)
-    ax1.set_ylabel('Vollasturen (uren)', color=blue, fontsize=14)
-    ax1.tick_params(axis='y', labelcolor=blue)
-    
-    # Lijn voor gemiddelde temperatuur
-    ax2 = ax1.twinx()
-    ax2.plot(positions_year + bar_width / 2, yearly_summary['Avg_del_T'], color=red, marker='o', label='Gemiddelde temperatuur')
-    ax2.set_ylabel('Gemiddelde temperatuur (°C)', color=red, fontsize=14)
-    ax2.tick_params(axis='y', labelcolor=red)
-    
-    ax1.set_xlabel('Jaar', fontsize=14)
-    ax1.set_title('Jaarlijkse samenvatting: Vollasturen en temperatuur', fontsize=16)
-    ax1.set_xticks(positions_year + bar_width / 2)
-    ax1.set_xticklabels(yearly_summary['YearMonth'], fontsize=12)
-    
-    # Datalabels
-    for bar in bars_vollasturen:
-        yval = bar.get_height()
-        ax1.text(bar.get_x() + bar.get_width()/2, yval + 10, f'{yval:.0f}', ha='center', va='bottom', fontsize=13, color='black')
-    for bar in bars_draaiuren:
-        yval = bar.get_height()
-        ax1.text(bar.get_x()+bar.get_width()/2, yval + 10, f'{yval:.0f}', ha='center', va='bottom', fontsize=13, color='black')
-        
-    for x, y in zip(positions_year + bar_width / 2, yearly_summary['Avg_del_T']):
-        ax2.text(x, y, f'{y:.1f}°C', ha='center', va='bottom', fontsize=13, color='black')
-    
-    fig1.tight_layout()
     return df_hourly, monthly_summary, yearly_summary 
+
+
+
+
+def add_logo(fig, logo_path, position=(0.95, 0.95), zoom=0.08):
+    """
+    Add a logo to the plot.
+
+    Parameters:
+    fig (matplotlib.figure.Figure): The figure object to add the logo to.
+    logo_path (str): Path to the logo image file.
+    position (tuple): Position of the logo in figure coordinates (0 to 1).
+    zoom (float): Zoom factor for the logo image.
+
+    Returns:
+    None
+    """
+    import matplotlib.image as mpimg
+
+    logo = mpimg.imread(logo_path)
+    imagebox = OffsetImage(logo, zoom=zoom)
+    ab = AnnotationBbox(imagebox, position, xycoords='figure fraction', frameon=False)
+    fig.add_artist(ab)

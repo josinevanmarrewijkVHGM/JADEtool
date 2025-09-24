@@ -1,6 +1,6 @@
 import streamlit as st
 import pandas as pd
-from utils import process_data, calculate_temperature_adjustments_month
+from utils import process_data, calculate_temperature_adjustments_month, add_logo
 import matplotlib.pyplot as plt
 from datetime import datetime
 import numpy as np
@@ -8,7 +8,7 @@ from matplotlib.colors import to_rgb
 
 red = to_rgb('#ee1c25')
 blue = to_rgb('#003d73')
-
+logopath = r"C:\Users\JosinevanMarrewijk\Github\JADEtool\Afbeeldingen\logo VHGM.png"
 st.title("Water Temperature & Discharge Analysis Tool")
 
 # File upload
@@ -28,9 +28,6 @@ end_date = st.date_input("Einddatum", value=default_end)
 # Optioneel: omzetten naar string voor je functie
 start_date_str = start_date.strftime('%d-%m-%Y')
 end_date_str = end_date.strftime('%d-%m-%Y')
-
-
-
 
 delta_T = st.slider("Temperature difference (°K)", min_value=0, max_value=12, value=10)
 max_deltaT = delta_T
@@ -81,6 +78,7 @@ if temp_file and discharge_file:
             ax2.tick_params(axis='y', labelcolor='red')
         ax1.set_xlabel("Datum")
         fig.tight_layout()
+        add_logo(fig, logopath)
         ax1.legend(loc='upper left')
         ax2.legend(loc='upper right')
         ax1.grid(True)
