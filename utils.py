@@ -158,7 +158,3 @@ def add_logo(fig, logopath, position=(0.95, 0.95), zoom=0.05):
     ab = AnnotationBbox(imagebox, position, xycoords='figure fraction', frameon=False)
     fig.add_artist(ab)
     
-
-logopath = r"C:\Users\JosinevanMarrewijk\Github\JADEtool\Afbeeldingen\logo VHGM.png"
-fig, ax =  plt.subplots(figsize=(10, 4))
-add_logo(fig, logopath)
