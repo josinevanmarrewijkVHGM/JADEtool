@@ -71,16 +71,13 @@ if temp_file and discharge_file:
         st.subheader("Temperatuur en debiet over tijd (controleer data)")
         fig, ax1 = plt.subplots(figsize=(10, 4))
         add_logo(fig, logopath)
-
-        if 'waarde' in final_df.columns:
-            ax1.plot(final_df.index, final_df['waarde'], label='Debiet (waarde)', color='blue')
-            ax1.set_ylabel('Debiet (m³/s)', color='blue')
-            ax1.tick_params(axis='y', labelcolor='blue')
+        ax1.plot(final_df.index, final_df['debiet'], label='Debiet (waarde)', color='blue')
+        ax1.set_ylabel('Debiet (m³/s)', color='blue')
+        ax1.tick_params(axis='y', labelcolor='blue')
         ax2 = ax1.twinx()
-        if 'temp' in final_df.columns:
-            ax2.plot(final_df.index, final_df['temp'], label='Temperatuur (temp)', color='red')
-            ax2.set_ylabel('Temperatuur (°C)', color='red')
-            ax2.tick_params(axis='y', labelcolor='red')
+        ax2.plot(final_df.index, final_df['temperatuur'], label='Temperatuur (temp)', color='red')
+        ax2.set_ylabel('Temperatuur (°C)', color='red')
+        ax2.tick_params(axis='y', labelcolor='red')
         ax1.set_xlabel("Datum")
         fig.tight_layout()
         ax1.legend(loc='upper left')
