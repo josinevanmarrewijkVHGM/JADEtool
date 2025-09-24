@@ -1,6 +1,7 @@
 import streamlit as st
 import pandas as pd
 from utils import process_data
+import matplotlib.pyplot as plt
 
 st.title("Water Temperature & Discharge Analysis Tool")
 
@@ -45,3 +46,16 @@ else:
 if temp_file and discharge_file:
     # final_df = process_data(debiet_file,temperature_file, start_date,end_date)
     final_df = process_data(discharge_file,temp_file, start_date,end_date)
+    
+    # Plotting temperatuur en debiet in Streamlit
+    st.subheader("Temperatuur en debiet over tijd")
+    fig, ax = plt.subplots(figsize=(10, 4))
+    if 'waarde' in final_df.columns:
+        ax.plot(final_df.index, final_df['waarde'], label='Debiet (waarde)', color='blue')
+    if 'temp' in final_df.columns:
+        ax.plot(final_df.index, final_df['temp'], label='Temperatuur (temp)', color='red')
+    ax.set_xlabel("Datum")
+    ax.set_ylabel("Waarde")
+    ax.legend()
+    ax.grid(True)
+    st.pyplot(fig)
