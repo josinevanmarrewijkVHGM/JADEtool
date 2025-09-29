@@ -65,7 +65,6 @@ show_fig3 = st.checkbox("Toon maandelijkse samenvatting", value=True)
 # Analyse uitvoeren
 if temp_file and discharge_file:
     final_df = process_data(discharge_file, temp_file, start_date, end_date)
-
     if show_fig1:
         # Figuur 1: debiet en temperatuur
         st.subheader("Temperatuur en debiet over tijd (controleer data)")
@@ -122,16 +121,10 @@ if temp_file and discharge_file:
 
     if show_fig3:
         # Figuur 3: maandelijkse samenvatting
-        st.subheader("Maandelijkse samenvatting")
+        st.subheader("Analyse watertemperatuur")
         fig2, ax = plt.subplots(figsize=(14, 5))
-        months = monthly_summary['Month']
-        ax.bar(months, monthly_summary['Hours'], label='Draaiuren', color='orange', edgecolor='black', alpha=0.7)
-        ax.set_ylabel('Draaiuren (uren)', fontsize=14)
-        ax.set_xlabel('Maand', fontsize=14)
-        ax.set_title('Maandelijkse draaiuren', fontsize=16)
-        for i, val in enumerate(monthly_summary['Hours']):
-            ax.text(i, val + 5, f'{val:.0f}', ha='center', va='bottom', fontsize=12)
-        ax.grid(True)
-        fig2.tight_layout()
-        st.dataframe(monthly_summary)
+
+
+
+
         st.pyplot(fig2)

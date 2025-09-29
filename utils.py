@@ -139,9 +139,6 @@ def calculate_temperature_adjustments_month(df, threshold_temp_month, min_dif, d
 
 
 
-
-
-
 def add_logo(fig, logo_path="assets/logo.png", fallback_path="assets/fallback_logo.png", position=(0.85, 0.85), zoom=0.1):
     """
     Voeg een logo toe aan een matplotlib figuur.
