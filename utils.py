@@ -268,9 +268,9 @@ def plot_monthly_temperature(
     MWH = None
     if plot_debiet:
         debiet_inschatting = percentile_10th * 0.1
-        deb = debiet_inschatting / 3600
-        MWH = avg_delta_T_all_years * avg_draaiuren / (1 + maintenance_factor) * deb * 4185 * 998 / 10**6 / 3600
-        MWH = round(MWH / 500) * 500
+        deb = debiet_inschatting * 3600
+        MWH = avg_delta_T_all_years * avg_draaiuren / (1 + maintenance_factor) * deb * 4185 * 998 / 3600 / 10**6 
+        # MWH = round(MWH / 500) * 500
 
     plot_type = 'TEO'
     text = "(met wko) "
@@ -303,7 +303,7 @@ def plot_monthly_temperature(
     )
 
     if MWH is not None:
-        text_content += f"\nQ = {debiet_inschatting:.0f} m3/s (op basis van {avg_draaiuren:.0f} uur)"
+        text_content += f"\nQ = {debiet_inschatting:.0f} m3/s (op basis van {avg_draaiuren:.0f} uur en dT = {avg_delta_T_all_years:.2f}"
         text_content += f"\nE = {MWH:,.3f} MWh".replace(',', '.')
 
     if not alleen_temp:

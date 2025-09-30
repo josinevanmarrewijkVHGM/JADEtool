@@ -25,6 +25,7 @@ st.title("🔍 Water Temperature & Discharge Analysis Tool")
 # Sidebar for file upload and parameters
 with st.sidebar:
     st.header("📁 Upload Data Files")
+    titel = "Maas"
     temp_file = st.file_uploader("Upload Water Temperature CSV", type="csv")
     discharge_file = st.file_uploader("Upload Discharge CSV", type="csv")
 
@@ -52,7 +53,7 @@ with st.sidebar:
             val = st.number_input(f"{month}", min_value=0, max_value=30)
             min_loz_month.append(val)
     else:
-        loz_temp = st.number_input("Annual Minimum Lozing Temperature", min_value=0, max_value=40, value=20)
+        loz_temp = st.number_input("Annual Minimum Lozing Temperature", min_value=0, max_value=20, value=12)
         min_loz_month = [loz_temp] * 12
 
     threshold_temp_month = [temp + min_dif for temp in min_loz_month]
@@ -65,7 +66,6 @@ with st.sidebar:
 # Run button to trigger analysis
 if st.button("🚀 Run Analysis"):
     st.success("Analysis started...")
-    
 
     # Placeholder for actual analysis and plotting logic
     if temp_file and discharge_file:
@@ -140,7 +140,7 @@ if st.button("🚀 Run Analysis"):
             st.subheader("📉 Analyse watertemperatuur")
             fig3 = plot_monthly_temperature(df_hourly, start_date, end_date, delta_T, 
                                             min_loz_month, min_dif, threshold_temp_month,
-                                            maintenance, alleen_temp, max_deb=25, titel='naam', plot_debiet=True,
+                                            maintenance, alleen_temp, titel=titel, plot_debiet=True,
                                             logopath=logopath, fontsize=15, t_lim=[0, 30],
                                             draaiseizoen_shade=True, wko=True
                                             )
