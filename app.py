@@ -27,7 +27,7 @@ with st.sidebar:
     st.header("📁 Upload Data Files")
     titel = "Maas"
     temp_file = st.file_uploader("Upload Water Temperature CSV", type="csv")
-    discharge_file = st.file_uploader("Upload Discharge CSV", type="csv")
+    discharge_file = st.file_uploader("Upload Discharge CSV (optional)", type="csv")
 
     st.header("📅 Date Range Selection")
     default_start = datetime.strptime('01-01-2020', '%d-%m-%Y')
@@ -68,6 +68,81 @@ if st.button("🚀 Run Analysis"):
     st.success("Analysis started...")
 
     # Placeholder for actual analysis and plotting logic
+    # if temp_file and no discharge_file:
+    #         final_df = process_data(discharge_file, temp_file, start_date, end_date)
+    #         if show_fig1:
+    #             # Figuur 1: debiet en temperatuur
+    #             st.subheader("📈 Temperatuur en debiet over tijd (controleer data)")
+    #             fig, ax1 = plt.subplots(figsize=(10, 4))
+    #             add_logo(fig, logopath)
+    #             ax1.plot(final_df.index, final_df['debiet'], label='Debiet (waarde)', color='blue')
+    #             ax1.set_ylabel('Debiet (m³/s)', color='blue')
+    #             ax1.tick_params(axis='y', labelcolor='blue')
+    #             ax2 = ax1.twinx()
+    #             ax2.plot(final_df.index, final_df['temperatuur'], label='Temperatuur (temp)', color='red')
+    #             ax2.set_ylabel('Temperatuur (°C)', color='red')
+    #             ax2.tick_params(axis='y', labelcolor='red')
+    #             ax1.set_xlabel("Datum")
+    #             fig.tight_layout()
+    #             ax1.legend(loc='upper left')
+    #             ax2.legend(loc='upper right')
+    #             ax1.grid(True)
+    #             st.pyplot(fig)
+            
+    #         # Berekeningen
+    #         df_hourly, monthly_summary, yearly_summary = calculate_temperature_adjustments_month(
+    #             final_df, threshold_temp_month, min_dif, delta_T, min_loz_month, max_deltaT=delta_T, method='estimation'
+    #         )
+        
+    #         if show_fig2:
+    #             # Figuur 2: jaarlijkse samenvatting
+    #             st.subheader("📊 Jaarlijkse samenvatting draaiuren en vollasturen")
+                
+    #             fig1, ax1 = plt.subplots(figsize=(14, 10))
+    #             st.dataframe(yearly_summary)
+
+    #             add_logo(fig1, logopath, position=(0.85, 0.85), zoom=0.2)
+                
+    #             positions_year = np.arange(len(yearly_summary))
+    #             bar_width = 0.4
+    #             bars_draaiuren = ax1.bar(positions_year, yearly_summary['Draaiuren'], bar_width, label='Draaiuren', color='red', edgecolor='black', alpha=0.7)
+    #             bars_vollasturen = ax1.bar(positions_year + bar_width, yearly_summary['Vollast_uren'], bar_width, label='Vollast uren', color='blue', edgecolor='black', alpha=0.7)
+    #             ax1.set_ylabel('Vollasturen (uren)', color='blue', fontsize=14)
+    #             ax1.tick_params(axis='y', labelcolor='blue')
+    #             ax2 = ax1.twinx()
+    #             ax2.plot(positions_year + bar_width / 2, yearly_summary['Gemiddelde_delta_T'], color='red', marker='o', label='Gemiddelde temperatuur')
+    #             ax2.set_ylabel('Gemiddelde temperatuur (°C)', color='red', fontsize=14)
+    #             ax2.tick_params(axis='y', labelcolor='red')
+    #             ax1.set_xlabel('Jaar', fontsize=14)
+    #             ax1.set_title('Jaarlijkse samenvatting: Vollasturen en temperatuur', fontsize=16)
+    #             ax1.set_xticks(positions_year + bar_width / 2)
+    #             ax1.set_xticklabels(yearly_summary['YearMonth'], fontsize=12)
+    #             for bar in bars_vollasturen:
+    #                 yval = bar.get_height()
+    #                 ax1.text(bar.get_x() + bar.get_width()/2, yval + 10, f'{yval:.0f}', ha='center', va='bottom', fontsize=13, color='black')
+    #             for bar in bars_draaiuren:
+    #                 yval = bar.get_height()
+    #                 ax1.text(bar.get_x() + bar.get_width()/2, yval + 10, f'{yval:.0f}', ha='center', va='bottom', fontsize=13, color='black')
+    #             for x, y in zip(positions_year + bar_width / 2, yearly_summary['Gemiddelde_delta_T']):
+    #                 ax2.text(x, y, f'{y:.1f}°C', ha='center', va='bottom', fontsize=13, color='black')
+    #             fig1.tight_layout()
+                
+    #             st.pyplot(fig1)
+            
+    #         if show_fig3:
+
+    
+    #             # Figuur 3: maandelijkse samenvatting
+    #             st.subheader("📉 Analyse watertemperatuur")
+    #             fig3 = plot_monthly_temperature(df_hourly, start_date, end_date, delta_T, 
+    #                                             min_loz_month, min_dif, threshold_temp_month,
+    #                                             maintenance, alleen_temp, titel=titel, plot_debiet=True,
+    #                                             logopath=logopath, fontsize=15, t_lim=[0, 30],
+    #                                             draaiseizoen_shade=True, wko=True
+    #                                             )
+    #             st.pyplot(fig3)
+        
+    
     if temp_file and discharge_file:
         st.write("Files uploaded successfully.")
         st.write(f"Start Date: {start_date_str}, End Date: {end_date_str}")
@@ -107,7 +182,6 @@ if st.button("🚀 Run Analysis"):
             fig1, ax1 = plt.subplots(figsize=(14, 10))
             st.dataframe(yearly_summary)
 
-            add_logo(fig1, logopath, position=(0.85, 0.85), zoom=0.2)
             
             positions_year = np.arange(len(yearly_summary))
             bar_width = 0.4
@@ -131,6 +205,9 @@ if st.button("🚀 Run Analysis"):
                 ax1.text(bar.get_x() + bar.get_width()/2, yval + 10, f'{yval:.0f}', ha='center', va='bottom', fontsize=13, color='black')
             for x, y in zip(positions_year + bar_width / 2, yearly_summary['Gemiddelde_delta_T']):
                 ax2.text(x, y, f'{y:.1f}°C', ha='center', va='bottom', fontsize=13, color='black')
+
+            add_logo(fig1, logopath, position=(0.85, 0.85), zoom=0.02)
+
             fig1.tight_layout()
             
             st.pyplot(fig1)
@@ -140,7 +217,7 @@ if st.button("🚀 Run Analysis"):
             st.subheader("📉 Analyse watertemperatuur")
             fig3 = plot_monthly_temperature(df_hourly, start_date, end_date, delta_T, 
                                             min_loz_month, min_dif, threshold_temp_month,
-                                            maintenance, alleen_temp, titel=titel, plot_debiet=True,
+                                            maintenance, alleen_temp, titel=titel, plot_debiet=False,
                                             logopath=logopath, fontsize=15, t_lim=[0, 30],
                                             draaiseizoen_shade=True, wko=True
                                             )
