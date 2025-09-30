@@ -157,8 +157,8 @@ def calculate_temperature_adjustments_month(df, threshold_temp_month, min_dif, d
 
 def plot_monthly_temperature(
     df_final, start_date, end_date, delta_T, min_loz, min_dif, threshold_temp,
-    maintenance_factor, alleen_temp, titel='naam', plot_debiet=True,
-    logopath=None, fontsize=15, t_lim=[0, 30],
+    maintenance_factor, alleen_temp, logopath, titel='naam', plot_debiet=True,
+    fontsize=15, t_lim=[0, 30],
     draaiseizoen_shade=True, wko=True
 ):
     """
@@ -172,8 +172,8 @@ def plot_monthly_temperature(
 
     # Create figure and axes
     if plot_debiet:
-        fig, (ax1, ax2) = plt.subplots(2, 1, figsize=(10, 25), sharex=True)
-        fig.suptitle(f'\n Analyse watertemperatuur, draaiuren en debiet\n\n{titel}', fontsize=fontsize+2)
+        fig, (ax1, ax2) = plt.subplots(2, 1, figsize=(10, 35), sharex=True)
+        fig.suptitle(f'\n Analyse watertemperatuur, draaiuren en debiet\n{titel}', fontsize=fontsize+2)
         ax1.set_title('Watertemperatuur', size=fontsize-2)
     else:
         fig, ax1 = plt.subplots(1, 1, figsize=(10, 10))
@@ -341,13 +341,10 @@ def add_logo(fig, logo_path="assets/logo.png", position=(0.85, 0.85), zoom=0.1):
     Als het logo niet gevonden wordt, gebruik dan een fallback-logo.
     """
     # Controleer of het opgegeven logo bestaat
-
-    
     
     if os.path.exists(logo_path):
         logo_img = mpimg.imread(logo_path)
         fig.figimage(logo_img, xo=int(fig.bbox.xmax * position[0]), yo=int(fig.bbox.ymax * position[1]), origin='upper', zorder=10, resize=True)
-        return fig
     else:
         print("Bestaat bestand?", os.path.exists(logo_path))
         print(f"❌ Geen logo beschikbaar. Controleer pad: {logo_path}")

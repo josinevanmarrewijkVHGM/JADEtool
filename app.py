@@ -77,6 +77,7 @@ if st.button("🚀 Run Analysis"):
         final_df = process_data(discharge_file, temp_file, start_date, end_date)
         if show_fig1:
             # Figuur 1: debiet en temperatuur
+            st.markdown("---")
             st.subheader("📈 Temperatuur en debiet over tijd (controleer data)")
             fig, ax1 = plt.subplots(figsize=(10, 4))
             ax1.plot(final_df.index, final_df['debiet'], label='Debiet (waarde)', color='blue')
@@ -101,6 +102,7 @@ if st.button("🚀 Run Analysis"):
     
         if show_fig2:
             # Figuur 2: jaarlijkse samenvatting
+            st.markdown("---")
             st.subheader("📊 Jaarlijkse samenvatting draaiuren en vollasturen")
             st.dataframe(yearly_summary)
 
@@ -129,13 +131,14 @@ if st.button("🚀 Run Analysis"):
                 ax2.text(x, y, f'{y:.1f}°C', ha='center', va='bottom', fontsize=13, color='black')
 
             # fig1.tight_layout()
-            fig1.tight_layout()
+            fig1.tight_layout(pad=2.0)
             add_logo(fig1, logopath, position=(0.95, 0.85), zoom=0.1)
 
             st.pyplot(fig1)
         
         if show_fig3:
             # Figuur 3: maandelijkse samenvatting
+            st.markdown("---")
             st.subheader("📉 Analyse watertemperatuur")
             if plot_debiet:
                 # fig3, (ax1, ax2) = plt.subplots(2, 1, figsize=(15, 25), sharex=True)
@@ -163,13 +166,14 @@ if st.button("🚀 Run Analysis"):
             # Figuur 1: debiet en temperatuur
             st.subheader("📈 Temperatuur en debiet over tijd (controleer data)")
             fig, ax2 = plt.subplots(figsize=(10, 4))
-            add_logo(fig, logopath)
             ax2.plot(final_df.index, final_df['temperatuur'], label='Temperatuur (temp)', color='red')
             ax2.set_ylabel('Temperatuur (°C)', color='red')
             ax2.tick_params(axis='y', labelcolor='red')
             ax2.set_xlabel("Datum")
+            ax2.grid()
             fig.tight_layout()
             ax2.legend(loc='upper right')
+            add_logo(fig, logopath,  position=(0.95, 0.85), zoom=0.1)
             st.pyplot(fig)
         
         #         # Berekeningen
