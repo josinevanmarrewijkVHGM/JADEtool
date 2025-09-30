@@ -17,7 +17,6 @@ logopath = "assets/logo.png"
 st.set_page_config(page_title="Water Analysis Tool", layout="wide")
 
 # Title and logo
-logopath = "logo.png"
 if os.path.exists(logopath):
     st.image(logopath, width=100)
 st.title("🔍 Water Temperature & Discharge Analysis Tool")
@@ -38,7 +37,6 @@ with st.sidebar:
 
     st.header("⚙️ Analysis Parameters")
     delta_T = st.slider("Temperature Difference (°K)", min_value=2, max_value=12, value=10)
-    max_deltaT = delta_T
     maintenance = st.number_input("Maintenance Factor", min_value=0.0, max_value=1.0, value=0.2, step=0.01)
     min_dif = st.selectbox("Minimum Difference", options=[2, 3, 4], index=1)
 
@@ -98,12 +96,13 @@ if st.button("🚀 Run Analysis"):
         
         # Berekeningen
         df_hourly, monthly_summary, yearly_summary = calculate_temperature_adjustments_month(
-            final_df, threshold_temp_month, min_dif, delta_T, min_loz_month, max_deltaT, method='estimation'
+            final_df, threshold_temp_month, min_dif, delta_T, min_loz_month, max_deltaT=delta_T, method='estimation'
         )
     
         if show_fig2:
             # Figuur 2: jaarlijkse samenvatting
             st.subheader("📊 Jaarlijkse samenvatting")
+            
             fig1, ax1 = plt.subplots(figsize=(14, 5))
             positions_year = np.arange(len(yearly_summary))
             bar_width = 0.4
@@ -127,7 +126,9 @@ if st.button("🚀 Run Analysis"):
                 ax1.text(bar.get_x() + bar.get_width()/2, yval + 10, f'{yval:.0f}', ha='center', va='bottom', fontsize=13, color='black')
             for x, y in zip(positions_year + bar_width / 2, yearly_summary['Avg_del_T']):
                 ax2.text(x, y, f'{y:.1f}°C', ha='center', va='bottom', fontsize=13, color='black')
+            add_logo(fig1, logopath, position=(0.12, 0.98), zoom=0.12)
             fig1.tight_layout()
+            
             st.dataframe(yearly_summary)
             st.pyplot(fig1)
         
