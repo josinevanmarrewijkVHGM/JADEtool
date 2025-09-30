@@ -13,7 +13,7 @@ import matplotlib.image as mpimg
 # from matplotlib.offsetbox import OffsetImage, AnnotationBbox
 
 # Set the font to Tahoma
-plt.rcParams['font.family'] = 'Tahoma'
+# plt.rcParams['font.family'] = 'Tahoma'
 
 red = to_rgb('#ee1c25')
 blue = to_rgb('#003d73')
@@ -132,7 +132,7 @@ def calculate_temperature_adjustments_month(df, threshold_temp_month, min_dif, d
         Draaiuren=('Above_Threshold', 'sum'),
         Gemiddelde_delta_T =('Temp_Difference', 'mean')
     ).reset_index()
-    yearly_summary['Vollast_uren'] = (yearly_summary['Avg_del_T'] / delta_T) * yearly_summary['Hours']
+    yearly_summary['Vollast_uren'] = (yearly_summary['Gemiddelde_delta_T'] / delta_T) * yearly_summary['Draaiuren']
     yearly_summary = yearly_summary.round({"Gemiddelde_delta_T": 2, "Vollast_uren": 0})
     
     return df_hourly, monthly_summary, yearly_summary 
@@ -162,3 +162,4 @@ def add_logo(fig, logo_path="assets/logo.png", fallback_path="assets/fallback_lo
     # ax_logo.axis('off')
 
     
+
