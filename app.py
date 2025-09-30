@@ -102,11 +102,10 @@ if st.button("🚀 Run Analysis"):
         if show_fig2:
             # Figuur 2: jaarlijkse samenvatting
             st.subheader("📊 Jaarlijkse samenvatting draaiuren en vollasturen")
-            
+            st.dataframe(yearly_summary)
+
             fig1, ax1 = plt.subplots(figsize=(14, 10))
-
-            add_logo(fig1, logopath, position=(0.75, 0.85), zoom=0.05)
-
+            add_logo(fig1, logopath, position=(0.95, 0.85), zoom=0.01)
             positions_year = np.arange(len(yearly_summary))
             bar_width = 0.4
             bars_draaiuren = ax1.bar(positions_year, yearly_summary['Draaiuren'], bar_width, label='Draaiuren', color='red', edgecolor='black', alpha=0.7)
@@ -132,7 +131,6 @@ if st.button("🚀 Run Analysis"):
 
 
             # fig1.tight_layout()
-            st.dataframe(yearly_summary)
             fig1.tight_layout()
             st.pyplot(fig1)
         
