@@ -129,11 +129,11 @@ def calculate_temperature_adjustments_month(df, threshold_temp_month, min_dif, d
     non_zero = df_hourly[df_hourly['Temp_Difference'].notna()]
     yearly_summary = non_zero.groupby('YearMonth').agg(
         Count=('Temp_Difference', 'size'),
-        Hours=('Above_Threshold', 'sum'),
-        Avg_del_T=('Temp_Difference', 'mean')
+        Draaiuren=('Above_Threshold', 'sum'),
+        Gemiddelde_delta_T =('Temp_Difference', 'mean')
     ).reset_index()
     yearly_summary['Vollast_uren'] = (yearly_summary['Avg_del_T'] / delta_T) * yearly_summary['Hours']
-    yearly_summary = yearly_summary.round({"Avg_del_T": 2, "Vollast_uren": 2})
+    yearly_summary = yearly_summary.round({"Gemiddelde_delta_T": 2, "Vollast_uren": 0})
     
     return df_hourly, monthly_summary, yearly_summary 
 
@@ -145,19 +145,20 @@ def add_logo(fig, logo_path="assets/logo.png", fallback_path="assets/fallback_lo
     Als het logo niet gevonden wordt, gebruik dan een fallback-logo.
     """
     # Controleer of het opgegeven logo bestaat
-    if not os.path.exists(logo_path):
-        print(f"⚠️ Logo niet gevonden op pad: {logo_path}. Fallback-logo wordt gebruikt.")
-        logo_path = fallback_path
 
-    # Controleer of fallback bestaat
-    if not os.path.exists(logo_path):
+    
+    
+    if os.path.exists(logo_path):
+        logo_img = mpimg.imread(logo_path)
+        fig.figimage(logo_img, xo=int(fig.bbox.xmax * position[0]), yo=int(fig.bbox.ymax * position[1]), origin='upper', zorder=10, resize=True)
+    else:
+        print("Bestaat bestand?", os.path.exists(logo_path))
         print(f"❌ Geen logo beschikbaar. Controleer pad: {logo_path}")
         return  # Stop zonder fout
 
-    # Lees en voeg logo toe
-    logo = mpimg.imread(logo_path)
-    ax_logo = fig.add_axes([position[0], position[1], zoom, zoom], anchor='NE', zorder=1)
-    ax_logo.imshow(logo)
-    ax_logo.axis('off')
+    # logo = mpimg.imread(logo_path)
+    # ax_logo = fig.add_axes([position[0], position[1], zoom, zoom], anchor='NE', zorder=1)
+    # ax_logo.imshow(logo)
+    # ax_logo.axis('off')
 
     

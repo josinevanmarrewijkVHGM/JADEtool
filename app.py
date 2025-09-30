@@ -104,7 +104,8 @@ if st.button("🚀 Run Analysis"):
             st.subheader("📊 Jaarlijkse samenvatting draaiuren en vollasturen")
             
             fig1, ax1 = plt.subplots(figsize=(14, 10))
-            add_logo(fig1, logopath, position=(0.98, 0.98), zoom=0.2)
+
+            add_logo(fig1, logopath, position=(0.85, 0.85), zoom=0.2)
 
             positions_year = np.arange(len(yearly_summary))
             bar_width = 0.4
