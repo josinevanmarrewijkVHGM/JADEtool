@@ -32,8 +32,7 @@ blue = to_rgb('#003d73')
 rhow = 998 #kg/m3
 cp = 4185 # warmtecoefficient water J/ (kg*K)
 cp_adjusted = 4200 * 1000/3600 # warmtecoefficient water kWh/(m^3 K)  
-import pandas as pd
-import numpy as np
+
 
 def process_data(debiet_file, temperature_file, start_date, end_date):
     def read_and_prepare(file_path, file_type):
@@ -63,6 +62,8 @@ def process_data(debiet_file, temperature_file, start_date, end_date):
     # Handle debiet file conditionally
     if debiet_file:
         df_debiet = read_and_prepare(debiet_file, 'Debiet')
+    
+    
     else:
         df_debiet = pd.DataFrame()
 

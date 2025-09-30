@@ -90,7 +90,7 @@ if st.button("🚀 Run Analysis"):
             ax1.legend(loc='upper left')
             ax2.legend(loc='upper right')
             ax1.grid(True)
-            add_logo(fig, logopath, position=(0.9, 0.1), zoom=0.05)
+            # add_logo(fig, logopath, position=(0.9, 0.1), zoom=0.05)
             fig.tight_layout()
             st.pyplot(fig)
         
@@ -156,6 +156,7 @@ if st.button("🚀 Run Analysis"):
         st.write(f"Start Date: {start_date_str}, End Date: {end_date_str}")
         st.write(f"Delta T: {delta_T} Kelvin, Maintenance: {maintenance}, Minimaal verschil: {min_dif} Kelvin")
         st.write(f"Threshold Temperatures: {threshold_temp_month} °C")
+        dicharge_file = None
         final_df = process_data(discharge_file, temp_file, start_date, end_date)
         if show_fig1:
             # Figuur 1: debiet en temperatuur
