@@ -104,17 +104,18 @@ if st.button("🚀 Run Analysis"):
             st.subheader("📊 Jaarlijkse samenvatting draaiuren en vollasturen")
             
             fig1, ax1 = plt.subplots(figsize=(14, 10))
+            st.dataframe(yearly_summary)
 
             add_logo(fig1, logopath, position=(0.85, 0.85), zoom=0.2)
-
+            
             positions_year = np.arange(len(yearly_summary))
             bar_width = 0.4
-            bars_draaiuren = ax1.bar(positions_year, yearly_summary['Hours'], bar_width, label='Draaiuren', color='red', edgecolor='black', alpha=0.7)
+            bars_draaiuren = ax1.bar(positions_year, yearly_summary['Draaiuren'], bar_width, label='Draaiuren', color='red', edgecolor='black', alpha=0.7)
             bars_vollasturen = ax1.bar(positions_year + bar_width, yearly_summary['Vollast_uren'], bar_width, label='Vollast uren', color='blue', edgecolor='black', alpha=0.7)
             ax1.set_ylabel('Vollasturen (uren)', color='blue', fontsize=14)
             ax1.tick_params(axis='y', labelcolor='blue')
             ax2 = ax1.twinx()
-            ax2.plot(positions_year + bar_width / 2, yearly_summary['Avg_del_T'], color='red', marker='o', label='Gemiddelde temperatuur')
+            ax2.plot(positions_year + bar_width / 2, yearly_summary['Gemiddelde_delta_T'], color='red', marker='o', label='Gemiddelde temperatuur')
             ax2.set_ylabel('Gemiddelde temperatuur (°C)', color='red', fontsize=14)
             ax2.tick_params(axis='y', labelcolor='red')
             ax1.set_xlabel('Jaar', fontsize=14)
@@ -127,11 +128,10 @@ if st.button("🚀 Run Analysis"):
             for bar in bars_draaiuren:
                 yval = bar.get_height()
                 ax1.text(bar.get_x() + bar.get_width()/2, yval + 10, f'{yval:.0f}', ha='center', va='bottom', fontsize=13, color='black')
-            for x, y in zip(positions_year + bar_width / 2, yearly_summary['Avg_del_T']):
+            for x, y in zip(positions_year + bar_width / 2, yearly_summary['Gemiddelde_delta_T']):
                 ax2.text(x, y, f'{y:.1f}°C', ha='center', va='bottom', fontsize=13, color='black')
             fig1.tight_layout()
             
-            st.dataframe(yearly_summary)
             st.pyplot(fig1)
         
         if show_fig3:
