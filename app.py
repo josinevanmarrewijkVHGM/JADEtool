@@ -79,7 +79,7 @@ if st.button("🚀 Run Analysis"):
             # Figuur 1: debiet en temperatuur
             st.subheader("📈 Temperatuur en debiet over tijd (controleer data)")
             fig, ax1 = plt.subplots(figsize=(10, 4))
-            add_logo(fig, logopath, position=(0.75, 0.85), zoom=0.05)
+            add_logo(fig, logopath, position=(0.9, 0.1), zoom=0.05)
             ax1.plot(final_df.index, final_df['debiet'], label='Debiet (waarde)', color='blue')
             ax1.set_ylabel('Debiet (m³/s)', color='blue')
             ax1.tick_params(axis='y', labelcolor='blue')
@@ -88,10 +88,10 @@ if st.button("🚀 Run Analysis"):
             ax2.set_ylabel('Temperatuur (°C)', color='red')
             ax2.tick_params(axis='y', labelcolor='red')
             ax1.set_xlabel("Datum")
-            fig.tight_layout()
             ax1.legend(loc='upper left')
             ax2.legend(loc='upper right')
             ax1.grid(True)
+            fig.tight_layout()
             st.pyplot(fig)
         
         # Berekeningen
@@ -133,6 +133,7 @@ if st.button("🚀 Run Analysis"):
 
             # fig1.tight_layout()
             st.dataframe(yearly_summary)
+            fig1.tight_layout()
             st.pyplot(fig1)
         
         if show_fig3:
@@ -146,7 +147,7 @@ if st.button("🚀 Run Analysis"):
                                                 logopath=logopath, fontsize=15, t_lim=[0, 30],
                                                 draaiseizoen_shade=True, wko=True
                                                 )
-                add_logo(fig3, logopath, position=(0.12, 0.98), zoom=0.005)
+                add_logo(fig3, logopath, position=(0.1, 0.98), zoom=0.005)
 
                 st.pyplot(fig3)
 
