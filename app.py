@@ -139,7 +139,8 @@ if st.button("🚀 Run Analysis"):
         if show_fig3:
             # Figuur 3: maandelijkse samenvatting
             st.subheader("📉 Analyse watertemperatuur")
-            fig3 = plot_monthly_temperature(df_hourly, start_date, end_date, delta_T, 
+            fig3, ax = plt.subplots()
+            fig3, ax = plot_monthly_temperature(df_hourly, start_date, end_date, delta_T, 
                                             min_loz_month, min_dif, threshold_temp_month,
                                             maintenance, alleen_temp, titel=titel, plot_debiet=False,
                                             logopath=logopath, fontsize=15, t_lim=[0, 30],
