@@ -38,7 +38,7 @@ with st.sidebar:
 
     st.header("⚙️ Analysis Parameters")
     delta_T = st.slider("Temperature Difference (°K)", min_value=2, max_value=12, value=10)
-    max_delta_T = delta_T
+    max_deltaT = delta_T
     maintenance = st.number_input("Maintenance Factor", min_value=0.0, max_value=1.0, value=0.2, step=0.01)
     min_dif = st.selectbox("Minimum Difference", options=[2, 3, 4], index=1)
 
