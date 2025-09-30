@@ -25,7 +25,7 @@ st.title("🔍 Water Temperature & Discharge Analysis Tool")
 # Sidebar for file upload and parameters
 with st.sidebar:
     st.header("📁 Upload Data Files")
-    titel = "Maas"
+    titel = st.text_input("Titel", value="Naam watergang", max_chars=100)    
     temp_file = st.file_uploader("Upload Water Temperature CSV", type="csv")
     discharge_file = st.file_uploader("Upload Discharge CSV (optional)", type="csv")
 
