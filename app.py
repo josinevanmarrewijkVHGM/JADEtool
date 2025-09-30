@@ -1,6 +1,6 @@
 import streamlit as st
 import pandas as pd
-from utils import process_data, calculate_temperature_adjustments_month, add_logo
+from utils import process_data, calculate_temperature_adjustments_month, add_logo, plot_monthly_temperature
 import matplotlib.pyplot as plt
 from datetime import datetime
 import numpy as np
@@ -10,7 +10,7 @@ red = to_rgb('#ee1c25')
 blue = to_rgb('#003d73')
 logopath = "assets/logo.png"
 
-
+alleen_temp = False
 
 
 # Page configuration
@@ -137,7 +137,14 @@ if st.button("🚀 Run Analysis"):
         if show_fig3:
             # Figuur 3: maandelijkse samenvatting
             st.subheader("📉 Analyse watertemperatuur")
-            
+            fig3 = plot_monthly_temperature(df_hourly, start_date, end_date, delta_T, 
+                                            min_loz_month, min_dif, threshold_temp_month,
+                                            maintenance, alleen_temp, max_deb=25, titel='naam', plot_debiet=True,
+                                            logopath=logopath, fontsize=15, t_lim=[0, 30],
+                                            draaiseizoen_shade=True, wko=True
+                                            )
+            st.pyplot(fig3)
+
             
     else:
         st.error("Please upload both temperature and discharge CSV files to proceed.")
