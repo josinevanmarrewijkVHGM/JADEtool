@@ -73,7 +73,7 @@ if st.button("🚀 Run Analysis"):
         st.write(f"Start Date: {start_date_str}, End Date: {end_date_str}")
         st.write(f"Delta T: {delta_T} Kelvin, Maintenance: {maintenance}, Minimaal verschil: {min_dif} Kelvin")
         st.write(f"Threshold Temperatures: {threshold_temp_month} °C")
-
+        plot_debiet = True
 
         final_df = process_data(discharge_file, temp_file, start_date, end_date)
         if show_fig1:
@@ -139,14 +139,15 @@ if st.button("🚀 Run Analysis"):
         if show_fig3:
             # Figuur 3: maandelijkse samenvatting
             st.subheader("📉 Analyse watertemperatuur")
-            fig3, ax = plt.subplots()
-            fig3, ax = plot_monthly_temperature(df_hourly, start_date, end_date, delta_T, 
-                                            min_loz_month, min_dif, threshold_temp_month,
-                                            maintenance, alleen_temp, titel=titel, plot_debiet=False,
-                                            logopath=logopath, fontsize=15, t_lim=[0, 30],
-                                            draaiseizoen_shade=True, wko=True
-                                            )
-            st.pyplot(fig3)
+            if plot_debiet:
+                fig3, (ax1, ax2) = plt.subplots()
+                fig3, (ax1, ax2) = plot_monthly_temperature(df_hourly, start_date, end_date, delta_T, 
+                                                min_loz_month, min_dif, threshold_temp_month,
+                                                maintenance, alleen_temp, titel=titel, plot_debiet=plot_debiet,
+                                                logopath=logopath, fontsize=15, t_lim=[0, 30],
+                                                draaiseizoen_shade=True, wko=True
+                                                )
+                st.pyplot(fig3)
 
         # Placeholder for actual analysis and plotting logic
         # if temp_file and no discharge_file:
