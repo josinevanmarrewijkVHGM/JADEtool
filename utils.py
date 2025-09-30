@@ -32,20 +32,19 @@ blue = to_rgb('#003d73')
 rhow = 998 #kg/m3
 cp = 4185 # warmtecoefficient water J/ (kg*K)
 cp_adjusted = 4200 * 1000/3600 # warmtecoefficient water kWh/(m^3 K)  
+import pandas as pd
+import numpy as np
 
 def process_data(debiet_file, temperature_file, start_date, end_date):
     def read_and_prepare(file_path, file_type):
         df = pd.read_csv(file_path, delimiter=';', encoding='ISO-8859-1')
         print(f'{file_type} columns:', df.columns)
 
-
         for col in df.columns:
             if col != 'DateTime':
                 df[col] = pd.to_numeric(df[col], errors='coerce')
-                # Outlier removal: z-score methode
                 col_mean = df[col].mean()
                 col_std = df[col].std()
-                # Houd alleen waarden binnen 3 standaarddeviaties
                 df = df[(df[col] - col_mean).abs() <= 10 * col_std]
 
         if 'DateTime' in df.columns:
@@ -61,11 +60,21 @@ def process_data(debiet_file, temperature_file, start_date, end_date):
 
         return df
 
-    df_debiet = read_and_prepare(debiet_file, 'Debiet')
+    # Handle debiet file conditionally
+    if debiet_file:
+        df_debiet = read_and_prepare(debiet_file, 'Debiet')
+    else:
+        df_debiet = pd.DataFrame()
+
     df_temp = read_and_prepare(temperature_file, 'Temperature')
-    df_temp.replace(-999, np.nan, inplace=True)    
-    final_df = pd.merge(df_debiet, df_temp, left_index=True, right_index=True, how='outer')
-    final_df.columns = ['debiet', 'temperatuur'] + list(final_df.columns[2:])
+    df_temp.replace(-999, np.nan, inplace=True)
+
+    if not df_debiet.empty:
+        final_df = pd.merge(df_debiet, df_temp, left_index=True, right_index=True, how='outer')
+        final_df.columns = ['debiet', 'temperatuur'] + list(final_df.columns[2:])
+    else:
+        final_df = df_temp.copy()
+        final_df.columns = ['temperatuur'] + list(final_df.columns[1:])
 
     try:
         start_date = pd.to_datetime(start_date)
@@ -162,11 +171,11 @@ def plot_monthly_temperature(
 
     # Create figure and axes
     if plot_debiet:
-        fig, (ax1, ax2) = plt.subplots(2, 1, figsize=(15, 25), sharex=True)
+        fig, (ax1, ax2) = plt.subplots(2, 1, figsize=(10, 25), sharex=True)
         fig.suptitle(f'\n Analyse watertemperatuur, draaiuren en debiet\n\n{titel}', fontsize=fontsize+2)
         ax1.set_title('Watertemperatuur', size=fontsize-2)
     else:
-        fig, ax1 = plt.subplots(1, 1, figsize=(15, 10))
+        fig, ax1 = plt.subplots(1, 1, figsize=(10, 10))
         fig.suptitle(f'\n', fontsize=fontsize)
         ax1.set_title(f'Watertemperatuur {titel}', size=fontsize+2)
 

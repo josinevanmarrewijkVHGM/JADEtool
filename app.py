@@ -149,35 +149,32 @@ if st.button("🚀 Run Analysis"):
 
         # Placeholder for actual analysis and plotting logic
         # if temp_file and no discharge_file:
-            # st.write("Temperature file uploaded successfully.")
-            # st.write(f"Start Date: {start_date_str}, End Date: {end_date_str}")
-            # st.write(f"Delta T: {delta_T} Kelvin, Maintenance: {maintenance}, Minimaal verschil: {min_dif} Kelvin")
-            # st.write(f"Threshold Temperatures: {threshold_temp_month} °C")
-        #         final_df = process_data(discharge_file, temp_file, start_date, end_date)
-        #         if show_fig1:
-        #             # Figuur 1: debiet en temperatuur
-        #             st.subheader("📈 Temperatuur en debiet over tijd (controleer data)")
-        #             fig, ax1 = plt.subplots(figsize=(10, 4))
-        #             add_logo(fig, logopath)
-        #             ax1.plot(final_df.index, final_df['debiet'], label='Debiet (waarde)', color='blue')
-        #             ax1.set_ylabel('Debiet (m³/s)', color='blue')
-        #             ax1.tick_params(axis='y', labelcolor='blue')
-        #             ax2 = ax1.twinx()
-        #             ax2.plot(final_df.index, final_df['temperatuur'], label='Temperatuur (temp)', color='red')
-        #             ax2.set_ylabel('Temperatuur (°C)', color='red')
-        #             ax2.tick_params(axis='y', labelcolor='red')
-        #             ax1.set_xlabel("Datum")
-        #             fig.tight_layout()
-        #             ax1.legend(loc='upper left')
-        #             ax2.legend(loc='upper right')
-        #             ax1.grid(True)
-        #             st.pyplot(fig)
-                
+        
+    if temp_file and not discharge_file:
+        # Your code here
+        st.write("Temperature file uploaded successfully.")
+        st.write(f"Start Date: {start_date_str}, End Date: {end_date_str}")
+        st.write(f"Delta T: {delta_T} Kelvin, Maintenance: {maintenance}, Minimaal verschil: {min_dif} Kelvin")
+        st.write(f"Threshold Temperatures: {threshold_temp_month} °C")
+        final_df = process_data(discharge_file, temp_file, start_date, end_date)
+        if show_fig1:
+            # Figuur 1: debiet en temperatuur
+            st.subheader("📈 Temperatuur en debiet over tijd (controleer data)")
+            fig, ax2 = plt.subplots(figsize=(10, 4))
+            add_logo(fig, logopath)
+            ax2.plot(final_df.index, final_df['temperatuur'], label='Temperatuur (temp)', color='red')
+            ax2.set_ylabel('Temperatuur (°C)', color='red')
+            ax2.tick_params(axis='y', labelcolor='red')
+            ax2.set_xlabel("Datum")
+            fig.tight_layout()
+            ax2.legend(loc='upper right')
+            st.pyplot(fig)
+        
         #         # Berekeningen
-        #         df_hourly, monthly_summary, yearly_summary = calculate_temperature_adjustments_month(
-        #             final_df, threshold_temp_month, min_dif, delta_T, min_loz_month, max_deltaT=delta_T, method='estimation'
-        #         )
-            
+            df_hourly, monthly_summary, yearly_summary = calculate_temperature_adjustments_month(
+                final_df, threshold_temp_month, min_dif, delta_T, min_loz_month, max_deltaT=delta_T, method='estimation'
+            )
+        
         #         if show_fig2:
         #             # Figuur 2: jaarlijkse samenvatting
         #             st.subheader("📊 Jaarlijkse samenvatting draaiuren en vollasturen")
