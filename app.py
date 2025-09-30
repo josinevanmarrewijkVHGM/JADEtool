@@ -70,8 +70,8 @@ if st.button("🚀 Run Analysis"):
     if temp_file and discharge_file:
         st.write("Files uploaded successfully.")
         st.write(f"Start Date: {start_date_str}, End Date: {end_date_str}")
-        st.write(f"Delta T: {delta_T}, Maintenance: {maintenance}, Min Difference: {min_dif}")
-        st.write(f"Threshold Temperatures: {threshold_temp_month}")
+        st.write(f"Delta T: {delta_T} Kelvin, Maintenance: {maintenance}, Minimaal verschil: {min_dif} Kelvin")
+        st.write(f"Threshold Temperatures: {threshold_temp_month} °C")
 
 
         final_df = process_data(discharge_file, temp_file, start_date, end_date)
@@ -101,9 +101,11 @@ if st.button("🚀 Run Analysis"):
     
         if show_fig2:
             # Figuur 2: jaarlijkse samenvatting
-            st.subheader("📊 Jaarlijkse samenvatting")
+            st.subheader("📊 Jaarlijkse samenvatting draaiuren en vollasturen")
             
-            fig1, ax1 = plt.subplots(figsize=(14, 5))
+            fig1, ax1 = plt.subplots(figsize=(14, 10))
+            add_logo(fig1, logopath, position=(0.98, 0.98), zoom=0.2)
+
             positions_year = np.arange(len(yearly_summary))
             bar_width = 0.4
             bars_draaiuren = ax1.bar(positions_year, yearly_summary['Hours'], bar_width, label='Draaiuren', color='red', edgecolor='black', alpha=0.7)
@@ -126,7 +128,6 @@ if st.button("🚀 Run Analysis"):
                 ax1.text(bar.get_x() + bar.get_width()/2, yval + 10, f'{yval:.0f}', ha='center', va='bottom', fontsize=13, color='black')
             for x, y in zip(positions_year + bar_width / 2, yearly_summary['Avg_del_T']):
                 ax2.text(x, y, f'{y:.1f}°C', ha='center', va='bottom', fontsize=13, color='black')
-            add_logo(fig1, logopath, position=(0.12, 0.98), zoom=0.12)
             fig1.tight_layout()
             
             st.dataframe(yearly_summary)
