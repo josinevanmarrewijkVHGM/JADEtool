@@ -316,7 +316,7 @@ def plot_monthly_temperature(
 
     ax1.legend(loc='upper left', fontsize=fontsize-2, ncol=2)
 
-    add_logo(fig, logopath, position=(0.12, 0.98), zoom=0.005)
+    add_logo(fig, logopath, position=(0.12, 0.98), zoom=0.12)
 
     fig.tight_layout()
     
