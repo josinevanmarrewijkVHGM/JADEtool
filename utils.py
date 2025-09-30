@@ -14,6 +14,7 @@ from matplotlib.dates import date2num
 
 import os
 import matplotlib.image as mpimg
+plt.rcParams['font.family'] = 'sans-serif'
 # from matplotlib.offsetbox import OffsetImage, AnnotationBbox
 
 # Set the font to Tahoma
@@ -314,7 +315,7 @@ def plot_monthly_temperature(
                  bbox=dict(facecolor='k', alpha=0.1, edgecolor='black'), ha='center')
 
     ax1.legend(loc='upper left', fontsize=fontsize-2, ncol=2)
-
+    add_logo(fig, logopath, position=(0.1, 0.98), zoom=0.005)
     fig.tight_layout()
     if plot_debiet:
         return fig, (ax1, ax2)
@@ -336,6 +337,7 @@ def add_logo(fig, logo_path="assets/logo.png", position=(0.85, 0.85), zoom=0.1):
     if os.path.exists(logo_path):
         logo_img = mpimg.imread(logo_path)
         fig.figimage(logo_img, xo=int(fig.bbox.xmax * position[0]), yo=int(fig.bbox.ymax * position[1]), origin='upper', zorder=10, resize=True)
+        return fig
     else:
         print("Bestaat bestand?", os.path.exists(logo_path))
         print(f"❌ Geen logo beschikbaar. Controleer pad: {logo_path}")
