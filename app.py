@@ -154,7 +154,7 @@ if st.button("🚀 Run Analysis"):
         # Placeholder for actual analysis and plotting logic
         # if temp_file and no discharge_file:
         
-    if temp_file and not discharge_file:
+    elif temp_file and not discharge_file:
         # Your code here
         st.write("Temperature file uploaded successfully.")
         st.write(f"Start Date: {start_date_str}, End Date: {end_date_str}")
