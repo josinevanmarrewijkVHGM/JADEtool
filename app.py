@@ -105,7 +105,6 @@ if st.button("🚀 Run Analysis"):
             st.subheader("📊 Jaarlijkse samenvatting draaiuren en vollasturen")
             
             fig1, ax1 = plt.subplots(figsize=(14, 10))
-            st.dataframe(yearly_summary)
 
             
             positions_year = np.arange(len(yearly_summary))
@@ -131,10 +130,10 @@ if st.button("🚀 Run Analysis"):
             for x, y in zip(positions_year + bar_width / 2, yearly_summary['Gemiddelde_delta_T']):
                 ax2.text(x, y, f'{y:.1f}°C', ha='center', va='bottom', fontsize=13, color='black')
 
-            add_logo(fig1, logopath, position=(0.75, 0.85), zoom=0.12)
+            add_logo(fig1, logopath, position=(0.75, 0.85), zoom=0.5)
 
             # fig1.tight_layout()
-            
+            st.dataframe(yearly_summary)
             st.pyplot(fig1)
         
         if show_fig3:

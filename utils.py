@@ -299,7 +299,6 @@ def plot_monthly_temperature(
         f"$\\bf{{Uitgangspunten   }} $" + '\n'
         f"ΔT max: {delta_T} Kelvin\n"
         f"{min_loz_text}\n\n"
-        f"$\\bf{{Resultaten}}$ " + '\n'
         f"Gem. aantal draaiuren = {avg_draaiuren:,.0f}".replace(',', '.') + '\n'
         f"Ontwerp draaiuren = {avg_draaiuren / (1 + maintenance_factor):,.0f}".replace(',', '.') + '\n'
         "Gem. ΔT = " + f"{avg_delta_T_all_years:.2f}".replace('.', ',') + " Kelvin" + '\n'
@@ -316,7 +315,7 @@ def plot_monthly_temperature(
 
     ax1.legend(loc='upper left', fontsize=fontsize-2, ncol=2)
 
-    add_logo(fig, logopath, position=(0.12, 0.98), zoom=0.12)
+    add_logo(fig, logopath, position=(0.12, 0.98), zoom=0.05)
 
     fig.tight_layout()
     
