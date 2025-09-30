@@ -129,7 +129,7 @@ if st.button("🚀 Run Analysis"):
             for x, y in zip(positions_year + bar_width / 2, yearly_summary['Gemiddelde_delta_T']):
                 ax2.text(x, y, f'{y:.1f}°C', ha='center', va='bottom', fontsize=13, color='black')
 
-            add_logo(fig1, logopath, position=(0.75, 0.85), zoom=0.5)
+            add_logo(fig1, logopath, position=(0.75, 0.85), zoom=0.05)
 
             # fig1.tight_layout()
             st.dataframe(yearly_summary)
@@ -146,6 +146,8 @@ if st.button("🚀 Run Analysis"):
                                                 logopath=logopath, fontsize=15, t_lim=[0, 30],
                                                 draaiseizoen_shade=True, wko=True
                                                 )
+                add_logo(fig3, logopath, position=(0.12, 0.98), zoom=0.05)
+
                 st.pyplot(fig3)
 
         # Placeholder for actual analysis and plotting logic
