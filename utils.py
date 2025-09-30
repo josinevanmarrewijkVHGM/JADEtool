@@ -146,7 +146,7 @@ def calculate_temperature_adjustments_month(df, threshold_temp_month, min_dif, d
 
 def plot_monthly_temperature(
     df_final, start_date, end_date, delta_T, min_loz, min_dif, threshold_temp,
-    maintenance_factor, alleen_temp, max_deb=25, titel='naam', plot_debiet=True,
+    maintenance_factor, alleen_temp, titel='naam', plot_debiet=True,
     logopath=None, fontsize=15, t_lim=[0, 30],
     draaiseizoen_shade=True, wko=True
 ):
@@ -203,7 +203,7 @@ def plot_monthly_temperature(
         ax2.set_title('Debiet', size=fontsize-2)
         ax2.set_xlabel('Datum', fontsize=fontsize-2)
         ax2.set_ylabel('Debiet [m³/s]', fontsize=fontsize-2)
-        ax2.set_ylim(0, max_deb)
+        ax2.set_ylim(0,  np.max(df['debiet']))
 
     # Shade draaiseizoen
     if draaiseizoen_shade:
@@ -270,11 +270,15 @@ def plot_monthly_temperature(
         debiet_inschatting = percentile_10th * 0.1
         deb = debiet_inschatting * 3600
         MWH = avg_delta_T_all_years * avg_draaiuren / (1 + maintenance_factor) * deb * 4185 * 998 / 3600 / 10**6 
-        # MWH = round(MWH / 500) * 500
+        MWH = round(MWH / 500) * 500
 
     plot_type = 'TEO'
     text = "(met wko) "
-    min_loz_text = f"Min. lozingstemperatuur: {min_loz} °C" if isinstance(min_loz, int) else "Min. lozingstemperatuur: verschilt per maand"
+
+    if len(set(min_loz)) == 1:
+        min_loz_text = f"Min. lozingstemperatuur: {min_loz[0]} °C"
+    else:
+        min_loz_text = "Min. lozingstemperatuur: verschilt per maand"
 
     results_data = {
         "Plot Type": [plot_type],
@@ -304,7 +308,7 @@ def plot_monthly_temperature(
 
     if MWH is not None:
         text_content += f"\nQ = {debiet_inschatting:.0f} m3/s (op basis van {avg_draaiuren:.0f} uur en dT = {avg_delta_T_all_years:.2f}"
-        text_content += f"\nE = {MWH:,.3f} MWh".replace(',', '.')
+        text_content += f"\nE = {MWH:,.3f} MWh (jaarlijks)".replace(',', '.')
 
     if not alleen_temp:
         fig.text(0.88, 0.90, text_content, fontsize=fontsize - 2,
