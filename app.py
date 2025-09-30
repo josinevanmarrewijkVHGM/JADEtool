@@ -13,7 +13,6 @@ logopath = "assets/logo.png"
 
 alleen_temp = False
 
-
 # Page configuration
 st.set_page_config(page_title="Water Analysis Tool", layout="wide")
 
@@ -140,7 +139,7 @@ if st.button("🚀 Run Analysis"):
             # Figuur 3: maandelijkse samenvatting
             st.subheader("📉 Analyse watertemperatuur")
             if plot_debiet:
-                fig3, (ax1, ax2) = plt.subplots()
+                fig3, (ax1, ax2) = plt.subplots(2, 1)
                 fig3, (ax1, ax2) = plot_monthly_temperature(df_hourly, start_date, end_date, delta_T, 
                                                 min_loz_month, min_dif, threshold_temp_month,
                                                 maintenance, alleen_temp, titel=titel, plot_debiet=plot_debiet,
