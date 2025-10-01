@@ -327,10 +327,8 @@ def plot_monthly_temperature(
     ax1.legend(loc='upper left', fontsize=fontsize-2, ncol=2)
     add_logo(fig, logopath, position=(0.1, 0.98), zoom=0.005)
     fig.tight_layout()
-    if plot_debiet:
-        return fig, (ax1, ax2)
-    else:
-        return fig, ax1
+    return fig
+
     
 
 
