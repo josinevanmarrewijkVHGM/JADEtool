@@ -79,7 +79,7 @@ if st.button("🚀 Run Analysis"):
             # Figuur 1: debiet en temperatuur
             st.markdown("---")
             st.subheader("📈 Temperatuur en debiet over tijd (controleer data)")
-            fig, ax1 = plt.subplots(figsize=(10, 4))
+            fig, ax1 = plt.subplots(figsize=(10, 4), constrained_layout=True)
             ax1.plot(final_df.index, final_df['debiet'], label='Debiet (waarde)', color='blue')
             ax1.set_ylabel('Debiet (m³/s)', color='blue')
             ax1.tick_params(axis='y', labelcolor='blue')
