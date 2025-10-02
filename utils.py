@@ -449,34 +449,42 @@ def plot_monthly_temperature(
         
 from PIL import Image
 
+import matplotlib.pyplot as plt
 
 def add_logo(fig, zoom, logo_path="assets/logo.png", position=(0.85, 0.85)):
     """
     Voeg een logo toe aan een matplotlib figuur met een zoomfactor.
+    De positie is relatief ten opzichte van de volledige figuur (0.0 tot 1.0).
     Als het logo niet gevonden wordt, gebruik dan een fallback-logo.
     """
     if os.path.exists(logo_path):
-        # Lees het logo in met PIL en pas zoom toe
+        # Lees het logo in en pas zoom toe
         logo_img = Image.open(logo_path)
         width, height = logo_img.size
         new_size = (int(width * zoom), int(height * zoom))
         logo_img = logo_img.resize(new_size, Image.Resampling.LANCZOS)
 
-        # Converteer naar numpy array voor figimage
+        # Converteer naar numpy array
         logo_array = np.array(logo_img)
 
-        # Voeg het logo toe aan de figuur
+        # Bereken de positie op basis van de figuurgrootte
+        fig_width, fig_height = fig.get_size_inches() * fig.dpi  # pixels
+        logo_h, logo_w = logo_array.shape[:2]
+
+        xo = int(fig_width * position[0]) - logo_w
+        yo = int(fig_height * position[1]) - logo_h
+
+        # Voeg het logo toe
         fig.figimage(
             logo_array,
-            xo=int(fig.bbox.xmax * position[0]),
-            yo=int(fig.bbox.ymax * position[1]),
+            xo=xo,
+            yo=yo,
             origin='upper',
             zorder=10
         )
     else:
         print("Bestaat bestand?", os.path.exists(logo_path))
         print(f"❌ Geen logo beschikbaar. Controleer pad: {logo_path}")
-
     # logo = mpimg.imread(logo_path)
     # ax_logo = fig.add_axes([position[0], position[1], zoom, zoom], anchor='NE', zorder=1)
     # ax_logo.imshow(logo)

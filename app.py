@@ -184,7 +184,7 @@ if st.button("🚀 Run Analysis"):
             ax2.grid()
             fig.tight_layout()
             ax2.legend(loc='upper right')
-            add_logo(fig, zoom=0.1, logo_path=logopath, position=(0.95, 0.85))
+            add_logo(fig, zoom=0.2, logo_path=logopath, position=(0.95, 0.95))
             st.pyplot(fig)
         
     #     #         # Berekeningen
@@ -236,6 +236,8 @@ if st.button("🚀 Run Analysis"):
             
             fig1.tight_layout(pad=2.0)
             plt.show()
+            st.pyplot(fig1)
+
                 
         if show_fig3:
             # Figuur 3: maandelijkse samenvatting
@@ -249,7 +251,7 @@ if st.button("🚀 Run Analysis"):
                                             fontsize=15, t_lim=[0, 30],
                                             draaiseizoen_shade=True, wko=True
                                             ) 
-            add_logo(fig3, zoom=0.3, logo_path=logopath, position=(0.1, 0.9))
+            add_logo(fig3, zoom=0.3, logo_path=logopath, position=(0.01, 0.99))
             st.pyplot(fig3)
             
     else:
