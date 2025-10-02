@@ -171,7 +171,7 @@ def plot_monthly_temperature_debiet(
     df_month.index = pd.to_datetime(df_month.index).to_period('M').start_time
 
     # Create figure and axes
-    fig, (ax1, ax2) = plt.subplots(2, 1, figsize=(10, 35), sharex=True)
+    fig, (ax1, ax2) = plt.subplots(2, 1, figsize=(30, 35), sharex=True)
     fig.suptitle(f'\n Analyse watertemperatuur, draaiuren en debiet\n{titel}', fontsize=fontsize+2)
     ax1.set_title('Watertemperatuur', size=fontsize-2)
 
