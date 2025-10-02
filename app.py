@@ -49,10 +49,10 @@ with st.sidebar:
         months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", 
                   "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]
         for month in months:
-            val = st.number_input(f"{month}", min_value=0, max_value=30)
+            val = st.number_input(f"{month}", min_value=0, max_value=25)
             min_loz_month.append(val)
     else:
-        loz_temp = st.number_input("Annual Minimum Lozing Temperature", min_value=0, max_value=20, value=12)
+        loz_temp = st.number_input("Annual Minimum Lozing Temperature", min_value=0, max_value=25, value=12)
         min_loz_month = [loz_temp] * 12
 
     threshold_temp_month = [temp + min_dif for temp in min_loz_month]
@@ -154,32 +154,32 @@ if st.button("🚀 Run Analysis"):
         # Placeholder for actual analysis and plotting logic
         # if temp_file and no discharge_file:
         
-    elif temp_file and not discharge_file:
-        # Your code here
-        st.write("Temperature file uploaded successfully.")
-        st.write(f"Start Date: {start_date_str}, End Date: {end_date_str}")
-        st.write(f"Delta T: {delta_T} Kelvin, Maintenance: {maintenance}, Minimaal verschil: {min_dif} Kelvin")
-        st.write(f"Threshold Temperatures: {threshold_temp_month} °C")
-        dicharge_file = None
-        final_df = process_data(discharge_file, temp_file, start_date, end_date)
-        if show_fig1:
-            # Figuur 1: debiet en temperatuur
-            st.subheader("📈 Temperatuur en debiet over tijd (controleer data)")
-            fig, ax2 = plt.subplots(figsize=(10, 4))
-            ax2.plot(final_df.index, final_df['temperatuur'], label='Temperatuur (temp)', color='red')
-            ax2.set_ylabel('Temperatuur (°C)', color='red')
-            ax2.tick_params(axis='y', labelcolor='red')
-            ax2.set_xlabel("Datum")
-            ax2.grid()
-            fig.tight_layout()
-            ax2.legend(loc='upper right')
-            add_logo(fig, logopath,  position=(0.95, 0.85), zoom=0.1)
-            st.pyplot(fig)
+    # elif temp_file and not discharge_file:
+    #     # Your code here
+    #     st.write("Temperature file uploaded successfully.")
+    #     st.write(f"Start Date: {start_date_str}, End Date: {end_date_str}")
+    #     st.write(f"Delta T: {delta_T} Kelvin, Maintenance: {maintenance}, Minimaal verschil: {min_dif} Kelvin")
+    #     st.write(f"Threshold Temperatures: {threshold_temp_month} °C")
+    #     dicharge_file = None
+    #     final_df = process_data(discharge_file, temp_file, start_date, end_date)
+    #     if show_fig1:
+    #         # Figuur 1: debiet en temperatuur
+    #         st.subheader("📈 Temperatuur en debiet over tijd (controleer data)")
+    #         fig, ax2 = plt.subplots(figsize=(10, 4))
+    #         ax2.plot(final_df.index, final_df['temperatuur'], label='Temperatuur (temp)', color='red')
+    #         ax2.set_ylabel('Temperatuur (°C)', color='red')
+    #         ax2.tick_params(axis='y', labelcolor='red')
+    #         ax2.set_xlabel("Datum")
+    #         ax2.grid()
+    #         fig.tight_layout()
+    #         ax2.legend(loc='upper right')
+    #         add_logo(fig, logopath,  position=(0.95, 0.85), zoom=0.1)
+    #         st.pyplot(fig)
         
-        #         # Berekeningen
-            df_hourly, monthly_summary, yearly_summary = calculate_temperature_adjustments_month(
-                final_df, threshold_temp_month, min_dif, delta_T, min_loz_month, max_deltaT=delta_T, method='estimation'
-            )
+    #     #         # Berekeningen
+    #         df_hourly, monthly_summary, yearly_summary = calculate_temperature_adjustments_month(
+    #             final_df, threshold_temp_month, min_dif, delta_T, min_loz_month, max_deltaT=delta_T, method='estimation'
+    #         )
         
         #         if show_fig2:
         #             # Figuur 2: jaarlijkse samenvatting
