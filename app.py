@@ -149,17 +149,9 @@ if st.button("🚀 Run Analysis"):
                                             logopath=logopath, fontsize=15, t_lim=[0, 30],
                                             draaiseizoen_shade=True, wko=True
                                             )
-            # else:
-            #     fig3 = plot_monthly_temperature(df_hourly, start_date, end_date, delta_T, 
-            #                                     min_loz_month, min_dif, threshold_temp_month,
-            #                                     maintenance, alleen_temp, titel=titel, 
-            #                                     logopath=logopath, fontsize=15, t_lim=[0, 30],
-            #                                     draaiseizoen_shade=True, wko=True
-            #                                     )
+            add_logo(fig3, logopath, position=(0.1, 0.98), zoom=0.10)
             st.pyplot(fig3)
 
-        # Placeholder for actual analysis and plotting logic
-        # if temp_file and no discharge_file:
         
     elif temp_file and not discharge_file:
     #     # Your code here
@@ -228,20 +220,14 @@ if st.button("🚀 Run Analysis"):
             st.markdown("---")
             st.subheader("📉 Analyse watertemperatuur")
             # if plot_debiet:
-            fig3, ax1 = plt.subplots(1, 1, figsize=(13, 6))
+            fig3, ax1 = plt.subplots(1, 1, figsize=(13, 8))
             fig3, ax1 = plot_monthly_temperature(df_hourly, start_date, end_date, delta_T, 
                                             min_loz_month, min_dif, threshold_temp_month,
                                             maintenance, alleen_temp, titel=titel, 
                                             logopath=logopath, fontsize=15, t_lim=[0, 30],
                                             draaiseizoen_shade=True, wko=True
-                                            )
-            # else:
-            #     fig3 = plot_monthly_temperature(df_hourly, start_date, end_date, delta_T, 
-            #                                     min_loz_month, min_dif, threshold_temp_month,
-            #                                     maintenance, alleen_temp, titel=titel, 
-            #                                     logopath=logopath, fontsize=15, t_lim=[0, 30],
-            #                                     draaiseizoen_shade=True, wko=True
-            #                                     )
+                                            ) 
+            add_logo(fig3, logopath, position=(0.1, 0.98), zoom=0.05)
             st.pyplot(fig3)
             
     else:

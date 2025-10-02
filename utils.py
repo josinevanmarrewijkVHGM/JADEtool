@@ -258,9 +258,16 @@ def plot_monthly_temperature_debiet(
     avg_bron = df['Average_bron'].mean()
 
     MWH = None
-    debiet_inschatting = percentile_10th * 0.1
-    deb = debiet_inschatting * 3600
-    MWH = avg_delta_T_all_years * avg_draaiuren / (1 + maintenance_factor) * deb * 4185 * 998 / 3600 / 10**6 
+    debiet_inschatting = percentile_10th * 0.1 #m3/s
+    
+    # deb = debiet_inschatting * 3600 
+    
+    dt = avg_delta_T_all_years
+    
+    KW =  debiet_inschatting * 998  * 4185 * dt #mass and thermal  kW
+
+    MWH =  avg_draaiuren / (1 + maintenance_factor) * KW / 10**3 #KW
+
     MWH = round(MWH / 500) * 500
 
     plot_type = 'TEO'
@@ -297,7 +304,7 @@ def plot_monthly_temperature_debiet(
     )
 
     if MWH is not None:
-        text_content += f"\nQ = {debiet_inschatting:.0f} m3/s (op basis van {avg_draaiuren:.0f} uur en dT = {avg_delta_T_all_years:.2f}"
+        text_content += f"\nQ = {debiet_inschatting:.0f} m3/s (op basis van {avg_draaiuren/(1 + maintenance_factor):.0f} uur en dT = {avg_delta_T_all_years:.2f})"
         text_content += f"\nE = {MWH:,.3f} MWh (jaarlijks)".replace(',', '.')
 
     if not alleen_temp:
@@ -435,7 +442,6 @@ def plot_monthly_temperature(
                  bbox=dict(facecolor='k', alpha=0.1, edgecolor='black'), ha='center')
 
     ax1.legend(loc='upper left', fontsize=fontsize-2, ncol=2)
-    add_logo(fig, logopath, position=(0.1, 0.98), zoom=0.005)
     fig.tight_layout()
     return fig, ax1
 
