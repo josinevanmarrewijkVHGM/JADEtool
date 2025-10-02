@@ -157,7 +157,7 @@ def calculate_temperature_adjustments_month(df, threshold_temp_month, min_dif, d
 
 def plot_monthly_temperature_debiet(
     df_final, start_date, end_date, delta_T, min_loz, min_dif, threshold_temp,
-    maintenance_factor, alleen_temp, logopath, titel='naam',
+    maintenance_factor, alleen_temp, titel='naam',
     fontsize=15, t_lim=[0, 30],
     draaiseizoen_shade=True, wko=True
 ):
@@ -319,7 +319,7 @@ def plot_monthly_temperature_debiet(
     
 def plot_monthly_temperature(
     df_final, start_date, end_date, delta_T, min_loz, min_dif, threshold_temp,
-    maintenance_factor, alleen_temp, logopath, titel='naam',
+    maintenance_factor, alleen_temp, titel='naam',
     fontsize=15, t_lim=[0, 30],
     draaiseizoen_shade=True, wko=True
 ):
