@@ -335,7 +335,7 @@ def plot_monthly_temperature(
 
     # Create figure and axes
     # if plot_debiet:
-    fig, ax1 = plt.subplots(1, 1)
+    fig, ax1 = plt.subplots(1, 1,  figsize=(15, 8))
     fig.suptitle(f'\n Analyse watertemperatuur, draaiuren en debiet\n{titel}', fontsize=fontsize+2)
     ax1.set_title('Watertemperatuur', size=fontsize-2)
     # Plot temperature data
