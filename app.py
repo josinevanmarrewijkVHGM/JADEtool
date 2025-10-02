@@ -117,12 +117,12 @@ if st.button("🚀 Run Analysis"):
             ax1.grid(True)
             
             ax2 = ax1.twinx()
-            line_temp, = ax2.plot(positions_year + bar_width / 2, yearly_summary['Gemiddelde_delta_T'], color='red', marker='o', label='Gemiddelde temperatuur')
+            line_temp, = ax2.plot(positions_year + bar_width / 2, yearly_summary['Gemiddelde_delta_T'], color='red', marker='o')
             max_dT = yearly_summary['Gemiddelde_delta_T'].max()
-            line_max = ax2.axhline(y=max_dT, color='orange', linestyle='--', linewidth=2, label=f'Max dT: {max_dT:.1f}°C')
+            line_max = ax2.axhline(y=max_dT, color='orange', linestyle='--', linewidth=2)
             ax2.set_ylabel('Gemiddelde temperatuur (°K)', color='red', fontsize=14)
             ax2.tick_params(axis='y', labelcolor='red')
-            ax2.set_ylim(0, max_dT + 2)
+            ax2.set_ylim(0, max_dT + 4)
             
             ax1.set_xlabel('Jaar', fontsize=14)
             ax1.set_title('Jaarlijkse samenvatting: Draaiuren, vollasturen en temperatuur', fontsize=16)
@@ -139,7 +139,7 @@ if st.button("🚀 Run Analysis"):
             ax1.text(bar.get_x() + bar.get_width()/2, yval + 10, f'{yval:.0f}', ha='center', va='bottom', fontsize=13, color='black')
             
             for x, y in zip(positions_year + bar_width / 2, yearly_summary['Gemiddelde_delta_T']):
-                ax2.text(x, y, f'{y:.1f}°C', ha='center', va='bottom', fontsize=13, color='black')
+                ax2.text(x, y, f'{y:.1f}°K', ha='center', va='bottom', fontsize=13, color='black')
             
             # Gecombineerde legenda op figuurniveau
             handles1, labels1 = ax1.get_legend_handles_labels()
@@ -213,12 +213,12 @@ if st.button("🚀 Run Analysis"):
             ax1.grid(True)
             
             ax2 = ax1.twinx()
-            line_temp, = ax2.plot(positions_year + bar_width / 2, yearly_summary['Gemiddelde_delta_T'], color='red', marker='o', label='Gemiddelde temperatuur')
+            line_temp, = ax2.plot(positions_year + bar_width / 2, yearly_summary['Gemiddelde_delta_T'], color='red', marker='o')
             max_dT = yearly_summary['Gemiddelde_delta_T'].max()
-            line_max = ax2.axhline(y=max_dT, color='orange', linestyle='--', linewidth=2, label=f'Max dT: {max_dT:.1f}°C')
+            line_max = ax2.axhline(y=max_dT, color='orange', linestyle='--', linewidth=2)
             ax2.set_ylabel('Gemiddelde temperatuur (°K)', color='red', fontsize=14)
             ax2.tick_params(axis='y', labelcolor='red')
-            ax2.set_ylim(0, max_dT + 2)
+            ax2.set_ylim(0, max_dT + 4)
             
             ax1.set_xlabel('Jaar', fontsize=14)
             ax1.set_title('Jaarlijkse samenvatting: Draaiuren, vollasturen en temperatuur', fontsize=16)
@@ -235,7 +235,7 @@ if st.button("🚀 Run Analysis"):
             ax1.text(bar.get_x() + bar.get_width()/2, yval + 10, f'{yval:.0f}', ha='center', va='bottom', fontsize=13, color='black')
             
             for x, y in zip(positions_year + bar_width / 2, yearly_summary['Gemiddelde_delta_T']):
-                ax2.text(x, y, f'{y:.1f}°C', ha='center', va='bottom', fontsize=13, color='black')
+                ax2.text(x, y, f'{y:.1f}°K', ha='center', va='bottom', fontsize=13, color='black')
             
             # Gecombineerde legenda op figuurniveau
             handles1, labels1 = ax1.get_legend_handles_labels()
@@ -245,7 +245,6 @@ if st.button("🚀 Run Analysis"):
             fig1.tight_layout(pad=2.0)
             plt.show()
             st.pyplot(fig1)
-
 
                 
         if show_fig3:
