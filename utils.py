@@ -155,9 +155,9 @@ def calculate_temperature_adjustments_month(df, threshold_temp_month, min_dif, d
 
 
 
-def plot_monthly_temperature(
+def plot_monthly_temperature_debiet(
     df_final, start_date, end_date, delta_T, min_loz, min_dif, threshold_temp,
-    maintenance_factor, alleen_temp, logopath, titel='naam', plot_debiet=True,
+    maintenance_factor, alleen_temp, logopath, titel='naam',
     fontsize=15, t_lim=[0, 30],
     draaiseizoen_shade=True, wko=True
 ):
@@ -171,14 +171,9 @@ def plot_monthly_temperature(
     df_month.index = pd.to_datetime(df_month.index).to_period('M').start_time
 
     # Create figure and axes
-    if plot_debiet:
-        fig, (ax1, ax2) = plt.subplots(2, 1, figsize=(10, 35), sharex=True)
-        fig.suptitle(f'\n Analyse watertemperatuur, draaiuren en debiet\n{titel}', fontsize=fontsize+2)
-        ax1.set_title('Watertemperatuur', size=fontsize-2)
-    else:
-        fig, ax1 = plt.subplots(1, 1, figsize=(10, 10))
-        fig.suptitle(f'\n', fontsize=fontsize)
-        ax1.set_title(f'Watertemperatuur {titel}', size=fontsize+2)
+    fig, (ax1, ax2) = plt.subplots(2, 1, figsize=(10, 35), sharex=True)
+    fig.suptitle(f'\n Analyse watertemperatuur, draaiuren en debiet\n{titel}', fontsize=fontsize+2)
+    ax1.set_title('Watertemperatuur', size=fontsize-2)
 
     # Plot temperature data
     ax1.scatter(df.index, df['temperatuur'], s=0.5, alpha=1, label='Gemeten watertemperatuur')
@@ -202,19 +197,17 @@ def plot_monthly_temperature(
             )
 
     # Plot discharge data
-    if plot_debiet:
-        ax2.scatter(df.index, df['debiet'], alpha=0.5, color=blue, s=1, label='Gemeten (uurlijks)')
-        percentile_10th = df['debiet'].quantile(0.1)
-        ax2.axhline(y=percentile_10th, color=red, linestyle='--', alpha=0.6, linewidth=2,
+    ax2.scatter(df.index, df['debiet'], alpha=0.5, color=blue, s=1, label='Gemeten (uurlijks)')
+    percentile_10th = df['debiet'].quantile(0.1)
+    ax2.axhline(y=percentile_10th, color=red, linestyle='--', alpha=0.6, linewidth=2,
                     label=f'10e Percentiel = {percentile_10th:.3f}'.replace('.', ',') + ' m³/s')
 
     # Axis labels
     ax1.set_ylabel('Watertemperatuur [°C]', fontsize=fontsize-2)
-    if plot_debiet:
-        ax2.set_title('Debiet', size=fontsize-2)
-        ax2.set_xlabel('Datum', fontsize=fontsize-2)
-        ax2.set_ylabel('Debiet [m³/s]', fontsize=fontsize-2)
-        ax2.set_ylim(0,  np.max(df['debiet']))
+    ax2.set_title('Debiet', size=fontsize-2)
+    ax2.set_xlabel('Datum', fontsize=fontsize-2)
+    ax2.set_ylabel('Debiet [m³/s]', fontsize=fontsize-2)
+    ax2.set_ylim(0,  np.max(df['debiet']))
 
     # Shade draaiseizoen
     if draaiseizoen_shade:
@@ -224,8 +217,7 @@ def plot_monthly_temperature(
             if df_shade['Above_Threshold'][i] == 1:
                 ax1.axvspan(date2num(df_shade['DateTime'][i]), date2num(df_shade['DateTime'][i] + pd.Timedelta(hours=1)),
                             color='black', alpha=0.005, label='Draaiseizoen' if not legend_added else None)
-                if plot_debiet:
-                    ax2.axvspan(date2num(df_shade['DateTime'][i]), date2num(df_shade['DateTime'][i] + pd.Timedelta(hours=1)),
+                ax2.axvspan(date2num(df_shade['DateTime'][i]), date2num(df_shade['DateTime'][i] + pd.Timedelta(hours=1)),
                                 color='black', alpha=0.005, label='Draaiseizoen' if not legend_added else None)
                 legend_added = True
         # Adjust legend alpha
@@ -245,27 +237,16 @@ def plot_monthly_temperature(
     # Format x-axis
     ax1.xaxis.set_major_locator(mdates.YearLocator())
     ax1.xaxis.set_minor_locator(mdates.MonthLocator())
-    if plot_debiet:
-        ax2.xaxis.set_minor_formatter(mdates.DateFormatter('%b'))
-        ax2.xaxis.set_major_formatter(mdates.DateFormatter('%Y-%b'))
-        ax2.tick_params(axis='x', which='major', size=10, pad=5)
-        ax2.tick_params(axis='y', which='major', size=10)
-        ax2.tick_params(axis='x', which='minor', pad=10, rotation=90)
-        ax2.grid(True, which='both', axis='x')
-        ax2.grid(True, which='both', axis='y')
-        plt.setp(ax2.get_xticklabels(which='major'), fontsize=fontsize-2, rotation=90, ha='left')
-        plt.setp(ax2.get_xticklabels(which='minor'), fontsize=fontsize-2, rotation=90, ha='left')
-        ax2.legend(fontsize=fontsize-2, markerscale=5, loc='upper left', ncol=2)
-    else:
-        ax1.xaxis.set_minor_formatter(mdates.DateFormatter('%b'))
-        ax1.xaxis.set_major_formatter(mdates.DateFormatter('%Y-%b'))
-        ax1.tick_params(axis='x', which='major', size=10, pad=5)
-        ax1.tick_params(axis='y', which='major', size=10)
-        ax1.tick_params(axis='x', which='minor', pad=10, rotation=90)
-        plt.setp(ax1.get_xticklabels(which='major'), fontsize=fontsize-2, rotation=90, ha='left')
-        plt.setp(ax1.get_xticklabels(which='minor'), fontsize=fontsize-2, rotation=90, ha='left')
-        ax1.set_xlabel('Datum')
-
+    ax2.xaxis.set_minor_formatter(mdates.DateFormatter('%b'))
+    ax2.xaxis.set_major_formatter(mdates.DateFormatter('%Y-%b'))
+    ax2.tick_params(axis='x', which='major', size=10, pad=5)
+    ax2.tick_params(axis='y', which='major', size=10)
+    ax2.tick_params(axis='x', which='minor', pad=10, rotation=90)
+    ax2.grid(True, which='both', axis='x')
+    ax2.grid(True, which='both', axis='y')
+    plt.setp(ax2.get_xticklabels(which='major'), fontsize=fontsize-2, rotation=90, ha='left')
+    plt.setp(ax2.get_xticklabels(which='minor'), fontsize=fontsize-2, rotation=90, ha='left')
+    ax2.legend(fontsize=fontsize-2, markerscale=5, loc='upper left', ncol=2)
     ax1.tick_params(axis='y', which='minor', labelsize=fontsize-2)
     ax1.tick_params(axis='both', which='major', size=10, labelsize=fontsize-2)
     ax1.grid(True, which='both', axis='x')
@@ -277,11 +258,10 @@ def plot_monthly_temperature(
     avg_bron = df['Average_bron'].mean()
 
     MWH = None
-    if plot_debiet:
-        debiet_inschatting = percentile_10th * 0.1
-        deb = debiet_inschatting * 3600
-        MWH = avg_delta_T_all_years * avg_draaiuren / (1 + maintenance_factor) * deb * 4185 * 998 / 3600 / 10**6 
-        MWH = round(MWH / 500) * 500
+    debiet_inschatting = percentile_10th * 0.1
+    deb = debiet_inschatting * 3600
+    MWH = avg_delta_T_all_years * avg_draaiuren / (1 + maintenance_factor) * deb * 4185 * 998 / 3600 / 10**6 
+    MWH = round(MWH / 500) * 500
 
     plot_type = 'TEO'
     text = "(met wko) "
@@ -330,7 +310,134 @@ def plot_monthly_temperature(
     return fig
 
     
+def plot_monthly_temperature(
+    df_final, start_date, end_date, delta_T, min_loz, min_dif, threshold_temp,
+    maintenance_factor, alleen_temp, logopath, titel='naam',
+    fontsize=15, t_lim=[0, 30],
+    draaiseizoen_shade=True, wko=True
+):
+    """
+    Plots water temperature and flow rate data with optional logo, seasonal shading, and summary statistics.
+    """
+    df = df_final.copy()
+    df_day = df.resample('D').mean()
+    df_month_rolling = df_day.select_dtypes(include='number').rolling(window=30, center=True, min_periods=1).mean()
+    df_month = df_day.resample('M').mean()
+    df_month.index = pd.to_datetime(df_month.index).to_period('M').start_time
 
+    # Create figure and axes
+    # if plot_debiet:
+    fig, (ax1, ax2) = plt.subplots(2, 1, figsize=(10, 35), sharex=True)
+    fig.suptitle(f'\n Analyse watertemperatuur, draaiuren en debiet\n{titel}', fontsize=fontsize+2)
+    ax1.set_title('Watertemperatuur', size=fontsize-2)
+    # Plot temperature data
+    ax1.scatter(df.index, df['temperatuur'], s=0.5, alpha=1, label='Gemeten watertemperatuur')
+    ax1.plot(df_month_rolling['temperatuur'], color=red, lw=1.5, label='Maandelijks gemiddelde')
+    df['Lozingstemperatuur'].plot(ax=ax1, label='Lozingstemperatuur', linestyle='-', color='g', linewidth=1.5)
+
+    # Annotate draaiuren and delta T per year
+    for year, group in df.groupby(df.index.year):
+        max_draaiuren = group['Draaiuren'].max()
+        avg_delta_T = group['Yearly_Avg_delta_T'].mean()
+        if max_draaiuren > 0:
+            max_date = group['Draaiuren'].idxmax()
+            ax1.text(
+                max_date - pd.Timedelta(days=120),
+                0.5,
+                f"{year}\nDraaiuren {max_draaiuren:,.0f}".replace(',', '.') + "\nGem. ΔT: " + f"{avg_delta_T:.2f}".replace('.', ',') + " Kelvin",
+                fontsize=fontsize - 3,
+                ha='center',
+                va='bottom',
+                bbox=dict(facecolor='white', alpha=0.8)
+            )
+    # Axis labels
+    ax1.set_ylabel('Watertemperatuur [°C]', fontsize=fontsize-2)
+
+    # Shade draaiseizoen
+    if draaiseizoen_shade:
+        df_shade = df.reset_index()
+        legend_added = False
+        for i in range(len(df_shade)):
+            if df_shade['Above_Threshold'][i] == 1:
+                ax1.axvspan(date2num(df_shade['DateTime'][i]), date2num(df_shade['DateTime'][i] + pd.Timedelta(hours=1)),
+                            color='black', alpha=0.005, label='Draaiseizoen' if not legend_added else None)
+                legend_added = True
+        # Adjust legend alpha
+        handles, labels = ax1.get_legend_handles_labels()
+        for handle, label in zip(handles, labels):
+            if label == 'Draaiseizoen':
+                handle.set_alpha(0.2)
+
+    # Add horizontal lines
+    if isinstance(min_loz, int):
+        ax1.hlines(y=min_loz, xmin=start_date, xmax=end_date, alpha=0.9, ls='--',
+                   label=f'Min. lozingstemperatuur {min_loz} °C', linewidth=1.5, color='green')
+        ax1.hlines(y=threshold_temp, xmin=start_date, xmax=end_date, ls=':',
+                   label=f'Min. innametemperatuur {threshold_temp} °C', linewidth=1.5, color='purple')
+        ax1.fill_between(df.index, 0, threshold_temp, color=blue, alpha=0.1)
+
+    # Format x-axis
+    ax1.xaxis.set_major_locator(mdates.YearLocator())
+    ax1.xaxis.set_minor_locator(mdates.MonthLocator())
+    ax1.xaxis.set_minor_formatter(mdates.DateFormatter('%b'))
+    ax1.xaxis.set_major_formatter(mdates.DateFormatter('%Y-%b'))
+    ax1.tick_params(axis='x', which='major', size=10, pad=5)
+    ax1.tick_params(axis='y', which='major', size=10)
+    ax1.tick_params(axis='x', which='minor', pad=10, rotation=90)
+    plt.setp(ax1.get_xticklabels(which='major'), fontsize=fontsize-2, rotation=90, ha='left')
+    plt.setp(ax1.get_xticklabels(which='minor'), fontsize=fontsize-2, rotation=90, ha='left')
+    ax1.set_xlabel('Datum')
+
+    ax1.tick_params(axis='y', which='minor', labelsize=fontsize-2)
+    ax1.tick_params(axis='both', which='major', size=10, labelsize=fontsize-2)
+    ax1.grid(True, which='both', axis='x')
+    ax1.grid(True, which='both', axis='y')
+
+    # Summary statistics
+    avg_draaiuren = df[df['Draaiuren'] > 0].groupby(df.index.to_series().dt.year)['Draaiuren'].max().mean()
+    avg_delta_T_all_years = df.groupby(df.index.year)['Yearly_Avg_delta_T'].mean().mean()
+    avg_bron = df['Average_bron'].mean()
+
+    plot_type = 'TEO'
+    text = "(met wko) "
+
+    if len(set(min_loz)) == 1:
+        min_loz_text = f"Min. lozingstemperatuur: {min_loz[0]} °C"
+    else:
+        min_loz_text = "Min. lozingstemperatuur: verschilt per maand"
+
+    results_data = {
+        "Plot Type": [plot_type],
+        "ΔT max (Kelvin)": [delta_T],
+        "Min. Lozingstemperatuur": [min_loz_text],
+        "Gem. aantal draaiuren": [avg_draaiuren],
+        "Ontwerp draaiuren": [avg_draaiuren / (1 + maintenance_factor)],
+        "Gem. ΔT (Kelvin)": [avg_delta_T_all_years],
+        "Gem. innametemperatuur (°C)": [avg_bron]
+    }
+
+    results_df = pd.DataFrame(results_data)
+
+    text_content = (
+        f"$\\bf{{{plot_type}}} $ " + " "
+        f"$\\bf{{{text}}} $" + '\n'
+        f"$\\bf{{Uitgangspunten   }} $" + '\n'
+        f"ΔT max: {delta_T} Kelvin\n"
+        f"{min_loz_text}\n\n"
+        f"Gem. aantal draaiuren = {avg_draaiuren:,.0f}".replace(',', '.') + '\n'
+        f"Ontwerp draaiuren = {avg_draaiuren / (1 + maintenance_factor):,.0f}".replace(',', '.') + '\n'
+        "Gem. ΔT = " + f"{avg_delta_T_all_years:.2f}".replace('.', ',') + " Kelvin" + '\n'
+        "Gem. innametemperatuur = " + f"{avg_bron:.2f}".replace('.', ',') + " °C"
+    )
+
+    if not alleen_temp:
+        fig.text(0.88, 0.90, text_content, fontsize=fontsize - 2,
+                 bbox=dict(facecolor='k', alpha=0.1, edgecolor='black'), ha='center')
+
+    ax1.legend(loc='upper left', fontsize=fontsize-2, ncol=2)
+    add_logo(fig, logopath, position=(0.1, 0.98), zoom=0.005)
+    fig.tight_layout()
+    return fig, ax1
 
         
 def add_logo(fig, logo_path="assets/logo.png", position=(0.85, 0.85), zoom=0.1):
