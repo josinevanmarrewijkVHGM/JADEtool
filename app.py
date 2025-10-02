@@ -147,7 +147,7 @@ if st.button("🚀 Run Analysis"):
             fig3, ax1, ax2 = plot_monthly_temperature_debiet(df_hourly, start_date, end_date, delta_T, 
                                             min_loz_month, min_dif, threshold_temp_month,
                                             maintenance, alleen_temp, titel=titel, 
-                                            logo_path=logopath, fontsize=15, t_lim=[0, 30],
+                                            fontsize=15, t_lim=[0, 30],
                                             draaiseizoen_shade=True, wko=True
                                             )
             add_logo(fig3, zoom=0.01, logo_path=logopath, position=(0.1, 0.98))
@@ -225,7 +225,7 @@ if st.button("🚀 Run Analysis"):
             fig3, ax1 = plot_monthly_temperature(df_hourly, start_date, end_date, delta_T, 
                                             min_loz_month, min_dif, threshold_temp_month,
                                             maintenance, alleen_temp, titel=titel, 
-                                            logo_path=logopath, fontsize=15, t_lim=[0, 30],
+                                            fontsize=15, t_lim=[0, 30],
                                             draaiseizoen_shade=True, wko=True
                                             ) 
             add_logo(fig3, zoom=0.01, logo_path=logopath, position=(0.01, 0.95))
