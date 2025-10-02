@@ -66,7 +66,7 @@ with st.sidebar:
 if st.button("🚀 Run Analysis"):
     st.success("Analysis started...")
 
-    
+    # %%% ______________________________________Watergang met debiet en temperatuur
     if temp_file and discharge_file:
         st.write("Files uploaded successfully.")
         st.write(f"Start Date: {start_date_str}, End Date: {end_date_str}")
@@ -91,7 +91,7 @@ if st.button("🚀 Run Analysis"):
             ax1.legend(loc='upper left')
             ax2.legend(loc='upper right')
             ax1.grid(True)
-            # add_logo(fig, logopath, position=(0.9, 0.1), zoom=0.05)
+            add_logo(fig, zoom=0.01, logo_path=logopath, position=(0.9, 0.1))
             fig.tight_layout()
             st.pyplot(fig)
         
@@ -106,7 +106,7 @@ if st.button("🚀 Run Analysis"):
             st.subheader("📊 Jaarlijkse samenvatting draaiuren en vollasturen")
             st.dataframe(yearly_summary)
 
-            fig1, ax1 = plt.subplots(figsize=(14, 14))
+            fig1, ax1 = plt.subplots(figsize=(14, 10))
             positions_year = np.arange(len(yearly_summary))
             bar_width = 0.4
             bars_draaiuren = ax1.bar(positions_year, yearly_summary['Draaiuren'], bar_width, label='Draaiuren', color='red', edgecolor='black', alpha=0.7)
@@ -129,10 +129,10 @@ if st.button("🚀 Run Analysis"):
                 ax1.text(bar.get_x() + bar.get_width()/2, yval + 10, f'{yval:.0f}', ha='center', va='bottom', fontsize=13, color='black')
             for x, y in zip(positions_year + bar_width / 2, yearly_summary['Gemiddelde_delta_T']):
                 ax2.text(x, y, f'{y:.1f}°C', ha='center', va='bottom', fontsize=13, color='black')
+            add_logo(fig1, zoom=0.01, logo_path=logopath, position=(0.95, 0.85))
 
             # fig1.tight_layout()
             fig1.tight_layout(pad=2.0)
-            add_logo(fig1, zoom=0.01, logo_path=logopath, position=(0.95, 0.85))
             
 
             st.pyplot(fig1)
@@ -144,15 +144,15 @@ if st.button("🚀 Run Analysis"):
             st.subheader("📉 Analyse watertemperatuur")
             # if plot_debiet:
             fig3, (ax1, ax2) = plt.subplots(2, 1, figsize=(15, 12), sharex=True)
+            add_logo(fig3, zoom=0.01, logo_path=logopath, position=(0.1, 0.98))
             fig3, ax1, ax2 = plot_monthly_temperature_debiet(df_hourly, start_date, end_date, delta_T, 
                                             min_loz_month, min_dif, threshold_temp_month,
                                             maintenance, alleen_temp, titel=titel, 
                                             fontsize=15, t_lim=[0, 30],
                                             draaiseizoen_shade=True, wko=True
                                             )
-            add_logo(fig3, zoom=0.01, logo_path=logopath, position=(0.1, 0.98))
             st.pyplot(fig3)
-
+# %%% ______________________________________Alleen temperatuur
         
     elif temp_file and not discharge_file:
     #     # Your code here
@@ -221,14 +221,14 @@ if st.button("🚀 Run Analysis"):
             st.markdown("---")
             st.subheader("📉 Analyse watertemperatuur")
             # if plot_debiet:
-            fig3, ax1 = plt.subplots(1, 1, figsize=(13, 8))
+            fig3, ax1 = plt.subplots(1, 1, figsize=(13, 10))
             fig3, ax1 = plot_monthly_temperature(df_hourly, start_date, end_date, delta_T, 
                                             min_loz_month, min_dif, threshold_temp_month,
                                             maintenance, alleen_temp, titel=titel, 
                                             fontsize=15, t_lim=[0, 30],
                                             draaiseizoen_shade=True, wko=True
                                             ) 
-            add_logo(fig3, zoom=0.01, logo_path=logopath, position=(0.01, 0.95))
+            add_logo(fig3, zoom=0.1, logo_path=logopath, position=(0.01, 0.95))
             st.pyplot(fig3)
             
     else:

@@ -264,7 +264,7 @@ def plot_monthly_temperature_debiet(
     
     dt = avg_delta_T_all_years
     
-    KW =  debiet_inschatting * 998  * 4185 * dt #mass and thermal  kW
+    KW =  debiet_inschatting * 998  * 4185 /3600 * dt #mass and thermal  kW
 
     MWH =  avg_draaiuren / (1 + maintenance_factor) * KW / 10**3 #KW
 
@@ -305,7 +305,7 @@ def plot_monthly_temperature_debiet(
 
     if MWH is not None:
         text_content += f"\nQ = {debiet_inschatting:.0f} m3/s (op basis van {avg_draaiuren/(1 + maintenance_factor):.0f} uur en dT = {avg_delta_T_all_years:.2f})"
-        text_content += f"\nE = {MWH:,.3f} MWh (jaarlijks)".replace(',', '.')
+        text_content += f"\nE = {MWH:.0f} MWh (jaarlijks)".replace(',', '.')
 
     if not alleen_temp:
         fig.text(0.88, 0.90, text_content, fontsize=fontsize - 2,
