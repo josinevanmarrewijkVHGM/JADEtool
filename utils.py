@@ -16,6 +16,7 @@ import os
 import matplotlib.image as mpimg
 plt.rcParams['font.family'] = 'sans-serif'
 # from matplotlib.offsetbox import OffsetImage, AnnotationBbox
+logopath = "assets/logo.png"
 
 # Set the font to Tahoma
 # plt.rcParams['font.family'] = 'Tahoma'
@@ -256,8 +257,6 @@ def plot_monthly_temperature_debiet(
     avg_draaiuren = df[df['Draaiuren'] > 0].groupby(df.index.to_series().dt.year)['Draaiuren'].max().mean()
     avg_delta_T_all_years = df.groupby(df.index.year)['Yearly_Avg_delta_T'].mean().mean()
     avg_bron = df['Average_bron'].mean()
-
-    MWH = None
     debiet_inschatting = percentile_10th * 0.1 #m3/s
     
     # deb = debiet_inschatting * 3600 
@@ -312,6 +311,8 @@ def plot_monthly_temperature_debiet(
                  bbox=dict(facecolor='k', alpha=0.1, edgecolor='black'), ha='center')
 
     ax1.legend(loc='upper left', fontsize=fontsize-2, ncol=2)
+    # add_logo(fig, zoom=0.01, logo_path=logopath, position=(0.1, 0.98))
+
     # add_logo(fig, logopath, position=(0.1, 0.98), zoom=0.005)
     fig.tight_layout()
     return fig, ax1, ax2
