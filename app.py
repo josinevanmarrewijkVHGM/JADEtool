@@ -1,6 +1,6 @@
 import streamlit as st
 import pandas as pd
-from utils import process_data, calculate_temperature_adjustments_month, add_logo, plot_monthly_temperature
+from utils import process_data, calculate_temperature_adjustments_month, add_logo, plot_monthly_temperature_debiet, plot_monthly_temperature
 
 import matplotlib.pyplot as plt
 from datetime import datetime
@@ -142,13 +142,19 @@ if st.button("🚀 Run Analysis"):
             st.subheader("📉 Analyse watertemperatuur")
             if plot_debiet:
                 # fig3, (ax1, ax2) = plt.subplots(2, 1, figsize=(15, 25), sharex=True)
+                fig3 = plot_monthly_temperature_debiet(df_hourly, start_date, end_date, delta_T, 
+                                                min_loz_month, min_dif, threshold_temp_month,
+                                                maintenance, alleen_temp, titel=titel, plot_debiet=plot_debiet,
+                                                logopath=logopath, fontsize=15, t_lim=[0, 30],
+                                                draaiseizoen_shade=True, wko=True
+                                                )
+            else:
                 fig3 = plot_monthly_temperature(df_hourly, start_date, end_date, delta_T, 
                                                 min_loz_month, min_dif, threshold_temp_month,
                                                 maintenance, alleen_temp, titel=titel, plot_debiet=plot_debiet,
                                                 logopath=logopath, fontsize=15, t_lim=[0, 30],
                                                 draaiseizoen_shade=True, wko=True
                                                 )
-
                 st.pyplot(fig3)
 
         # Placeholder for actual analysis and plotting logic
