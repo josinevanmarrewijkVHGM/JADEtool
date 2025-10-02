@@ -132,7 +132,7 @@ if st.button("🚀 Run Analysis"):
 
             # fig1.tight_layout()
             fig1.tight_layout(pad=2.0)
-            add_logo(fig1, zoom=0.01, logopath=logopath, position=(0.95, 0.85))
+            add_logo(fig1, zoom=0.01, logo_path=logopath, position=(0.95, 0.85))
             
 
             st.pyplot(fig1)
@@ -147,10 +147,10 @@ if st.button("🚀 Run Analysis"):
             fig3, ax1, ax2 = plot_monthly_temperature_debiet(df_hourly, start_date, end_date, delta_T, 
                                             min_loz_month, min_dif, threshold_temp_month,
                                             maintenance, alleen_temp, titel=titel, 
-                                            logopath=logopath, fontsize=15, t_lim=[0, 30],
+                                            logo_path=logopath, fontsize=15, t_lim=[0, 30],
                                             draaiseizoen_shade=True, wko=True
                                             )
-            add_logo(fig3, zoom=0.01, logopath=logopath, position=(0.1, 0.98))
+            add_logo(fig3, zoom=0.01, logo_path=logopath, position=(0.1, 0.98))
             st.pyplot(fig3)
 
         
@@ -173,7 +173,7 @@ if st.button("🚀 Run Analysis"):
             ax2.grid()
             fig.tight_layout()
             ax2.legend(loc='upper right')
-            add_logo(fig, zoom=0.01, logopath=logopath, position=(0.95, 0.85))
+            add_logo(fig, zoom=0.01, logo_path=logopath, position=(0.95, 0.85))
             st.pyplot(fig)
         
     #     #         # Berekeningen
@@ -188,7 +188,7 @@ if st.button("🚀 Run Analysis"):
             fig1, ax1 = plt.subplots(figsize=(13, 10))
             st.dataframe(yearly_summary)
 
-            add_logo(fig1, zoom=0.01, logopath=logopath, position=(0.95, 0.85))
+            add_logo(fig1, zoom=0.01, logo_path=logopath, position=(0.95, 0.85))
             
             positions_year = np.arange(len(yearly_summary))
             bar_width = 0.4
@@ -225,10 +225,10 @@ if st.button("🚀 Run Analysis"):
             fig3, ax1 = plot_monthly_temperature(df_hourly, start_date, end_date, delta_T, 
                                             min_loz_month, min_dif, threshold_temp_month,
                                             maintenance, alleen_temp, titel=titel, 
-                                            logopath=logopath, fontsize=15, t_lim=[0, 30],
+                                            logo_path=logopath, fontsize=15, t_lim=[0, 30],
                                             draaiseizoen_shade=True, wko=True
                                             ) 
-            add_logo(fig3, zoom=0.01, logopath=logopath, position=(0.01, 0.95))
+            add_logo(fig3, zoom=0.01, logo_path=logopath, position=(0.01, 0.95))
             st.pyplot(fig3)
             
     else:
