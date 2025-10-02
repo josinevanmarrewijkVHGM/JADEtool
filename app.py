@@ -132,7 +132,7 @@ if st.button("🚀 Run Analysis"):
 
             # fig1.tight_layout()
             fig1.tight_layout(pad=2.0)
-            add_logo(fig1, logopath, position=(0.95, 0.85), zoom=0.1)
+            add_logo(fig1, logopath, position=(0.95, 0.85), zoom=0.01)
 
             st.pyplot(fig1)
         
@@ -149,7 +149,7 @@ if st.button("🚀 Run Analysis"):
                                             logopath=logopath, fontsize=15, t_lim=[0, 30],
                                             draaiseizoen_shade=True, wko=True
                                             )
-            add_logo(fig3, logopath, position=(0.1, 0.98), zoom=0.10)
+            add_logo(fig3, logopath, position=(0.1, 0.98), zoom=0.05)
             st.pyplot(fig3)
 
         
@@ -172,7 +172,7 @@ if st.button("🚀 Run Analysis"):
             ax2.grid()
             fig.tight_layout()
             ax2.legend(loc='upper right')
-            add_logo(fig, logopath,  position=(0.95, 0.85), zoom=0.1)
+            add_logo(fig, logopath,  position=(0.95, 0.85), zoom=0.01)
             st.pyplot(fig)
         
     #     #         # Berekeningen
@@ -227,7 +227,7 @@ if st.button("🚀 Run Analysis"):
                                             logopath=logopath, fontsize=15, t_lim=[0, 30],
                                             draaiseizoen_shade=True, wko=True
                                             ) 
-            add_logo(fig3, logopath, position=(0.1, 0.98), zoom=0.05)
+            add_logo(fig3, logopath, position=(0.1, 0.98), zoom=0.01)
             st.pyplot(fig3)
             
     else:
