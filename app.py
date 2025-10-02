@@ -75,8 +75,8 @@ if st.button("🚀 Run Analysis"):
         plot_debiet = True
 
         final_df = process_data(discharge_file, temp_file, start_date, end_date)
-        if show_fig1:
-            # Figuur 1: debiet en temperatuur
+        
+        if show_fig1: # Figuur 1: debiet en temperatuur
             st.markdown("---")
             st.subheader("📈 Temperatuur en debiet over tijd (controleer data)")
             fig, ax1 = plt.subplots(figsize=(10, 4), constrained_layout=True)
