@@ -10,7 +10,6 @@ import os
 red = to_rgb('#ee1c25')
 blue = to_rgb('#003d73')
 logopath = "assets/logo.png"
-
 alleen_temp = False
 
 # Page configuration
@@ -91,8 +90,8 @@ if st.button("🚀 Run Analysis"):
             ax1.legend(loc='upper left')
             ax2.legend(loc='upper right')
             ax1.grid(True)
-            add_logo(fig, zoom=0.01, logo_path=logopath, position=(0.9, 0.1))
-            fig.tight_layout()
+            add_logo(fig, zoom=0.1, logo_path=logopath, position=(0.9, 0.1))
+            # fig.tight_layout()
             st.pyplot(fig)
         
         # Berekeningen
@@ -146,33 +145,6 @@ if st.button("🚀 Run Analysis"):
             fig1.tight_layout(pad=2.0)
             plt.show()
 
-            # fig1, ax1 = plt.subplots(figsize=(8, 4))
-            # positions_year = np.arange(len(yearly_summary))
-            # bar_width = 0.4
-            # bars_draaiuren = ax1.bar(positions_year, yearly_summary['Draaiuren'], bar_width, label='Draaiuren', color='red', edgecolor='black', alpha=0.7)
-            # bars_vollasturen = ax1.bar(positions_year + bar_width, yearly_summary['Vollast_uren'], bar_width, label='Vollast uren', color='blue', edgecolor='black', alpha=0.7)
-            # ax1.set_ylabel('Vollasturen (uren)', color='blue', fontsize=14)
-            # ax1.tick_params(axis='y', labelcolor='blue')
-            # ax2 = ax1.twinx()
-            # ax2.plot(positions_year + bar_width / 2, yearly_summary['Gemiddelde_delta_T'], color='red', marker='o', label='Gemiddelde temperatuur')
-            # ax2.set_ylabel('Gemiddelde temperatuur (°C)', color='red', fontsize=14)
-            # ax2.tick_params(axis='y', labelcolor='red')
-            # ax1.set_xlabel('Jaar', fontsize=14)
-            # ax1.set_title('Jaarlijkse samenvatting: Vollasturen en temperatuur', fontsize=16)
-            # ax1.set_xticks(positions_year + bar_width / 2)
-            # ax1.set_xticklabels(yearly_summary['YearMonth'], fontsize=12)
-            # for bar in bars_vollasturen:
-            #     yval = bar.get_height()
-            #     ax1.text(bar.get_x() + bar.get_width()/2, yval + 10, f'{yval:.0f}', ha='center', va='bottom', fontsize=13, color='black')
-            # for bar in bars_draaiuren:
-            #     yval = bar.get_height()
-            #     ax1.text(bar.get_x() + bar.get_width()/2, yval + 10, f'{yval:.0f}', ha='center', va='bottom', fontsize=13, color='black')
-            # for x, y in zip(positions_year + bar_width / 2, yearly_summary['Gemiddelde_delta_T']):
-            #     ax2.text(x, y, f'{y:.1f}°C', ha='center', va='bottom', fontsize=13, color='black')
-            # # add_logo(fig1, zoom=0.01, logo_path=logopath, position=(0.95, 0.85))
-
-            # # fig1.tight_layout()
-            # fig1.tight_layout(pad=2.0)
             st.pyplot(fig1)
         
     
@@ -188,7 +160,7 @@ if st.button("🚀 Run Analysis"):
                                             fontsize=15, t_lim=[0, 30],
                                             draaiseizoen_shade=True, wko=True
                                             )
-            add_logo(fig3, zoom=0.1, logo_path=logopath, position=(0.01, 0.99))
+            add_logo(fig3, zoom=0.1, logo_path=logopath, position=(0.8, 0.99))
 
             st.pyplot(fig3)
 # %%% ______________________________________Alleen temperatuur
@@ -212,7 +184,7 @@ if st.button("🚀 Run Analysis"):
             ax2.grid()
             fig.tight_layout()
             ax2.legend(loc='upper right')
-            add_logo(fig, zoom=0.01, logo_path=logopath, position=(0.95, 0.85))
+            add_logo(fig, zoom=0.1, logo_path=logopath, position=(0.95, 0.85))
             st.pyplot(fig)
         
     #     #         # Berekeningen
@@ -226,32 +198,44 @@ if st.button("🚀 Run Analysis"):
             st.dataframe(yearly_summary)
 
             fig1, ax1 = plt.subplots(figsize=(8, 4))
-            add_logo(fig1, zoom=0.01, logo_path=logopath, position=(0.95, 0.85))
             positions_year = np.arange(len(yearly_summary))
             bar_width = 0.4
+            
             bars_draaiuren = ax1.bar(positions_year, yearly_summary['Draaiuren'], bar_width, label='Draaiuren', color='red', edgecolor='black', alpha=0.7)
             bars_vollasturen = ax1.bar(positions_year + bar_width, yearly_summary['Vollast_uren'], bar_width, label='Vollast uren', color='blue', edgecolor='black', alpha=0.7)
+            
             ax1.set_ylabel('Vollasturen (uren)', color='blue', fontsize=14)
             ax1.tick_params(axis='y', labelcolor='blue')
+            ax1.grid(True)  # Voeg raster toe aan de Vollasturen-as
+            
             ax2 = ax1.twinx()
             ax2.plot(positions_year + bar_width / 2, yearly_summary['Gemiddelde_delta_T'], color='red', marker='o', label='Gemiddelde temperatuur')
             ax2.set_ylabel('Gemiddelde temperatuur (°C)', color='red', fontsize=14)
             ax2.tick_params(axis='y', labelcolor='red')
+            
+            # Voeg een horizontale lijn toe bij de maximale delta T
+            max_dT = yearly_summary['Gemiddelde_delta_T'].max()
+            ax2.axhline(y=max_dT, color='orange', linestyle='--', linewidth=2, label=f'Max dT: {max_dT:.1f}°C')
+            ax2.set_ylim(0, max_dT)  # Stel de y-as limiet in van 0 tot max dT
+            
             ax1.set_xlabel('Jaar', fontsize=14)
             ax1.set_title('Jaarlijkse samenvatting: Vollasturen en temperatuur', fontsize=16)
             ax1.set_xticks(positions_year + bar_width / 2)
             ax1.set_xticklabels(yearly_summary['YearMonth'], fontsize=12)
+            
             for bar in bars_vollasturen:
                 yval = bar.get_height()
                 ax1.text(bar.get_x() + bar.get_width()/2, yval + 10, f'{yval:.0f}', ha='center', va='bottom', fontsize=13, color='black')
+            
             for bar in bars_draaiuren:
                 yval = bar.get_height()
                 ax1.text(bar.get_x() + bar.get_width()/2, yval + 10, f'{yval:.0f}', ha='center', va='bottom', fontsize=13, color='black')
+            
             for x, y in zip(positions_year + bar_width / 2, yearly_summary['Gemiddelde_delta_T']):
                 ax2.text(x, y, f'{y:.1f}°C', ha='center', va='bottom', fontsize=13, color='black')
-            fig1.tight_layout()
             
-            st.pyplot(fig1)
+            fig1.tight_layout(pad=2.0)
+            plt.show()
                 
         if show_fig3:
             # Figuur 3: maandelijkse samenvatting
@@ -265,7 +249,7 @@ if st.button("🚀 Run Analysis"):
                                             fontsize=15, t_lim=[0, 30],
                                             draaiseizoen_shade=True, wko=True
                                             ) 
-            add_logo(fig3, zoom=0.1, logo_path=logopath, position=(0.01, 0.99))
+            add_logo(fig3, zoom=0.3, logo_path=logopath, position=(0.1, 0.9))
             st.pyplot(fig3)
             
     else:
