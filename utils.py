@@ -448,17 +448,18 @@ def plot_monthly_temperature(
         
 from PIL import Image
 
-def add_logo(fig, zoom, logopath="assets/logo.png", position=(0.85, 0.85)):
+
+def add_logo(fig, zoom, logo_path="assets/logo.png", position=(0.85, 0.85)):
     """
     Voeg een logo toe aan een matplotlib figuur met een zoomfactor.
     Als het logo niet gevonden wordt, gebruik dan een fallback-logo.
     """
-    if os.path.exists(logopath):
+    if os.path.exists(logo_path):
         # Lees het logo in met PIL en pas zoom toe
-        logo_img = Image.open(logopath)
+        logo_img = Image.open(logo_path)
         width, height = logo_img.size
         new_size = (int(width * zoom), int(height * zoom))
-        logo_img = logo_img.resize(new_size, Image.ANTIALIAS)
+        logo_img = logo_img.resize(new_size, Image.Resampling.LANCZOS)
 
         # Converteer naar numpy array voor figimage
         logo_array = np.array(logo_img)
@@ -472,9 +473,9 @@ def add_logo(fig, zoom, logopath="assets/logo.png", position=(0.85, 0.85)):
             zorder=10
         )
     else:
-        print("Bestaat bestand?", os.path.exists(logopath))
-        print(f"❌ Geen logo beschikbaar. Controleer pad: {logopath}")
-        return
+        print("Bestaat bestand?", os.path.exists(logo_path))
+        print(f"❌ Geen logo beschikbaar. Controleer pad: {logo_path}")
+
     # logo = mpimg.imread(logo_path)
     # ax_logo = fig.add_axes([position[0], position[1], zoom, zoom], anchor='NE', zorder=1)
     # ax_logo.imshow(logo)
