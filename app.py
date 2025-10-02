@@ -136,12 +136,13 @@ if st.button("🚀 Run Analysis"):
 
             st.pyplot(fig1)
         
+    
         if show_fig3:
             # Figuur 3: maandelijkse samenvatting
             st.markdown("---")
             st.subheader("📉 Analyse watertemperatuur")
             # if plot_debiet:
-            fig3, (ax1, ax2) = plt.subplots(2, 1, figsize=(15, 25), sharex=True)
+            fig3, (ax1, ax2) = plt.subplots(2, 1, figsize=(15, 12), sharex=True)
             fig3, ax1, ax2 = plot_monthly_temperature_debiet(df_hourly, start_date, end_date, delta_T, 
                                             min_loz_month, min_dif, threshold_temp_month,
                                             maintenance, alleen_temp, titel=titel, 
