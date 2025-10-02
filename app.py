@@ -149,7 +149,7 @@ if st.button("🚀 Run Analysis"):
                                             logopath=logopath, fontsize=15, t_lim=[0, 30],
                                             draaiseizoen_shade=True, wko=True
                                             )
-            add_logo(fig3, logopath, position=(0.1, 0.98), zoom=0.05)
+            add_logo(fig3, logopath, position=(0.1, 0.98), zoom=0.005)
             st.pyplot(fig3)
 
         
@@ -227,7 +227,7 @@ if st.button("🚀 Run Analysis"):
                                             logopath=logopath, fontsize=15, t_lim=[0, 30],
                                             draaiseizoen_shade=True, wko=True
                                             ) 
-            add_logo(fig3, logopath, position=(0.1, 0.98), zoom=0.01)
+            add_logo(fig3, logopath, position=(0.1, 0.98), zoom=0.001)
             st.pyplot(fig3)
             
     else:
