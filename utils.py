@@ -159,7 +159,7 @@ def plot_monthly_temperature_debiet(
     df_final, start_date, end_date, delta_T, min_loz, min_dif, threshold_temp,
     maintenance_factor, alleen_temp, titel='naam',
     fontsize=15, t_lim=[0, 30],
-    draaiseizoen_shade=True, wko=True
+    draaiseizoen_shade=True, wko=True, s1=10, s2=10
 ):
     """
     Plots water temperature and flow rate data with optional logo, seasonal shading, and summary statistics.
@@ -171,8 +171,8 @@ def plot_monthly_temperature_debiet(
     df_month.index = pd.to_datetime(df_month.index).to_period('M').start_time
 
     # Create figure and axes
-    fig, (ax1, ax2) = plt.subplots(2, 1, figsize=(10, 8), sharex=True)
-    fig.suptitle(f'\n Analyse watertemperatuur, draaiuren en debiet\n{titel}', fontsize=fontsize+2)
+    fig, (ax1, ax2) = plt.subplots(2, 1, figsize=(s1, s2), sharex=True)
+    fig.suptitle(f'\n Analyse watertemperatuur, draaiuren en debiet\n{titel}', fontsize=fontsize+2, x=1.0)
     ax1.set_title('Watertemperatuur', size=fontsize-2)
 
     # Plot temperature data
@@ -335,7 +335,7 @@ def plot_monthly_temperature(
     # Create figure and axes
     # if plot_debiet:
     fig, ax1 = plt.subplots(1, 1,  figsize=(10, 8))
-    fig.suptitle(f'\n Analyse watertemperatuur, draaiuren en debiet\n{titel}', fontsize=fontsize+2)
+    fig.suptitle(f'\n Analyse watertemperatuur en draaiuren{titel}', fontsize=fontsize+2, x=1.0)
     ax1.set_title('Watertemperatuur', size=fontsize-2)
     # Plot temperature data
     ax1.scatter(df.index, df['temperatuur'], s=0.5, alpha=1, label='Gemeten watertemperatuur')
