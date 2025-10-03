@@ -118,14 +118,14 @@ if st.button("🚀 Run Analysis"):
             
             ax2 = ax1.twinx()
             line_temp, = ax2.plot(positions_year + bar_width / 2, yearly_summary['Gemiddelde_delta_T'], color='red', marker='o')
-            line_max = ax2.axhline(y=delta_T, color='orange', linestyle='--', linewidth=2)
-            ax2.set_ylabel('Gemiddelde afkoeling (°K)', color='red', fontsize=14)
-            ax2.tick_params(axis='y', labelcolor='red')
+            line_max = ax2.axhline(y=delta_T, color='orange', linestyle='--', linewidth=0.5, label='max delta T')
+            ax2.set_ylabel('Gemiddelde afkoeling (°K)', color='k', fontsize=14)
+            ax2.tick_params(axis='y', labelcolor='k')
             ax2.set_ylim(0, delta_T + 2)
             
             ax1.set_xlabel('Jaar', fontsize=14)
             ax1.set_title('Jaarlijkse samenvatting: Draaiuren, vollasturen en temperatuur', fontsize=16)
-            ax1.set_xticks(positions_year + bar_width / 2)
+            ax1.set_xticks(positions_year - bar_width / 2)
             ax1.set_xticklabels(yearly_summary['YearMonth'], fontsize=12)
             
             for bar in bars_vollasturen:
@@ -212,6 +212,7 @@ if st.button("🚀 Run Analysis"):
         
         if show_fig2:
             # Figuur 2: jaarlijkse samenvatting
+            st.markdown("---")
             st.subheader("📊 Jaarlijkse samenvatting draaiuren en vollasturen")
             st.dataframe(yearly_summary)
             
@@ -228,14 +229,14 @@ if st.button("🚀 Run Analysis"):
             
             ax2 = ax1.twinx()
             line_temp, = ax2.plot(positions_year + bar_width / 2, yearly_summary['Gemiddelde_delta_T'], color='red', marker='o')
-            line_max = ax2.axhline(y=delta_T, color='orange', linestyle='--', linewidth=2)
-            ax2.set_ylabel('Gemiddelde afkoeling (°K)', color='red', fontsize=14)
-            ax2.tick_params(axis='y', labelcolor='red')
+            line_max = ax2.axhline(y=delta_T, color='orange', linestyle='--', linewidth=0.5, label='max delta T')
+            ax2.set_ylabel('Gemiddelde afkoeling (°K)', color='k', fontsize=14)
+            ax2.tick_params(axis='y', labelcolor='k')
             ax2.set_ylim(0, delta_T + 2)
             
             ax1.set_xlabel('Jaar', fontsize=14)
             ax1.set_title('Jaarlijkse samenvatting: Draaiuren, vollasturen en temperatuur', fontsize=16)
-            ax1.set_xticks(positions_year + bar_width / 2)
+            ax1.set_xticks(positions_year - bar_width / 2)
             ax1.set_xticklabels(yearly_summary['YearMonth'], fontsize=12)
             
             for bar in bars_vollasturen:
@@ -258,6 +259,7 @@ if st.button("🚀 Run Analysis"):
             fig1.tight_layout(pad=2.0)
             plt.show()
             st.pyplot(fig1)
+
 
                 
         if show_fig3:
