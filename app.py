@@ -18,52 +18,70 @@ st.set_page_config(page_title="Water Analysis Tool", layout="wide")
 # Title and logo
 if os.path.exists(logopath):
     st.image(logopath, width=100)
-st.title("🔍 Water Temperature & Discharge Analysis Tool")
+st.title("🔍 Aquathermie Data Explorer")
 
 # Sidebar for file upload and parameters
 with st.sidebar:
-    st.header("📁 Upload Data Files")
+    st.header("📁 Upload")
     titel = st.text_input("Titel", value="Naam watergang", max_chars=100)    
     temp_file = st.file_uploader("Upload Water Temperature CSV", type="csv")
     discharge_file = st.file_uploader("Upload Discharge CSV (optional)", type="csv")
 
-    st.header("📅 Date Range Selection")
+    st.header("📅 Tijdsperiode")
     default_start = datetime.strptime('01-01-2020', '%d-%m-%Y')
     default_end = datetime.strptime('01-01-2025', '%d-%m-%Y')
-    start_date = st.date_input("Start Date", value=default_start)
-    end_date = st.date_input("End Date", value=default_end)
+    start_date = st.date_input("Start datum", value=default_start)
+    end_date = st.date_input("Eind datum", value=default_end)
     start_date_str = start_date.strftime('%d-%m-%Y')
     end_date_str = end_date.strftime('%d-%m-%Y')
 
-    st.header("⚙️ Analysis Parameters")
-    delta_T = st.slider("Temperature Difference (°K)", min_value=2, max_value=12, value=10)
-    maintenance = st.number_input("Maintenance Factor", min_value=0.0, max_value=1.0, value=0.2, step=0.01)
-    min_dif = st.selectbox("Minimum Difference", options=[2, 3, 4], index=1)
+    st.header("⚙️ Uitgangpunten")
+    delta_T = st.slider("Temperatuur verschil (°K)", min_value=2, max_value=12, value=10)
+    maintenance = st.number_input("Onderhouds factor", min_value=0.0, max_value=1.0, value=0.2, step=0.01)
+    min_dif = st.selectbox("Minimaal temperatuur verschil (°K)", options=[2, 3, 4], index=1)
 
-    use_monthly_loz = st.checkbox("Set Monthly Minimum Lozing Temperature?", value=False)
+    use_monthly_loz = st.checkbox("Maandelijkse minimale lozingstemperaturen", value=False)
 
     min_loz_month = []
     if use_monthly_loz:
         st.subheader("🌡️ Monthly Minimum Lozing Temperatures")
-        months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", 
-                  "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]
+        months = ["Jan", "Feb", "Mar", "Apr", "Mei", "Jun", 
+                  "Jul", "Aug", "Sep", "Okt", "Nov", "Dec"]
         for month in months:
             val = st.number_input(f"{month}", min_value=0, max_value=25)
             min_loz_month.append(val)
     else:
-        loz_temp = st.number_input("Annual Minimum Lozing Temperature", min_value=0, max_value=25, value=12)
+        loz_temp = st.number_input("Jaarlijkse minimale lozingstemperatuur", min_value=0, max_value=25, value=12)
         min_loz_month = [loz_temp] * 12
 
     threshold_temp_month = [temp + min_dif for temp in min_loz_month]
 
-    st.header("📊 Visualization Options")
-    show_fig1 = st.checkbox("Show Discharge & Temperature Data Visualization", value=True)
-    show_fig2 = st.checkbox(f"Show Analysis Results ({start_date_str} to {end_date_str})", value=True)
-    show_fig3 = st.checkbox("Show JADE Chart", value=True)
+    st.header("📊 Keuze grafieken")
+    show_fig1 = st.checkbox("1. Data visualisatie", value=True)
+    show_fig2 = st.checkbox(f"2. Resultaten analyse ({start_date_str} to {end_date_str})", value=True)
+    show_fig3 = st.checkbox("3. JADE grafiek", value=True)
 
 # Run button to trigger analysis
-if st.button("🚀 Run Analysis"):
-    st.success("Analysis started...")
+st.write("De JADE-tool is ontwikkeld om inzicht te krijgen in de potentie van oppervlaktewateren voor Thermische Energie uit Oppervlaktewater systemen. Met deze functie kun je op een geautomatiseerde manier bepalen hoeveel draaiuren een systeem kan realiseren en wat de gemiddelde delta T is, afhankelijk van vooraf ingestelde voorwaarden. Dit maakt het mogelijk om snel en nauwkeurig de haalbaarheid van een systeem te analyseren onder verschillende scenario’s.")
+st.write("Bij het gebruik van de JADE-tool worden de berekeningen gestuurd door een aantal belangrijke voorwaarden. Deze zijn afhankelijk van het gekozen scenario en bepalen hoe streng of ruim de analyse wordt uitgevoerd:")
+
+st.write("Maximale delta T")
+st.write("Dit is de maximale temperatuurverschil tussen inname en lozing. Een hogere delta T betekent een efficiënter systeem, maar kan beperkt worden door technische of ecologische randvoorwaarden.")
+
+
+st.write("Minimale lozingstemperatuur")
+st.write("De temperatuur van het water dat wordt teruggebracht in de omgeving moet voldoen aan milieunormen. Deze grenswaarde voorkomt thermische vervuiling.")
+
+
+st.write("Minimaal verschil tussen lozing en inname")
+st.write("it criterium waarborgt dat er voldoende thermisch rendement is. Een te klein verschil kan duiden op inefficiëntie of ongeschiktheid van het systeem.")
+
+
+st.write("Percentage onderhoud (standaard 20%)")
+st.write("Dit percentage houdt rekening met de tijd waarin het systeem niet operationeel is door gepland onderhoud. Het beïnvloedt direct het aantal draaiuren dat beschikbaar is.")
+
+if st.button("🚀 Start analyse"):
+    st.success("Gestart...")
 
     # %%% ______________________________________Watergang met debiet en temperatuur
     if temp_file and discharge_file:
@@ -193,7 +211,7 @@ if st.button("🚀 Run Analysis"):
         final_df = process_data(discharge_file, temp_file, start_date, end_date)
         if show_fig1:
             # Figuur 1: debiet en temperatuur
-            st.subheader("📈 Temperatuur en debiet over tijd (controleer data)")
+            st.subheader("📈 Temperatuur over tijd (controleer data)")
             fig, ax2 = plt.subplots(figsize=(10, 4))
             ax2.plot(final_df.index, final_df['temperatuur'], label='Temperatuur', color='red')
             ax2.set_ylabel('Temperatuur (°C)', color='red')
