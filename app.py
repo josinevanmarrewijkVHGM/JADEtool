@@ -156,15 +156,15 @@ if st.button("🚀 Run Analysis"):
             st.markdown("---")
             st.subheader("📉 Analyse watertemperatuur")
             # if plot_debiet:
-            s1 = 15
-            s2 = 15
-            fig3, (ax1, ax2) = plt.subplots(2, 1, figsize=(s1, s2), sharex=True)
+            s_1 = 15
+            s_2 = 15
+            fig3, (ax1, ax2) = plt.subplots(2, 1, figsize=(s_1, s_2), sharex=True)
             fig3, ax1, ax2 = plot_monthly_temperature_debiet(df_hourly, start_date, end_date, delta_T, 
                                             min_loz_month, min_dif, threshold_temp_month,
                                             maintenance, alleen_temp, titel=titel, 
                                             fontsize=15, t_lim=[0, 30],
                                             draaiseizoen_shade=True, wko=True,
-                                            s1=s1, s2=s2)
+                                            s1=s_1, s2=s_2)
             # add_logo(fig3, zoom=0.1, logo_path=logopath, position=(0.8, 0.99))
 
             st.pyplot(fig3)
