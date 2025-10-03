@@ -79,11 +79,11 @@ if st.button("🚀 Run Analysis"):
             st.markdown("---")
             st.subheader("📈 Temperatuur en debiet over tijd (controleer data)")
             fig, ax1 = plt.subplots(figsize=(10, 4), constrained_layout=True)
-            ax1.plot(final_df.index, final_df['debiet'], label='Debiet (waarde)', color='blue')
+            ax1.plot(final_df.index, final_df['debiet'], label='Debiet', color='blue')
             ax1.set_ylabel('Debiet (m³/s)', color='blue')
             ax1.tick_params(axis='y', labelcolor='blue')
             ax2 = ax1.twinx()
-            ax2.plot(final_df.index, final_df['temperatuur'], label='Temperatuur (temp)', color='red')
+            ax2.plot(final_df.index, final_df['temperatuur'], label='Temperatuur', color='red')
             ax2.set_ylabel('Temperatuur (°C)', color='red')
             ax2.tick_params(axis='y', labelcolor='red')
             ax1.set_xlabel("Datum")
@@ -91,7 +91,7 @@ if st.button("🚀 Run Analysis"):
             ax2.legend(loc='upper right')
             ax1.grid(True)
             # add_logo(fig, zoom=0.2, logo_path=logopath, position=(0.9, 0.1))
-            # fig.tight_layout()
+            fig.tight_layout()
             st.pyplot(fig)
         
         # Berekeningen
@@ -118,11 +118,10 @@ if st.button("🚀 Run Analysis"):
             
             ax2 = ax1.twinx()
             line_temp, = ax2.plot(positions_year + bar_width / 2, yearly_summary['Gemiddelde_delta_T'], color='red', marker='o')
-            max_dT = yearly_summary['Gemiddelde_delta_T'].max()
-            line_max = ax2.axhline(y=max_dT, color='orange', linestyle='--', linewidth=2)
+            line_max = ax2.axhline(y=delta_T, color='orange', linestyle='--', linewidth=2)
             ax2.set_ylabel('Gemiddelde afkoeling (°K)', color='red', fontsize=14)
             ax2.tick_params(axis='y', labelcolor='red')
-            ax2.set_ylim(0, max_dT + 4)
+            ax2.set_ylim(0, delta_T + 2)
             
             ax1.set_xlabel('Jaar', fontsize=14)
             ax1.set_title('Jaarlijkse samenvatting: Draaiuren, vollasturen en temperatuur', fontsize=16)
@@ -166,20 +165,21 @@ if st.button("🚀 Run Analysis"):
                                             )
             # add_logo(fig3, zoom=0.1, logo_path=logopath, position=(0.8, 0.99))
 
-            # Save figure to a BytesIO buffer
+            st.pyplot(fig3)
             buf = io.BytesIO()
-            fig3.savefig(buf, format="png")
+            fig3.savefig(buf, format="png", bbox_inches='tight', dpi=300)
             buf.seek(0)
         
-            # Add download button
             st.download_button(
-                label="📥 Download figuur 3 als PNG",
+                label="📥 Download grafiek Aquathermie Data Explorer als PNG",
                 data=buf,
                 file_name=f"JADE_{delta_T}.png",
                 mime="image/png"
             )
 
             st.pyplot(fig3)
+
+
 # %%% ______________________________________Alleen temperatuur
         
     elif temp_file and not discharge_file:
@@ -194,7 +194,7 @@ if st.button("🚀 Run Analysis"):
             # Figuur 1: debiet en temperatuur
             st.subheader("📈 Temperatuur en debiet over tijd (controleer data)")
             fig, ax2 = plt.subplots(figsize=(10, 4))
-            ax2.plot(final_df.index, final_df['temperatuur'], label='Temperatuur (temp)', color='red')
+            ax2.plot(final_df.index, final_df['temperatuur'], label='Temperatuur', color='red')
             ax2.set_ylabel('Temperatuur (°C)', color='red')
             ax2.tick_params(axis='y', labelcolor='red')
             ax2.set_xlabel("Datum")
@@ -227,11 +227,10 @@ if st.button("🚀 Run Analysis"):
             
             ax2 = ax1.twinx()
             line_temp, = ax2.plot(positions_year + bar_width / 2, yearly_summary['Gemiddelde_delta_T'], color='red', marker='o')
-            max_dT = yearly_summary['Gemiddelde_delta_T'].max()
-            line_max = ax2.axhline(y=max_dT, color='orange', linestyle='--', linewidth=2)
+            line_max = ax2.axhline(y=delta_T, color='orange', linestyle='--', linewidth=2)
             ax2.set_ylabel('Gemiddelde afkoeling (°K)', color='red', fontsize=14)
             ax2.tick_params(axis='y', labelcolor='red')
-            ax2.set_ylim(0, max_dT + 4)
+            ax2.set_ylim(0, delta_T + 2)
             
             ax1.set_xlabel('Jaar', fontsize=14)
             ax1.set_title('Jaarlijkse samenvatting: Draaiuren, vollasturen en temperatuur', fontsize=16)
@@ -265,7 +264,7 @@ if st.button("🚀 Run Analysis"):
             st.markdown("---")
             st.subheader("📉 Analyse watertemperatuur")
             # if plot_debiet:
-            fig3, ax1 = plt.subplots(1, 1, figsize=(18, 8))
+            fig3, ax1 = plt.subplots(1, 1, figsize=(10, 8))
             fig3, ax1 = plot_monthly_temperature(df_hourly, start_date, end_date, delta_T, 
                                             min_loz_month, min_dif, threshold_temp_month,
                                             maintenance, alleen_temp, titel=titel, 
@@ -275,18 +274,16 @@ if st.button("🚀 Run Analysis"):
             # add_logo(fig3, zoom=0.3, logo_path=logopath, position=(0.01, 0.99))
             st.pyplot(fig3)
             buf = io.BytesIO()
-            fig3.savefig(buf, format="png")
+            fig3.savefig(buf, format="png", bbox_inches='tight', dpi=300)
             buf.seek(0)
         
-            # Add download button
             st.download_button(
-                label="📥 Download figuur 3 als PNG",
+                label="📥 Download grafiek Aquathermie Data Explorer als PNG",
                 data=buf,
                 file_name=f"JADE_{delta_T}.png",
                 mime="image/png"
             )
 
-            st.pyplot(fig3)
             
     else:
         st.error("Please upload both temperature and discharge CSV files to proceed.")
