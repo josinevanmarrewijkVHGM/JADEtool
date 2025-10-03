@@ -65,20 +65,10 @@ with st.sidebar:
 st.write("De JADE-tool is ontwikkeld om inzicht te krijgen in de potentie van oppervlaktewateren voor Thermische Energie uit Oppervlaktewater systemen. Met deze functie kun je op een geautomatiseerde manier bepalen hoeveel draaiuren een systeem kan realiseren en wat de gemiddelde delta T is, afhankelijk van vooraf ingestelde voorwaarden. Dit maakt het mogelijk om snel en nauwkeurig de haalbaarheid van een systeem te analyseren onder verschillende scenario’s.")
 st.write("Bij het gebruik van de JADE-tool worden de berekeningen gestuurd door een aantal belangrijke voorwaarden. Deze zijn afhankelijk van het gekozen scenario en bepalen hoe streng of ruim de analyse wordt uitgevoerd:")
 
-st.write("Maximale delta T")
-st.write("Dit is de maximale temperatuurverschil tussen inname en lozing. Een hogere delta T betekent een efficiënter systeem, maar kan beperkt worden door technische of ecologische randvoorwaarden.")
-
-
-st.write("Minimale lozingstemperatuur")
-st.write("De temperatuur van het water dat wordt teruggebracht in de omgeving moet voldoen aan milieunormen. Deze grenswaarde voorkomt thermische vervuiling.")
-
-
-st.write("Minimaal verschil tussen lozing en inname")
-st.write("it criterium waarborgt dat er voldoende thermisch rendement is. Een te klein verschil kan duiden op inefficiëntie of ongeschiktheid van het systeem.")
-
-
-st.write("Percentage onderhoud (standaard 20%)")
-st.write("Dit percentage houdt rekening met de tijd waarin het systeem niet operationeel is door gepland onderhoud. Het beïnvloedt direct het aantal draaiuren dat beschikbaar is.")
+st.write("- Maximale delta T: Dit is de maximale temperatuurverschil tussen inname en lozing. Een hogere delta T betekent een efficiënter systeem, maar kan beperkt worden door technische of ecologische randvoorwaarden.")
+st.write("- Minimale lozingstemperatuur: De temperatuur van het water dat wordt teruggebracht in de omgeving moet voldoen aan milieunormen. Deze grenswaarde voorkomt thermische vervuiling.")
+st.write("- Minimaal verschil tussen lozing en inname: dit criterium waarborgt dat er voldoende thermisch rendement is. Een te klein verschil kan duiden op inefficiëntie of ongeschiktheid van het systeem.")
+st.write("- Percentage onderhoud (standaard 20%): Dit percentage houdt rekening met de tijd waarin het systeem niet operationeel is door gepland onderhoud. Het beïnvloedt direct het aantal draaiuren dat beschikbaar is.")
 
 if st.button("🚀 Start analyse"):
     st.success("Gestart...")
@@ -86,9 +76,9 @@ if st.button("🚀 Start analyse"):
     # %%% ______________________________________Watergang met debiet en temperatuur
     if temp_file and discharge_file:
         st.write("Files uploaded successfully.")
-        st.write(f"Start Date: {start_date_str}, End Date: {end_date_str}")
-        st.write(f"Delta T: {delta_T} Kelvin, Maintenance: {maintenance}, Minimaal verschil: {min_dif} Kelvin")
-        st.write(f"Threshold Temperatures: {threshold_temp_month} °C")
+        st.write(f"Start: {start_date_str}, Eind datum: {end_date_str}")
+        st.write(f"Delta T: {delta_T} Kelvin, Onderhoudsfactor: {maintenance}, Minimaal verschil: {min_dif} Kelvin")
+        st.write(f"Minimale innametemperatuur (per maand): {threshold_temp_month} °C")
         plot_debiet = True
 
         final_df = process_data(discharge_file, temp_file, start_date, end_date)
@@ -174,8 +164,8 @@ if st.button("🚀 Start analyse"):
             st.markdown("---")
             st.subheader("📉 Analyse watertemperatuur")
             # if plot_debiet:
-            s_1 = 10
-            s_2 = 8
+            s_1 = 12
+            s_2 = 10
             fig3, (ax1, ax2) = plt.subplots(2, 1, figsize=(s_1, s_2), sharex=True)
             fig3, ax1, ax2 = plot_monthly_temperature_debiet(df_hourly, start_date, end_date, delta_T, 
                                             min_loz_month, min_dif, threshold_temp_month,
