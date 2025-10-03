@@ -144,7 +144,6 @@ def calculate_temperature_adjustments_month(df, threshold_temp_month, min_dif, d
     df_hourly['YearMonth'] = df_hourly.index.to_period('Y')
     non_zero = df_hourly[df_hourly['Temp_Difference'].notna()]
     yearly_summary = non_zero.groupby('YearMonth').agg(
-        Count=('Temp_Difference', 'size'),
         Draaiuren=('Above_Threshold', 'sum'),
         Gemiddelde_delta_T =('Temp_Difference', 'mean')
     ).reset_index()
@@ -172,7 +171,7 @@ def plot_monthly_temperature_debiet(
     df_month.index = pd.to_datetime(df_month.index).to_period('M').start_time
 
     # Create figure and axes
-    fig, (ax1, ax2) = plt.subplots(2, 1, figsize=(13, 10), sharex=True)
+    fig, (ax1, ax2) = plt.subplots(2, 1, figsize=(10, 8), sharex=True)
     fig.suptitle(f'\n Analyse watertemperatuur, draaiuren en debiet\n{titel}', fontsize=fontsize+2)
     ax1.set_title('Watertemperatuur', size=fontsize-2)
 
@@ -335,7 +334,7 @@ def plot_monthly_temperature(
 
     # Create figure and axes
     # if plot_debiet:
-    fig, ax1 = plt.subplots(1, 1,  figsize=(15, 8))
+    fig, ax1 = plt.subplots(1, 1,  figsize=(10, 8))
     fig.suptitle(f'\n Analyse watertemperatuur, draaiuren en debiet\n{titel}', fontsize=fontsize+2)
     ax1.set_title('Watertemperatuur', size=fontsize-2)
     # Plot temperature data
