@@ -163,7 +163,7 @@ if st.button("🚀 Run Analysis"):
                                             min_loz_month, min_dif, threshold_temp_month,
                                             maintenance, alleen_temp, titel=titel, 
                                             fontsize=15, t_lim=[0, 30],
-                                            draaiseizoen_shade=True, wko=True
+                                            draaiseizoen_shade=True, wko=True,
                                             s1=s1, s2=s2)
             # add_logo(fig3, zoom=0.1, logo_path=logopath, position=(0.8, 0.99))
 
