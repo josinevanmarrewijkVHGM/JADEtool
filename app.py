@@ -217,9 +217,9 @@ if st.button("🚀 Start analyse"):
         df_hourly, monthly_summary, yearly_summary = calculate_temperature_adjustments_month(
                 final_df, threshold_temp_month, min_dif, delta_T, min_loz_month, max_deltaT=delta_T, method='estimation'
             )
-        st.write(f"Check max:  {np.max(df_hourly)}")
-        st.write(f"Check min:  {np.min(df_hourly)}")
-        st.write(f"Check mean:  {np.mean(df_hourly)}")
+        st.write(f"Check max:  {np.max(df_hourly['temperatuur'])}")
+        st.write(f"Check min:  {np.min(df_hourly['temperatuur'])}")
+        st.write(f"Check mean:  {np.mean(df_hourly['temperatuur'])}")
 
         
         if show_fig2:
