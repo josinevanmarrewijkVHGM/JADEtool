@@ -35,18 +35,81 @@ cp = 4185 # warmtecoefficient water J/ (kg*K)
 cp_adjusted = 4200 * 1000/3600 # warmtecoefficient water kWh/(m^3 K)  
 
 
+# def process_data(debiet_file, temperature_file, start_date, end_date):
+#     def read_and_prepare(file_path, file_type):
+#         df = pd.read_csv(file_path, delimiter=';', encoding='ISO-8859-1')
+#         print(f'{file_type} columns:', df.columns)
+
+#         for col in df.columns:
+#             if col != 'DateTime':
+#                 df[col] = pd.to_numeric(df[col], errors='coerce')
+#                 col_mean = df[col].mean()
+#                 col_std = df[col].std()
+#                 df = df[(df[col] - col_mean).abs() <= 3 * col_std]
+
+#         if 'DateTime' in df.columns:
+#             try:
+#                 df['DateTime'] = pd.to_datetime(df['DateTime'], format='%d-%m-%Y %H:%M')
+#             except Exception:
+#                 df['DateTime'] = pd.to_datetime(df['DateTime'], errors='coerce', dayfirst=True)
+#         else:
+#             raise ValueError(f"No valid datetime column in {file_type} file found, make sure name is 'DateTime'")
+
+#         df.set_index('DateTime', inplace=True)
+#         df = df.resample('H').mean()
+
+#         return df
+
+#     # Handle debiet file conditionally
+#     if debiet_file:
+#         df_debiet = read_and_prepare(debiet_file, 'Debiet')
+    
+    
+#     else:
+#         df_debiet = pd.DataFrame()
+
+#     df_temp = read_and_prepare(temperature_file, 'Temperature')
+#     df_temp.replace(-999, np.nan, inplace=True)
+
+#     if not df_debiet.empty:
+#         final_df = pd.merge(df_debiet, df_temp, left_index=True, right_index=True, how='outer')
+#         final_df.columns = ['debiet', 'temperatuur'] + list(final_df.columns[2:])
+#     else:
+#         final_df = df_temp.copy()
+#         final_df.columns = ['temperatuur'] + list(final_df.columns[1:])
+
+#     try:
+#         start_date = pd.to_datetime(start_date)
+#         end_date = pd.to_datetime(end_date)
+#         final_df = final_df[(final_df.index >= start_date) & (final_df.index < end_date)]
+#     except ValueError as e:
+#         print(f"Error: Incorrect date format for start_date or end_date. Please use a valid date format. {e}")
+#         return None
+
+#     print('Final df columns:', final_df.columns)
+#     return final_df
+
+
 def process_data(debiet_file, temperature_file, start_date, end_date):
     def read_and_prepare(file_path, file_type):
         df = pd.read_csv(file_path, delimiter=';', encoding='ISO-8859-1')
         print(f'{file_type} columns:', df.columns)
 
+        # Converteer alle numerieke kolommen en verwijder outliers
         for col in df.columns:
             if col != 'DateTime':
                 df[col] = pd.to_numeric(df[col], errors='coerce')
+
+                # Bereken z-score en markeer outliers (>3 std)
                 col_mean = df[col].mean()
                 col_std = df[col].std()
-                df = df[(df[col] - col_mean).abs() <= 3 * col_std]
+                outliers = (df[col] - col_mean).abs() > 3 * col_std
+                df.loc[outliers, col] = np.nan  # vervang outliers door NaN
 
+                # Interpoleer ontbrekende waarden
+                df[col] = df[col].interpolate(method='linear')
+
+        # Datum parsing
         if 'DateTime' in df.columns:
             try:
                 df['DateTime'] = pd.to_datetime(df['DateTime'], format='%d-%m-%Y %H:%M')
@@ -55,22 +118,23 @@ def process_data(debiet_file, temperature_file, start_date, end_date):
         else:
             raise ValueError(f"No valid datetime column in {file_type} file found, make sure name is 'DateTime'")
 
+        # Zet index en resample naar uur
         df.set_index('DateTime', inplace=True)
         df = df.resample('H').mean()
 
         return df
 
-    # Handle debiet file conditionally
+    # Lees debietbestand (optioneel)
     if debiet_file:
         df_debiet = read_and_prepare(debiet_file, 'Debiet')
-    
-    
     else:
         df_debiet = pd.DataFrame()
 
+    # Lees temperatuurbestand
     df_temp = read_and_prepare(temperature_file, 'Temperature')
     df_temp.replace(-999, np.nan, inplace=True)
 
+    # Merge beide datasets
     if not df_debiet.empty:
         final_df = pd.merge(df_debiet, df_temp, left_index=True, right_index=True, how='outer')
         final_df.columns = ['debiet', 'temperatuur'] + list(final_df.columns[2:])
@@ -78,6 +142,7 @@ def process_data(debiet_file, temperature_file, start_date, end_date):
         final_df = df_temp.copy()
         final_df.columns = ['temperatuur'] + list(final_df.columns[1:])
 
+    # Filter op start- en einddatum
     try:
         start_date = pd.to_datetime(start_date)
         end_date = pd.to_datetime(end_date)
@@ -88,7 +153,6 @@ def process_data(debiet_file, temperature_file, start_date, end_date):
 
     print('Final df columns:', final_df.columns)
     return final_df
-
 
 
 def calculate_temperature_adjustments_month(df, threshold_temp_month, min_dif, delta_T, min_loz_month, max_deltaT, method=None):
