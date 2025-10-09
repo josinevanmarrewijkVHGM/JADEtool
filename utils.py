@@ -45,7 +45,7 @@ def process_data(debiet_file, temperature_file, start_date, end_date):
                 df[col] = pd.to_numeric(df[col], errors='coerce')
                 col_mean = df[col].mean()
                 col_std = df[col].std()
-                df = df[(df[col] - col_mean).abs() <= 10 * col_std]
+                df = df[(df[col] - col_mean).abs() <= 3 * col_std]
 
         if 'DateTime' in df.columns:
             try:
