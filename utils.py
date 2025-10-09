@@ -99,7 +99,12 @@ def process_data(debiet_file, temperature_file, start_date, end_date):
         for col in df.columns:
             if col != 'DateTime':
                 df[col] = pd.to_numeric(df[col], errors='coerce')
-
+                print(col)
+                if file_type == 'Temperature':
+                    high_values = df[col] > 50
+                    if high_values.any():
+                        print(f"⚠️ {high_values.sum()} waarden > 50 verwijderd in kolom '{col}'")
+                    df.loc[high_values, col] = np.nan
                 # Bereken z-score en markeer outliers (>3 std)
                 col_mean = df[col].mean()
                 col_std = df[col].std()
