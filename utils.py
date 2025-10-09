@@ -165,10 +165,10 @@ def calculate_temperature_adjustments_month(df, threshold_temp_month, min_dif, d
     Calculate temperature adjustments based on threshold temperature and other parameters.
     Returns: df_hourly, monthly_summary, yearly_summary
     """
-    if method == 'estimation':
-        df_hourly = df.resample('H').interpolate(method='linear')
-    else:
-        df_hourly = df.resample('H').mean()
+    # if method == 'estimation':
+    #     df_hourly = df.resample('H').interpolate(method='linear')
+    # else:
+    df_hourly = df.resample('H').mean()
 
     df_hourly['Month'] = df_hourly.index.month
     df_hourly['Year'] = df_hourly.index.year
