@@ -106,7 +106,6 @@ if st.button("🚀 Start analyse"):
         df_hourly, monthly_summary, yearly_summary = calculate_temperature_adjustments_month(
             final_df, threshold_temp_month, min_dif, delta_T, min_loz_month, max_deltaT=delta_T, method='estimation'
         )
-        print(df_hourly)
         if show_fig2:
             # Figuur 2: jaarlijkse samenvatting
             st.markdown("---")
@@ -200,7 +199,6 @@ if st.button("🚀 Start analyse"):
         dicharge_file = None
         final_df = process_data(discharge_file, temp_file, start_date, end_date)
         
-        st.dataframe(final_df)
 
         if show_fig1:
             # Figuur 1: debiet en temperatuur
@@ -220,7 +218,6 @@ if st.button("🚀 Start analyse"):
         df_hourly, monthly_summary, yearly_summary = calculate_temperature_adjustments_month(
                 final_df, threshold_temp_month, min_dif, delta_T, min_loz_month, max_deltaT=delta_T, method='estimation'
             )
-        st.dataframe(df_hourly)
 
         st.write(f"Check max:  {np.max(df_hourly['temperatuur'])}")
         st.write(f"Check min:  {np.min(df_hourly['temperatuur'])}")
