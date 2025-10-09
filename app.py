@@ -106,7 +106,7 @@ if st.button("🚀 Start analyse"):
         df_hourly, monthly_summary, yearly_summary = calculate_temperature_adjustments_month(
             final_df, threshold_temp_month, min_dif, delta_T, min_loz_month, max_deltaT=delta_T, method='estimation'
         )
-    
+        print(df_hourly)
         if show_fig2:
             # Figuur 2: jaarlijkse samenvatting
             st.markdown("---")
