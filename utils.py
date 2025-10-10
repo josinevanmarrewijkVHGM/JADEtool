@@ -353,7 +353,7 @@ def plot_monthly_temperature(
     df_final, start_date, end_date, delta_T, min_loz, min_dif, threshold_temp,
     maintenance_factor, alleen_temp, titel='naam',
     fontsize=15, t_lim=[0, 30],
-    draaiseizoen_shade=True, wko=True
+    draaiseizoen_shade=True, wko=True, s1=10, s2=10
 ):
     """
     Plots water temperature and flow rate data with optional logo, seasonal shading, and summary statistics.
@@ -366,7 +366,7 @@ def plot_monthly_temperature(
 
     # Create figure and axes
     # if plot_debiet:
-    fig, ax1 = plt.subplots(1, 1,  figsize=(10, 8))
+    fig, ax1 = plt.subplots(1, 1,  figsize=(s1, s2))
 
     fig.suptitle(
         f'\n Analyse watertemperatuur en draaiuren\n{titel}',
