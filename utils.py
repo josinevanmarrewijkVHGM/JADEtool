@@ -322,7 +322,7 @@ def plot_monthly_temperature_debiet(
     results_df = pd.DataFrame(results_data)
 
     text_content = (
-        f"$\\bf{{{plot_type} voor regeneratie}} $ " + '\n'
+        f"$\\bf{{{plot_type}}} $ " + '\n'
         f"$\\bf{{Uitgangspunten   }} $" + '\n' 
         f"ΔT max: {delta_T} Kelvin\n"
         f"{min_loz_text}\n\n"
@@ -483,7 +483,7 @@ def plot_monthly_temperature(
     
     
     text_content = (
-        f"$\\bf{{{plot_type} voor regeneratie}} $ " + '\n'
+        f"$\\bf{{{plot_type}}} $ " + '\n'
         f"$\\bf{{Uitgangspunten   }} $" + '\n' 
         f"ΔT max: {delta_T} Kelvin\n"
         f"{min_loz_text}\n\n"
