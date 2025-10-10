@@ -34,62 +34,6 @@ rhow = 998 #kg/m3
 cp = 4185 # warmtecoefficient water J/ (kg*K)
 cp_adjusted = 4200 * 1000/3600 # warmtecoefficient water kWh/(m^3 K)  
 
-
-# def process_data(debiet_file, temperature_file, start_date, end_date):
-#     def read_and_prepare(file_path, file_type):
-#         df = pd.read_csv(file_path, delimiter=';', encoding='ISO-8859-1')
-#         print(f'{file_type} columns:', df.columns)
-
-#         for col in df.columns:
-#             if col != 'DateTime':
-#                 df[col] = pd.to_numeric(df[col], errors='coerce')
-#                 col_mean = df[col].mean()
-#                 col_std = df[col].std()
-#                 df = df[(df[col] - col_mean).abs() <= 3 * col_std]
-
-#         if 'DateTime' in df.columns:
-#             try:
-#                 df['DateTime'] = pd.to_datetime(df['DateTime'], format='%d-%m-%Y %H:%M')
-#             except Exception:
-#                 df['DateTime'] = pd.to_datetime(df['DateTime'], errors='coerce', dayfirst=True)
-#         else:
-#             raise ValueError(f"No valid datetime column in {file_type} file found, make sure name is 'DateTime'")
-
-#         df.set_index('DateTime', inplace=True)
-#         df = df.resample('H').mean()
-
-#         return df
-
-#     # Handle debiet file conditionally
-#     if debiet_file:
-#         df_debiet = read_and_prepare(debiet_file, 'Debiet')
-    
-    
-#     else:
-#         df_debiet = pd.DataFrame()
-
-#     df_temp = read_and_prepare(temperature_file, 'Temperature')
-#     df_temp.replace(-999, np.nan, inplace=True)
-
-#     if not df_debiet.empty:
-#         final_df = pd.merge(df_debiet, df_temp, left_index=True, right_index=True, how='outer')
-#         final_df.columns = ['debiet', 'temperatuur'] + list(final_df.columns[2:])
-#     else:
-#         final_df = df_temp.copy()
-#         final_df.columns = ['temperatuur'] + list(final_df.columns[1:])
-
-#     try:
-#         start_date = pd.to_datetime(start_date)
-#         end_date = pd.to_datetime(end_date)
-#         final_df = final_df[(final_df.index >= start_date) & (final_df.index < end_date)]
-#     except ValueError as e:
-#         print(f"Error: Incorrect date format for start_date or end_date. Please use a valid date format. {e}")
-#         return None
-
-#     print('Final df columns:', final_df.columns)
-#     return final_df
-
-
 def process_data(debiet_file, temperature_file, start_date, end_date):
     def read_and_prepare(file_path, file_type):
         df = pd.read_csv(file_path, delimiter=';', encoding='ISO-8859-1')
@@ -240,7 +184,13 @@ def plot_monthly_temperature_debiet(
 
     # Create figure and axes
     fig, (ax1, ax2) = plt.subplots(2, 1, figsize=(s1, s2), sharex=True)
-    fig.suptitle(f'\n Analyse watertemperaturen en debiet\n{titel}', fontsize=fontsize+2)
+    fig.suptitle(
+        f'\n Analyse watertemperatuur en draaiuren\n{titel}',
+        fontsize=fontsize + 4,  # Maak het groter voor meer nadruk
+        x=0.5,                  # Centreer horizontaal
+        ha='center',            # Zorg dat de uitlijning ook gecentreerd is
+        weight='bold'           # Maak de tekst vetgedrukt
+    )
     ax1.set_title('Watertemperatuur', size=fontsize-2)
 
     # Plot temperature data
@@ -248,21 +198,30 @@ def plot_monthly_temperature_debiet(
     ax1.plot(df_month_rolling['temperatuur'], color=red, lw=1.5, label='Maandelijks gemiddelde')
     df['Lozingstemperatuur'].plot(ax=ax1, label='Lozingstemperatuur', linestyle='-', color='g', linewidth=1.5)
 
-    # Annotate draaiuren and delta T per year
-    for year, group in df.groupby(df.index.year):
-        max_draaiuren = group['Draaiuren'].max()
-        avg_delta_T = group['Yearly_Avg_delta_T'].mean()
-        if max_draaiuren > 0:
-            max_date = group['Draaiuren'].idxmax()
-            ax1.text(
-                max_date - pd.Timedelta(days=120),
-                0.5,
-                f"{year}\nDraaiuren {max_draaiuren:,.0f}".replace(',', '.') + "\nGem. ΔT: " + f"{avg_delta_T:.2f}".replace('.', ',') + " Kelvin",
-                fontsize=fontsize - 3,
-                ha='center',
-                va='bottom',
-                bbox=dict(facecolor='white', alpha=0.8)
-            )
+
+    # Controleer of er meer dan één uniek jaar in de index zit
+    years = df.index.year.unique()
+    
+    if len(years) > 1:
+        # Annotaties alleen toevoegen als er meerdere jaren zijn
+        for year, group in df.groupby(df.index.year):
+            max_draaiuren = group['Draaiuren'].max()
+            avg_delta_T = group['Yearly_Avg_delta_T'].mean()
+            if max_draaiuren > 0:
+                max_date = group['Draaiuren'].idxmax()
+                ax1.text(
+                    max_date - pd.Timedelta(days=120),
+                    0.5,
+                    f"{year}\nDraaiuren {max_draaiuren:,.0f}".replace(',', '.') +
+                    "\nGem. ΔT: " + f"{avg_delta_T:.2f}".replace('.', ',') + " Kelvin",
+                    fontsize=fontsize - 3,
+                    ha='center',
+                    va='bottom',
+                    bbox=dict(facecolor='white', alpha=0.8)
+                )
+
+
+
 
     # Plot discharge data
     ax2.scatter(df.index, df['debiet'], alpha=0.5, color=blue, s=1, label='Gemeten (uurlijks)')
@@ -337,7 +296,7 @@ def plot_monthly_temperature_debiet(
     MWH = round(MWH / 500) * 500
 
     plot_type = 'TEO'
-    text = "(met wko) "
+    text = "voor regeneratie "
 
     if len(set(min_loz)) == 1:
         min_loz_text = f"Min. lozingstemperatuur: {min_loz[0]} °C"
@@ -358,11 +317,11 @@ def plot_monthly_temperature_debiet(
     results_df = pd.DataFrame(results_data)
 
     text_content = (
-        f"$\\bf{{{plot_type}}} $ " + " "
-        f"$\\bf{{{text}}} $" + '\n'
-        f"$\\bf{{Uitgangspunten   }} $" + '\n'
+        f"$\\bf{{{plot_type} voor regeneratie}} $ " + '\n'
+        f"$\\bf{{Uitgangspunten   }} $" + '\n' 
         f"ΔT max: {delta_T} Kelvin\n"
         f"{min_loz_text}\n\n"
+        f"$\\mathbf{{Results}}$" + '\n'
         f"Gem. aantal draaiuren = {avg_draaiuren:,.0f}".replace(',', '.') + '\n'
         f"Ontwerp draaiuren = {avg_draaiuren / (1 + maintenance_factor):,.0f}".replace(',', '.') + '\n'
         "Gem. ΔT = " + f"{avg_delta_T_all_years:.2f}".replace('.', ',') + " Kelvin" + '\n'
@@ -382,7 +341,7 @@ def plot_monthly_temperature_debiet(
 
     # add_logo(fig, logopath, position=(0.1, 0.98), zoom=0.005)
     fig.tight_layout()
-    return fig, ax1, ax2
+    return fig, ax1, ax2, results_data
 
     
 def plot_monthly_temperature(
@@ -403,28 +362,40 @@ def plot_monthly_temperature(
     # Create figure and axes
     # if plot_debiet:
     fig, ax1 = plt.subplots(1, 1,  figsize=(10, 8))
-    fig.suptitle(f'\n Analyse watertemperatuur en draaiuren\n{titel}', fontsize=fontsize+2, x=0.0)
+
+    fig.suptitle(
+        f'\n Analyse watertemperatuur en draaiuren\n{titel}',
+        fontsize=fontsize + 4,  # Maak het groter voor meer nadruk
+        x=0.5,                  # Centreer horizontaal
+        ha='center',            # Zorg dat de uitlijning ook gecentreerd is
+        weight='bold'           # Maak de tekst vetgedrukt
+    )
     ax1.set_title('Watertemperatuur', size=fontsize-2)
     # Plot temperature data
     ax1.scatter(df.index, df['temperatuur'], s=0.5, alpha=1, label='Gemeten watertemperatuur')
     ax1.plot(df_month_rolling['temperatuur'], color=red, lw=1.5, label='Maandelijks gemiddelde')
     df['Lozingstemperatuur'].plot(ax=ax1, label='Lozingstemperatuur', linestyle='-', color='g', linewidth=1.5)
 
-    # Annotate draaiuren and delta T per year
-    for year, group in df.groupby(df.index.year):
-        max_draaiuren = group['Draaiuren'].max()
-        avg_delta_T = group['Yearly_Avg_delta_T'].mean()
-        if max_draaiuren > 0:
-            max_date = group['Draaiuren'].idxmax()
-            ax1.text(
-                max_date - pd.Timedelta(days=120),
-                0.5,
-                f"{year}\nDraaiuren {max_draaiuren:,.0f}".replace(',', '.') + "\nGem. ΔT: " + f"{avg_delta_T:.2f}".replace('.', ',') + " Kelvin",
-                fontsize=fontsize - 3,
-                ha='center',
-                va='bottom',
-                bbox=dict(facecolor='white', alpha=0.8)
-            )
+    # Controleer of er meer dan één uniek jaar in de index zit
+    years = df.index.year.unique()
+    
+    if len(years) > 1:
+        # Annotaties alleen toevoegen als er meerdere jaren zijn
+        for year, group in df.groupby(df.index.year):
+            max_draaiuren = group['Draaiuren'].max()
+            avg_delta_T = group['Yearly_Avg_delta_T'].mean()
+            if max_draaiuren > 0:
+                max_date = group['Draaiuren'].idxmax()
+                ax1.text(
+                    max_date - pd.Timedelta(days=120),
+                    0.5,
+                    f"{year}\nDraaiuren {max_draaiuren:,.0f}".replace(',', '.') +
+                    "\nGem. ΔT: " + f"{avg_delta_T:.2f}".replace('.', ',') + " Kelvin",
+                    fontsize=fontsize - 3,
+                    ha='center',
+                    va='bottom',
+                    bbox=dict(facecolor='white', alpha=0.8)
+                )
     # Axis labels
     ax1.set_ylabel('Watertemperatuur [°C]', fontsize=fontsize-2)
 
@@ -474,7 +445,7 @@ def plot_monthly_temperature(
     avg_bron = df['Average_bron'].mean()
 
     plot_type = 'TEO'
-    text = "(met wko) "
+    text = " voor regeneratie "
 
     if len(set(min_loz)) == 1:
         min_loz_text = f"Min. lozingstemperatuur: {min_loz[0]} °C"
@@ -493,17 +464,31 @@ def plot_monthly_temperature(
 
     results_df = pd.DataFrame(results_data)
 
+    # text_content = (
+    #     f"$\\bf{{{plot_type}}} $ " + " "
+    #     f"$\\bf{{{text}}} $" + '\n'
+    #     f"$\\bf{{Uitgangspunten   }} $" + '\n'
+    #     f"ΔT max: {delta_T} Kelvin\n"
+    #     f"{min_loz_text}\n\n"
+    #     f"Gem. aantal draaiuren = {avg_draaiuren:,.0f}".replace(',', '.') + '\n'
+    #     f"Ontwerp draaiuren = {avg_draaiuren / (1 + maintenance_factor):,.0f}".replace(',', '.') + '\n'
+    #     "Gem. ΔT = " + f"{avg_delta_T_all_years:.2f}".replace('.', ',') + " Kelvin" + '\n'
+    #     "Gem. innametemperatuur = " + f"{avg_bron:.2f}".replace('.', ',') + " °C"
+    # )
+    
+    
     text_content = (
-        f"$\\bf{{{plot_type}}} $ " + " "
-        f"$\\bf{{{text}}} $" + '\n'
-        f"$\\bf{{Uitgangspunten   }} $" + '\n'
+        f"$\\bf{{{plot_type} voor regeneratie}} $ " + '\n'
+        f"$\\bf{{Uitgangspunten   }} $" + '\n' 
         f"ΔT max: {delta_T} Kelvin\n"
         f"{min_loz_text}\n\n"
+        f"$\\mathbf{{Results}}$" + '\n'
         f"Gem. aantal draaiuren = {avg_draaiuren:,.0f}".replace(',', '.') + '\n'
         f"Ontwerp draaiuren = {avg_draaiuren / (1 + maintenance_factor):,.0f}".replace(',', '.') + '\n'
         "Gem. ΔT = " + f"{avg_delta_T_all_years:.2f}".replace('.', ',') + " Kelvin" + '\n'
         "Gem. innametemperatuur = " + f"{avg_bron:.2f}".replace('.', ',') + " °C"
     )
+
 
     if not alleen_temp:
         fig.text(0.88, 0.90, text_content, fontsize=fontsize - 2,
@@ -511,7 +496,7 @@ def plot_monthly_temperature(
 
     ax1.legend(loc='upper left', fontsize=fontsize-2, ncol=2)
     fig.tight_layout()
-    return fig, ax1
+    return fig, ax1, results_df
 
         
 from PIL import Image

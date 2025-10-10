@@ -166,7 +166,7 @@ if st.button("🚀 Start analyse"):
             s_1 = 12
             s_2 = 10
             fig3, (ax1, ax2) = plt.subplots(2, 1, figsize=(s_1, s_2), sharex=True)
-            fig3, ax1, ax2 = plot_monthly_temperature_debiet(df_hourly, start_date, end_date, delta_T, 
+            fig3, ax1, ax2, results_df = plot_monthly_temperature_debiet(df_hourly, start_date, end_date, delta_T, 
                                             min_loz_month, min_dif, threshold_temp_month,
                                             maintenance, alleen_temp, titel=titel, 
                                             fontsize=15, t_lim=[0, 30],
@@ -282,7 +282,7 @@ if st.button("🚀 Start analyse"):
             st.subheader("📉 Analyse watertemperatuur")
             # if plot_debiet:
             fig3, ax1 = plt.subplots(1, 1, figsize=(10, 8))
-            fig3, ax1 = plot_monthly_temperature(df_hourly, start_date, end_date, delta_T, 
+            fig3, ax1, results_df = plot_monthly_temperature(df_hourly, start_date, end_date, delta_T, 
                                             min_loz_month, min_dif, threshold_temp_month,
                                             maintenance, alleen_temp, titel=titel, 
                                             fontsize=15, t_lim=[0, 30],
