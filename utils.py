@@ -64,7 +64,7 @@ def process_data(debiet_file, temperature_file, start_date, end_date):
             except Exception:
                 df['DateTime'] = pd.to_datetime(df['DateTime'], errors='coerce', dayfirst=True)
         else:
-            raise ValueError(f"No valid datetime column in {file_type} file found, make sure name is 'DateTime'")
+            raise ValueError(f"Geen geldige 'DateTime' kolom gevonden in {file_type}, zorg ervoor dat de kolumnaam van de datum en tijd 'DateTime' is en data bevat gemeten per x minuten of uurlijks.")
 
         # Zet index en resample naar uur
         df.set_index('DateTime', inplace=True)
@@ -115,9 +115,9 @@ def calculate_temperature_adjustments_month(df, threshold_temp_month, min_dif, d
     
     try:
         df_hourly['Month'] = df_hourly.index.month
-    except:
-        print('Verkeerd datumbereik geselecteerd: het csv-document bevat geen data in de geselecteerde periode.')
-        return
+    except ValueError as e:
+        print(f"Error: Verkeerd datumbereik geselecteerd: het csv-document bevat geen data in de geselecteerde periode.")
+        return None
     df_hourly['Year'] = df_hourly.index.year
 
     threshold_temp_map = {month: temp for month, temp in enumerate(threshold_temp_month, start=1)}
