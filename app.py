@@ -163,7 +163,7 @@ if st.button("🚀 Start analyse"):
             st.markdown("---")
             st.subheader("📉 Analyse watertemperatuur")
             # if plot_debiet:
-            s_1 = 12
+            s_1 = 14
             s_2 = 10
             fig3, (ax1, ax2) = plt.subplots(2, 1, figsize=(s_1, s_2), sharex=True)
             fig3, ax1, ax2, results_df = plot_monthly_temperature_debiet(df_hourly, start_date, end_date, delta_T, 
@@ -178,7 +178,15 @@ if st.button("🚀 Start analyse"):
             buf = io.BytesIO()
             fig3.savefig(buf, format="png", bbox_inches='tight', dpi=300)
             buf.seek(0)
-        
+            
+            # Styling toepassen
+            styled_df = results_df.style\
+                .format(precision=2)\
+                .highlight_max(axis=0, color='lightgreen')\
+                .highlight_min(axis=0, color='lightcoral')
+            
+            # Weergeven in Streamlit
+            st.dataframe(styled_df, use_container_width=True)
             st.download_button(
                 label="📥 Download grafiek Aquathermie Data Explorer als PNG",
                 data=buf,
@@ -280,17 +288,29 @@ if st.button("🚀 Start analyse"):
             # Figuur 3: maandelijkse samenvatting
             st.markdown("---")
             st.subheader("📉 Analyse watertemperatuur")
-            # if plot_debiet:
-            fig3, ax1 = plt.subplots(1, 1, figsize=(10, 8))
+            
+            s_1 = 14
+            s_2 = 10
+            fig3, ax1 = plt.subplots(1, 1, figsize=(s_1, s_2))
             fig3, ax1, results_df = plot_monthly_temperature(df_hourly, start_date, end_date, delta_T, 
                                             min_loz_month, min_dif, threshold_temp_month,
                                             maintenance, alleen_temp, titel=titel, 
                                             fontsize=15, t_lim=[0, 30],
-                                            draaiseizoen_shade=True, wko=True
-                                            ) 
+                                            draaiseizoen_shade=True, wko=True,
+                                            s1=s_1, s2=s_2)
+            
+            
             # add_logo(fig3, zoom=0.3, logo_path=logopath, position=(0.01, 0.99))
             st.pyplot(fig3)
-            st.DataFrame(results_df)
+
+            # Styling toepassen
+            styled_df = results_df.style\
+                .format(precision=2)\
+                .highlight_max(axis=0, color='lightgreen')\
+                .highlight_min(axis=0, color='lightcoral')
+            
+            # Weergeven in Streamlit
+            st.dataframe(styled_df, use_container_width=True)
 
             buf = io.BytesIO()
             fig3.savefig(buf, format="png", bbox_inches='tight', dpi=300)
