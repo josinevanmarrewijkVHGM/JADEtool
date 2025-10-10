@@ -113,7 +113,11 @@ def calculate_temperature_adjustments_month(df, threshold_temp_month, min_dif, d
     else:
         df_hourly = df.resample('H').mean()
     
-    df_hourly['Month'] = df_hourly.index.month
+    try:
+        df_hourly['Month'] = df_hourly.index.month
+    except:
+        print('Verkeerd datumbereik geselecteerd: het csv-document bevat geen data in de geselecteerde periode.')
+        return
     df_hourly['Year'] = df_hourly.index.year
 
     threshold_temp_map = {month: temp for month, temp in enumerate(threshold_temp_month, start=1)}
