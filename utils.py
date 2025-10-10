@@ -282,7 +282,7 @@ def plot_monthly_temperature_debiet(
     ax1.tick_params(axis='both', which='major', size=10, labelsize=fontsize-2)
     ax1.grid(True, which='both', axis='x')
     ax1.grid(True, which='both', axis='y')
-    ax1.set_xlim(t_lim[0], t_lim[1])
+    ax1.set_ylim(t_lim[0], t_lim[1])
 
     # Summary statistics
     avg_draaiuren = df[df['Draaiuren'] > 0].groupby(df.index.to_series().dt.year)['Draaiuren'].max().mean()
@@ -438,7 +438,7 @@ def plot_monthly_temperature(
     plt.setp(ax1.get_xticklabels(which='major'), fontsize=fontsize-2, rotation=90, ha='left')
     plt.setp(ax1.get_xticklabels(which='minor'), fontsize=fontsize-2, rotation=90, ha='left')
     ax1.set_xlabel('Datum')
-    ax1.set_xlim(t_lim[0], t_lim[1])
+    ax1.set_ylim(t_lim[0], t_lim[1])
     ax1.tick_params(axis='y', which='minor', labelsize=fontsize-2)
     ax1.tick_params(axis='both', which='major', size=10, labelsize=fontsize-2)
     ax1.grid(True, which='both', axis='x')
