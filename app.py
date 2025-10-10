@@ -290,6 +290,8 @@ if st.button("🚀 Start analyse"):
                                             ) 
             # add_logo(fig3, zoom=0.3, logo_path=logopath, position=(0.01, 0.99))
             st.pyplot(fig3)
+            st.DataFrame(results_df)
+
             buf = io.BytesIO()
             fig3.savefig(buf, format="png", bbox_inches='tight', dpi=300)
             buf.seek(0)

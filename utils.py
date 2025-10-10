@@ -190,7 +190,7 @@ def plot_monthly_temperature_debiet(
     fig, (ax1, ax2) = plt.subplots(2, 1, figsize=(s1, s2), sharex=True)
     fig.suptitle(
         f'\n Analyse watertemperatuur en draaiuren\n{titel}',
-        fontsize=fontsize + 4,  # Maak het groter voor meer nadruk
+        fontsize=fontsize + 2,  # Maak het groter voor meer nadruk
         x=0.5,                  # Centreer horizontaal
         ha='center',            # Zorg dat de uitlijning ook gecentreerd is
         weight='bold'           # Maak de tekst vetgedrukt
@@ -282,6 +282,7 @@ def plot_monthly_temperature_debiet(
     ax1.tick_params(axis='both', which='major', size=10, labelsize=fontsize-2)
     ax1.grid(True, which='both', axis='x')
     ax1.grid(True, which='both', axis='y')
+    ax1.set_xlim(t_lim[0], t_lim[1])
 
     # Summary statistics
     avg_draaiuren = df[df['Draaiuren'] > 0].groupby(df.index.to_series().dt.year)['Draaiuren'].max().mean()
@@ -325,7 +326,7 @@ def plot_monthly_temperature_debiet(
         f"$\\bf{{Uitgangspunten   }} $" + '\n' 
         f"ΔT max: {delta_T} Kelvin\n"
         f"{min_loz_text}\n\n"
-        f"$\\mathbf{{Results}}$" + '\n'
+        f"$\\mathbf{{Resultaten}}$" + '\n'
         f"Gem. aantal draaiuren = {avg_draaiuren:,.0f}".replace(',', '.') + '\n'
         f"Ontwerp draaiuren = {avg_draaiuren / (1 + maintenance_factor):,.0f}".replace(',', '.') + '\n'
         "Gem. ΔT = " + f"{avg_delta_T_all_years:.2f}".replace('.', ',') + " Kelvin" + '\n'
@@ -369,7 +370,7 @@ def plot_monthly_temperature(
 
     fig.suptitle(
         f'\n Analyse watertemperatuur en draaiuren\n{titel}',
-        fontsize=fontsize + 4,  # Maak het groter voor meer nadruk
+        fontsize=fontsize + 2,  # Maak het groter voor meer nadruk
         x=0.5,                  # Centreer horizontaal
         ha='center',            # Zorg dat de uitlijning ook gecentreerd is
         weight='bold'           # Maak de tekst vetgedrukt
@@ -437,7 +438,7 @@ def plot_monthly_temperature(
     plt.setp(ax1.get_xticklabels(which='major'), fontsize=fontsize-2, rotation=90, ha='left')
     plt.setp(ax1.get_xticklabels(which='minor'), fontsize=fontsize-2, rotation=90, ha='left')
     ax1.set_xlabel('Datum')
-
+    ax1.set_xlim(t_lim[0], t_lim[1])
     ax1.tick_params(axis='y', which='minor', labelsize=fontsize-2)
     ax1.tick_params(axis='both', which='major', size=10, labelsize=fontsize-2)
     ax1.grid(True, which='both', axis='x')
@@ -486,7 +487,7 @@ def plot_monthly_temperature(
         f"$\\bf{{Uitgangspunten   }} $" + '\n' 
         f"ΔT max: {delta_T} Kelvin\n"
         f"{min_loz_text}\n\n"
-        f"$\\mathbf{{Results}}$" + '\n'
+        f"$\\mathbf{{Resultaten}}$" + '\n'
         f"Gem. aantal draaiuren = {avg_draaiuren:,.0f}".replace(',', '.') + '\n'
         f"Ontwerp draaiuren = {avg_draaiuren / (1 + maintenance_factor):,.0f}".replace(',', '.') + '\n'
         "Gem. ΔT = " + f"{avg_delta_T_all_years:.2f}".replace('.', ',') + " Kelvin" + '\n'
