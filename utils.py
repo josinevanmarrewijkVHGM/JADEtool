@@ -294,9 +294,9 @@ def plot_monthly_temperature_debiet(
     
     dt = avg_delta_T_all_years
     
-    KW =  debiet_inschatting * 998  * 4185 * dt #mass and thermal  kW
+    W =  debiet_inschatting * 998  * 4185 * dt #mass and thermal  W
 
-    MWH =  avg_draaiuren / (1 + maintenance_factor) * KW / 10**3 #KW
+    MWH =  avg_draaiuren / (1 + maintenance_factor) * W / 10**6 #KW
 
     MWH = round(MWH / 500) * 500
 
