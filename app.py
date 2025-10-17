@@ -35,10 +35,10 @@ with st.sidebar:
     start_date_str = start_date.strftime('%d-%m-%Y')
     end_date_str = end_date.strftime('%d-%m-%Y')
 
-    st.header("⚙️ Uitgangpunten")
-    delta_T = st.slider("Temperatuur verschil (°K)", min_value=2, max_value=12, value=10)
+    st.header("⚙️ Uitgangspunten")
+    delta_T = st.slider("Temperatuur verschil (K)", min_value=2, max_value=12, value=10)
     maintenance = st.number_input("Onderhouds factor", min_value=0.0, max_value=1.0, value=0.2, step=0.01)
-    min_dif = st.selectbox("Minimaal temperatuur verschil (°K)", options=[2, 3, 4], index=1)
+    min_dif = st.selectbox("Minimaal temperatuur verschil (K)", options=[2, 3, 4, 5], index=1)
 
     use_monthly_loz = st.checkbox("Maandelijkse minimale lozingstemperaturen", value=False)
 
@@ -62,11 +62,10 @@ with st.sidebar:
     show_fig3 = st.checkbox("3. JADE grafiek", value=True)
 
 # Run button to trigger analysis
-st.write("De JADE-tool is ontwikkeld om inzicht te krijgen in de potentie van oppervlaktewateren voor Thermische Energie uit Oppervlaktewater systemen. Met deze functie kun je op een geautomatiseerde manier bepalen hoeveel draaiuren een systeem kan realiseren en wat de gemiddelde delta T is, afhankelijk van vooraf ingestelde voorwaarden. Dit maakt het mogelijk om snel en nauwkeurig de haalbaarheid van een systeem te analyseren onder verschillende scenario’s.")
-st.write("Bij het gebruik van de JADE-tool worden de berekeningen gestuurd door een aantal belangrijke voorwaarden. Deze zijn afhankelijk van het gekozen scenario en bepalen hoe streng of ruim de analyse wordt uitgevoerd:")
+st.write("De JADE-tool is ontwikkeld om inzicht te krijgen in de potentie van oppervlaktewateren voor Thermische Energie uit Oppervlaktewater systemen. Met deze functie kan snel inzicht verkregen worden in de hoeveelheid draaiuren, de gemiddelde innametemperatuur en de gemiddelde afkoeling. Dit maakt het mogelijk om snel en nauwkeurig de potentie van een watersysteem te analyseren, afhankelijk van de gekozen uitgangspunten.")
 
 st.write("- Maximale delta T: Dit is de maximale temperatuurverschil tussen inname en lozing. Een hogere delta T betekent een efficiënter systeem, maar kan beperkt worden door technische of ecologische randvoorwaarden.")
-st.write("- Minimale lozingstemperatuur: De temperatuur van het water dat wordt teruggebracht in de omgeving moet voldoen aan milieunormen. Deze grenswaarde voorkomt thermische vervuiling.")
+st.write("- Minimale lozingstemperatuur: De minimale temperatuur van het geloosde water. Deze grenswaarde voorkomt onacceptabele invloed op het ontvangend water.")
 st.write("- Minimaal verschil tussen lozing en inname: dit criterium waarborgt dat er voldoende thermisch rendement is. Een te klein verschil kan duiden op inefficiëntie of ongeschiktheid van het systeem.")
 st.write("- Percentage onderhoud (standaard 20%): Dit percentage houdt rekening met de tijd waarin het systeem niet operationeel is door gepland onderhoud. Het beïnvloedt direct het aantal draaiuren dat beschikbaar is.")
 
