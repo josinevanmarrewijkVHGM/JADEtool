@@ -189,7 +189,7 @@ def plot_monthly_temperature_debiet(
     # Create figure and axes
     fig, (ax1, ax2) = plt.subplots(2, 1, figsize=(s1, s2), sharex=True)
     fig.suptitle(
-        f'\n Analyse watertemperatuur en draaiuren\n{titel}',
+        f'\n Analyse watertemperatuur, draaiuren en debiet\n{titel}',
         fontsize=fontsize + 2,  # Maak het groter voor meer nadruk
         x=0.5,                  # Centreer horizontaal
         ha='center',            # Zorg dat de uitlijning ook gecentreerd is

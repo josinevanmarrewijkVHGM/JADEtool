@@ -24,12 +24,12 @@ st.title("🔍 Aquathermie Data Explorer")
 with st.sidebar:
     st.header("📁 Upload")
     titel = st.text_input("Titel", value="Naam watergang", max_chars=100)    
-    temp_file = st.file_uploader("Upload Water Temperature CSV", type="csv")
-    discharge_file = st.file_uploader("Upload Discharge CSV (optional)", type="csv")
+    temp_file = st.file_uploader("Upload Watertemperatuur CSV (°C)", type="csv")
+    discharge_file = st.file_uploader("Upload CSV van debiet (m3/s) (optional)", type="csv")
 
     st.header("📅 Tijdsperiode")
     default_start = datetime.strptime('01-01-2020', '%d-%m-%Y')
-    default_end = datetime.strptime('01-01-2025', '%d-%m-%Y')
+    default_end = datetime.strptime('01-01-2026', '%d-%m-%Y')
     start_date = st.date_input("Start datum", value=default_start)
     end_date = st.date_input("Eind datum", value=default_end)
     start_date_str = start_date.strftime('%d-%m-%Y')
@@ -57,17 +57,17 @@ with st.sidebar:
     threshold_temp_month = [temp + min_dif for temp in min_loz_month]
 
     st.header("📊 Keuze grafieken")
-    show_fig1 = st.checkbox("1. Data visualisatie", value=True)
+    show_fig1 = st.checkbox(f"1. Data visualisatie {titel}", value=True)
     show_fig2 = st.checkbox(f"2. Resultaten analyse ({start_date_str} to {end_date_str})", value=True)
-    show_fig3 = st.checkbox("3. JADE grafiek", value=True)
+    show_fig3 = st.checkbox(f"3. JADE grafiek {titel}", value=True)
 
 # Run button to trigger analysis
-st.write("De JADE-tool is ontwikkeld om inzicht te krijgen in de potentie van oppervlaktewateren voor Thermische Energie uit Oppervlaktewater systemen. Met deze functie kan snel inzicht verkregen worden in de hoeveelheid draaiuren, de gemiddelde innametemperatuur en de gemiddelde afkoeling. Dit maakt het mogelijk om snel en nauwkeurig de potentie van een watersysteem te analyseren, afhankelijk van de gekozen uitgangspunten.")
+st.write("De JADE-tool is ontwikkeld om inzicht te krijgen in de potentie van oppervlaktewateren voor TEO- of TEA-systemen. Met deze functie kan snel inzicht verkregen worden in de hoeveelheid draaiuren, de gemiddelde innametemperatuur en de gemiddelde afkoeling. Dit maakt het mogelijk om snel en nauwkeurig de potentie van een watersysteem te bepalen, afhankelijk van de gekozen uitgangspunten.")
 
 st.write("- Maximale delta T: Dit is de maximale temperatuurverschil tussen inname en lozing. Een hogere delta T betekent een efficiënter systeem, maar kan beperkt worden door technische of ecologische randvoorwaarden.")
 st.write("- Minimale lozingstemperatuur: De minimale temperatuur van het geloosde water. Deze grenswaarde voorkomt onacceptabele invloed op het ontvangend water.")
 st.write("- Minimaal verschil tussen lozing en inname: dit criterium waarborgt dat er voldoende thermisch rendement is. Een te klein verschil kan duiden op inefficiëntie of ongeschiktheid van het systeem.")
-st.write("- Percentage onderhoud (standaard 20%): Dit percentage houdt rekening met de tijd waarin het systeem niet operationeel is door gepland onderhoud. Het beïnvloedt direct het aantal draaiuren dat beschikbaar is.")
+st.write("- Percentage onderhoud (standaard 20 %): Dit percentage houdt rekening met de tijd waarin het systeem niet operationeel is door gepland onderhoud. Het beïnvloedt direct het aantal draaiuren dat beschikbaar is.")
 
 if st.button("🚀 Start analyse"):
     st.success("Gestart...")
@@ -183,7 +183,7 @@ if st.button("🚀 Start analyse"):
             st.download_button(
                 label="📥 Download grafiek Aquathermie Data Explorer als PNG",
                 data=buf,
-                file_name=f"JADE_{delta_T}.png",
+                file_name=f"JADE_{delta_T}_{titel}.png",
                 mime="image/png"
             )
 
@@ -313,7 +313,7 @@ if st.button("🚀 Start analyse"):
             st.download_button(
                 label="📥 Download grafiek Aquathermie Data Explorer als PNG",
                 data=buf,
-                file_name=f"JADE_{delta_T}.png",
+                file_name=f"JADE_{delta_T}_{titel}.png",
                 mime="image/png"
             )
 
