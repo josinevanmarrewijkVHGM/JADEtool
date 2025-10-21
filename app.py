@@ -62,7 +62,7 @@ with st.sidebar:
     show_fig3 = st.checkbox(f"3. JADE grafiek {titel}", value=True)
 
 # Run button to trigger analysis
-st.write("De JADE-tool is ontwikkeld om inzicht te krijgen in de potentie van oppervlaktewateren voor TEO- of TEA-systemen. Met deze functie kan snel inzicht verkregen worden in de hoeveelheid draaiuren, de gemiddelde innametemperatuur en de gemiddelde afkoeling. Dit maakt het mogelijk om snel en nauwkeurig de potentie van een watersysteem te bepalen, afhankelijk van de gekozen uitgangspunten.")
+st.write("De JADE-tool is ontwikkeld om inzicht te krijgen in de potentie van oppervlaktewateren voor TEO-systemen of RWZI's. Met deze functie kan snel inzicht verkregen worden in de hoeveelheid draaiuren, de gemiddelde innametemperatuur en de gemiddelde afkoeling. Dit maakt het mogelijk om snel en nauwkeurig de potentie van een watersysteem te bepalen, afhankelijk van de gekozen uitgangspunten.")
 
 st.write("- Maximale delta T: Dit is de maximale temperatuurverschil tussen inname en lozing. Een hogere delta T betekent een efficiënter systeem, maar kan beperkt worden door technische of ecologische randvoorwaarden.")
 st.write("- Minimale lozingstemperatuur: De minimale temperatuur van het geloosde water. Deze grenswaarde voorkomt onacceptabele invloed op het ontvangend water.")
