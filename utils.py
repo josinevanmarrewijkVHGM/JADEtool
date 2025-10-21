@@ -298,7 +298,7 @@ def plot_monthly_temperature_debiet(
 
     MWH =  avg_draaiuren / (1 + maintenance_factor) * W / 10**6 #KW
 
-    MWH = round(MWH / 500) * 500
+    # MWH = round(MWH / 500) * 500
 
     plot_type = 'TEO'
     text = "voor regeneratie "
@@ -334,8 +334,10 @@ def plot_monthly_temperature_debiet(
     )
 
     if MWH is not None:
-        text_content += f"\nQ = {debiet_inschatting:.0f} m3/s (op basis van {avg_draaiuren/(1 + maintenance_factor):.0f} uur en dT = {avg_delta_T_all_years:.2f})"
-        text_content += f"\nE = {MWH:.0f} MWh (jaarlijks)".replace(',', '.')
+        text_content += "\nQ =" + f"{debiet_inschatting:.2f}".replace('.', ',') 
+        + "m3/s  (op basis van" + f"{avg_draaiuren/(1 + maintenance_factor):.0f}".replace('.', ',') 
+        + " uur en dT = "+ f"{avg_delta_T_all_years:.2f})".replace('.', ',')
+        +  f"E = {MWH:.0f} MWh (jaarlijks)".replace(',', '.')
 
     if not alleen_temp:
         fig.text(0.88, 0.90, text_content, fontsize=fontsize - 2,
