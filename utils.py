@@ -191,7 +191,7 @@ def plot_monthly_temperature_debiet(
     fig.suptitle(
         f'\n Analyse watertemperatuur, draaiuren en debiet\n{titel}',
         fontsize=fontsize,  # Maak het groter voor meer nadruk
-        x=0.5,                  # Centreer horizontaal
+        x=0.4,                  # Centreer horizontaal
         ha='center',            # Zorg dat de uitlijning ook gecentreerd is
         weight='bold'           # Maak de tekst vetgedrukt
     )
@@ -334,9 +334,9 @@ def plot_monthly_temperature_debiet(
     )
 
     if MWH is not None:
-        text_content += "\nQ =" + f"{debiet_inschatting:.2f}".replace('.', ',') 
-        + "m3/s  (op basis van" + f"{avg_draaiuren/(1 + maintenance_factor):.0f}".replace('.', ',') 
-        + " uur en dT = "+ f"{avg_delta_T_all_years:.2f})".replace('.', ',')
+        text_content += "\nQ =" + f"{debiet_inschatting:.2f}"
+        + "m3/s  (op basis van" + f"{avg_draaiuren/(1 + maintenance_factor):.0f}".replace(',', '.') 
+        + " uur en dT = "+ f"{avg_delta_T_all_years:.2f})".replace(',', '.')
         +  f"E = {MWH:.0f} MWh (jaarlijks)".replace(',', '.')
 
     if not alleen_temp:
