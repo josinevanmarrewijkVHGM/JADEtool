@@ -321,27 +321,64 @@ def plot_monthly_temperature_debiet(
 
     results_df = pd.DataFrame(results_data)
 
+    # text_content = (
+    #     f"$\\bf{{{plot_type}}} $ " + '\n'
+    #     f"$\\bf{{Uitgangspunten   }} $" + '\n' 
+    #     f"ΔT max: {delta_T} Kelvin\n"
+    #     f"{min_loz_text}\n\n"
+    #     f"$\\mathbf{{Resultaten}}$" + '\n'
+    #     f"Gem. aantal draaiuren = {avg_draaiuren:,.0f}".replace(',', '.') + '\n'
+    #     f"Ontwerp draaiuren = {avg_draaiuren / (1 + maintenance_factor):,.0f}".replace(',', '.') + '\n'
+    #     "Gem. ΔT = " + f"{avg_delta_T_all_years:.2f}".replace('.', ',') + " Kelvin" + '\n'
+    #     "Gem. innametemperatuur = " + f"{avg_bron:.2f}".replace('.', ',') + " °C"
+    # )
+
+    # if MWH is not None:
+    #     text_content += "\nQ =" + f"{debiet_inschatting:.2f}"
+    #     + "m3/s  (op basis van" + f"{avg_draaiuren/(1 + maintenance_factor):.0f}".replace(',', '.') 
+    #     + " uur en dT = "+ f"{avg_delta_T_all_years:.2f})".replace(',', '.')
+    #     +  f"E = {MWH:.0f} MWh (jaarlijks)".replace(',', '.')
+
+    # if not alleen_temp:
+    #     fig.text(0.88, 0.90, text_content, fontsize=fontsize - 2,
+    #              bbox=dict(facecolor='k', alpha=0.1, edgecolor='black'), ha='center')
+
+
+    # Basis tekstinhoud opbouwen
     text_content = (
-        f"$\\bf{{{plot_type}}} $ " + '\n'
-        f"$\\bf{{Uitgangspunten   }} $" + '\n' 
+        f"$\\bf{{{plot_type}}}$\n"
+        f"$\\bf{{Uitgangspunten}}$\n"
         f"ΔT max: {delta_T} Kelvin\n"
         f"{min_loz_text}\n\n"
-        f"$\\mathbf{{Resultaten}}$" + '\n'
-        f"Gem. aantal draaiuren = {avg_draaiuren:,.0f}".replace(',', '.') + '\n'
-        f"Ontwerp draaiuren = {avg_draaiuren / (1 + maintenance_factor):,.0f}".replace(',', '.') + '\n'
-        "Gem. ΔT = " + f"{avg_delta_T_all_years:.2f}".replace('.', ',') + " Kelvin" + '\n'
-        "Gem. innametemperatuur = " + f"{avg_bron:.2f}".replace('.', ',') + " °C"
+        f"$\\mathbf{{Resultaten}}$\n"
+        f"Gem. aantal draaiuren = {avg_draaiuren:,.0f}".replace(',', '.') + "\n"
+        f"Ontwerp draaiuren = {(avg_draaiuren / (1 + maintenance_factor)):,.0f}".replace(',', '.') + "\n"
+        f"Gem. ΔT = {avg_delta_T_all_years:.2f}".replace('.', ',') + " Kelvin\n"
+        f"Gem. innametemperatuur = {avg_bron:.2f}".replace('.', ',') + " °C"
     )
-
+    
+    # Optionele toevoeging van Q en E
     if MWH is not None:
-        text_content += "\nQ =" + f"{debiet_inschatting:.2f}"
-        + "m3/s  (op basis van" + f"{avg_draaiuren/(1 + maintenance_factor):.0f}".replace(',', '.') 
-        + " uur en dT = "+ f"{avg_delta_T_all_years:.2f})".replace(',', '.')
-        +  f"E = {MWH:.0f} MWh (jaarlijks)".replace(',', '.')
-
+        q = f"{debiet_inschatting:.2f}"
+        draaiuren = f"{avg_draaiuren / (1 + maintenance_factor):.0f}".replace(',', '.')
+        dT = f"{avg_delta_T_all_years:.2f}".replace(',', '.')
+        energie = f"{MWH:.0f}".replace(',', '.')
+        text_content += (
+            f"\nQ = {q} m3/s  (op basis van {draaiuren} uur en dT = {dT})\n"
+            f"E = {energie} MWh (jaarlijks)"
+        )
+    
+    # Toevoegen aan matplotlib figuur
     if not alleen_temp:
-        fig.text(0.88, 0.90, text_content, fontsize=fontsize - 2,
-                 bbox=dict(facecolor='k', alpha=0.1, edgecolor='black'), ha='center')
+        fig.text(
+            0.88, 0.90, text_content,
+            fontsize=fontsize - 2,
+            bbox=dict(facecolor='k', alpha=0.1, edgecolor='black'),
+            ha='center'
+        )
+
+
+
 
     ax1.legend(loc='upper left', fontsize=fontsize-2, ncol=2)
     # add_logo(fig, zoom=0.01, logo_path=logopath, position=(0.1, 0.98))
