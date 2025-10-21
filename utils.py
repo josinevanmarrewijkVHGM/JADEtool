@@ -191,7 +191,7 @@ def plot_monthly_temperature_debiet(
     fig.suptitle(
         f'\n Analyse watertemperatuur, draaiuren en debiet\n{titel}',
         fontsize=fontsize,  # Maak het groter voor meer nadruk
-        x=0.4,                  # Centreer horizontaal
+        x=0.45,                  # Centreer horizontaal
         ha='center',            # Zorg dat de uitlijning ook gecentreerd is
         weight='bold'           # Maak de tekst vetgedrukt
     )
@@ -353,18 +353,18 @@ def plot_monthly_temperature_debiet(
         f"$\\mathbf{{Resultaten}}$\n"
         f"Gem. aantal draaiuren = {avg_draaiuren:,.0f}".replace(',', '.') + "\n"
         f"Ontwerp draaiuren = {(avg_draaiuren / (1 + maintenance_factor)):,.0f}".replace(',', '.') + "\n"
-        f"Gem. ΔT = {avg_delta_T_all_years:.2f}".replace('.', ',') + " Kelvin\n"
-        f"Gem. innametemperatuur = {avg_bron:.2f}".replace('.', ',') + " °C"
+        "Gem."+f"ΔT = {avg_delta_T_all_years:.2f}".replace('.', ',') + " Kelvin\n"
+        "Gem."+f" innametemperatuur = {avg_bron:.2f}".replace('.', ',') + " °C"
     )
     
     # Optionele toevoeging van Q en E
     if MWH is not None:
         q = f"{debiet_inschatting:.2f}"
-        draaiuren = f"{avg_draaiuren / (1 + maintenance_factor):.0f}".replace(',', '.')
+        draaiuren = f"{avg_draaiuren / (1 + maintenance_factor):,.0f}".replace(',', '.')
         dT = f"{avg_delta_T_all_years:.2f}".replace(',', '.')
         energie = f"{MWH:.0f}".replace(',', '.')
         text_content += (
-            f"\nQ = {q} m3/s  (op basis van {draaiuren} uur en dT = {dT})\n"
+            f"\nQ = {q} m3/s  (op basis van bovenstaande):\n"
             f"E = {energie} MWh (jaarlijks)"
         )
     
