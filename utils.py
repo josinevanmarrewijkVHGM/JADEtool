@@ -306,7 +306,7 @@ def plot_monthly_temperature_debiet(
     if len(set(min_loz)) == 1:
         min_loz_text = f"Min. lozingstemperatuur: {min_loz[0]} °C"
     else:
-        min_loz_text = "Min. lozingstemperatuur: verschilt per maand"
+        min_loz_text = "Min. lozingstemperatuur: 2 °C"
 
     results_data = {
         "Plot Type": [plot_type],
