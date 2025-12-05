@@ -314,8 +314,8 @@ def plot_monthly_temperature_debiet(
         "Min. Lozingstemperatuur": [min_loz_text],
         "Gem. aantal draaiuren": [avg_draaiuren],
         "Ontwerp draaiuren": [avg_draaiuren / (1 + maintenance_factor)],
-        "Gem. ΔT (Kelvin)": [avg_delta_T_all_years]
-        "Gem. innametemperatuur (°C)": [avg_bron],
+        "Gem. ΔT (Kelvin)": [avg_delta_T_all_years],
+        "Gem. innametemperatuur (°C)": [avg_bron]
         # "E (MWh/jaar)": [MWH]
     }
 
