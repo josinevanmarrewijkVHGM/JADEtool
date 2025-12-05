@@ -314,9 +314,9 @@ def plot_monthly_temperature_debiet(
         "Min. Lozingstemperatuur": [min_loz_text],
         "Gem. aantal draaiuren": [avg_draaiuren],
         "Ontwerp draaiuren": [avg_draaiuren / (1 + maintenance_factor)],
-        "Gem. ΔT (Kelvin)": [avg_delta_T_all_years],
+        "Gem. ΔT (Kelvin)": [avg_delta_T_all_years]
         "Gem. innametemperatuur (°C)": [avg_bron],
-        "E (MWh/jaar)": [MWH]
+        # "E (MWh/jaar)": [MWH]
     }
 
     results_df = pd.DataFrame(results_data)
@@ -358,15 +358,15 @@ def plot_monthly_temperature_debiet(
     )
     
     # Optionele toevoeging van Q en E
-    if MWH is not None:
-        q = f"{debiet_inschatting:.2f}"
-        draaiuren = f"{avg_draaiuren / (1 + maintenance_factor):,.0f}".replace(',', '.')
-        dT = f"{avg_delta_T_all_years:.2f}".replace(',', '.')
-        energie = f"{MWH:.0f}".replace(',', '.')
-        text_content += (
-            f"\nQ = {q} m3/s  (op basis van bovenstaande):\n"
-            f"E = {energie} MWh (jaarlijks)"
-        )
+    # if MWH is not None:
+    #     q = f"{debiet_inschatting:.2f}"
+    #     draaiuren = f"{avg_draaiuren / (1 + maintenance_factor):,.0f}".replace(',', '.')
+    #     dT = f"{avg_delta_T_all_years:.2f}".replace(',', '.')
+    #     energie = f"{MWH:.0f}".replace(',', '.')
+    #     text_content += (
+    #         f"\nQ = {q} m3/s  (op basis van bovenstaande):\n"
+    #         f"E = {energie} MWh (jaarlijks)"
+    #     )
     
     # Toevoegen aan matplotlib figuur
     if not alleen_temp:
