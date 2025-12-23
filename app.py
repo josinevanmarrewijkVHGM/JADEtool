@@ -1,6 +1,6 @@
 import streamlit as st
 import pandas as pd
-from utils import process_data, calculate_temperature_adjustments_month, calculate_temperature_adjustments_month_v2, add_logo, plot_monthly_temperature_debiet, plot_monthly_temperature
+from utils import process_data, calculate_temperature_adjustments_month, calculate_temperature_adjustments_month_v2, add_logo, plot_monthly_temperature_debiet,plot_monthly_temperature_debiet_v2, plot_monthly_temperature
 import io
 import matplotlib.pyplot as plt
 from datetime import datetime
