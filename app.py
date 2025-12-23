@@ -1,6 +1,6 @@
 import streamlit as st
 import pandas as pd
-from utils import process_data, calculate_temperature_adjustments_month, calculate_temperature_adjustments_month_v2, add_logo, plot_monthly_temperature_debiet,plot_monthly_temperature_debiet_v2, plot_monthly_temperature
+from utils import process_data, calculate_temperature_adjustments_month, calculate_temperature_adjustments_month_v2, add_logo, plot_monthly_temperature_debiet,plot_monthly_temperature_debiet_v2, plot_monthly_temperature, plot_monthly_temperature_v2
 import io
 import matplotlib.pyplot as plt
 from datetime import datetime
@@ -234,7 +234,7 @@ if st.button("🚀 Start analyse"):
             st.pyplot(fig)
         
     #     #         # Berekeningen
-        df_hourly, monthly_summary, yearly_summary = calculate_temperature_adjustments_month(
+        df_hourly, monthly_summary, yearly_summary = calculate_temperature_adjustments_month_v2(
                 final_df, threshold_temp_month, min_dif, delta_T, min_loz_month, max_deltaT=delta_T, method='estimation'
             )
 
@@ -303,7 +303,7 @@ if st.button("🚀 Start analyse"):
             s_1 = 14
             s_2 = 10
             fig3, ax1 = plt.subplots(1, 1, figsize=(s_1, s_2))
-            fig3, ax1, results_df = plot_monthly_temperature(df_hourly, start_date, end_date, delta_T, 
+            fig3, ax1, results_df = plot_monthly_temperature_v2(df_hourly, start_date, end_date, delta_T, 
                                             min_loz_month, min_dif, threshold_temp_month,
                                             maintenance, alleen_temp, titel=titel, 
                                             fontsize=15, t_lim=[0, 30],
