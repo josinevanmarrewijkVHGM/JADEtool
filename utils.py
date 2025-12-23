@@ -569,7 +569,7 @@ def plot_monthly_temperature_debiet_v2(
     # Helpers for flexible inputs
     # ---------------------------
     months_short = ["Jan", "Feb", "Mar", "Apr", "Mei", "Jun", "Jul", "Aug", "Sep", "Okt", "Nov", "Dec"]
-
+    
     def to_month_map_12(x):
         """Return ({1..12: float}, is_scalar, scalar_value_or_None)."""
         if np.isscalar(x):
@@ -753,7 +753,7 @@ def plot_monthly_temperature_debiet_v2(
 
     elif mode == "automatic":
         # Toon naam van automatische modus en waarden
-        auto_text = f"Modus: {auto_mode}\nΔT waarden: ≥16°C={auto_values[0]} | 10–16°C={auto_values[1]} | 2–10°C={auto_values[2]}"
+        auto_text = f"Modus: {auto_mode}\nΔT waarden: ≥ 16°C={auto_values[0]} | 10–16 °C={auto_values[1]} | 2–10 °C={auto_values[2]}"
         text_content = (
             f"$\\bf{{TEO}}$\n"
             f"$\\bf{{Automatisch}}$\n"

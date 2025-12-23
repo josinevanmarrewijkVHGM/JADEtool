@@ -355,7 +355,7 @@ if st.button("🚀 Start analyse"):
                                                                             fontsize=15, t_lim=[0, 30],
                                                                             draaiseizoen_shade=True, wko=True,
                                                                             s1=s_1, s2=s_2,
-                                                                            mode=modus)
+                                                                            mode=modus, auto_mode=auto_mode, auto_values=auto_values)
             # add_logo(fig3, zoom=0.1, logo_path=logopath, position=(0.8, 0.99))
 
             st.pyplot(fig3)
