@@ -183,7 +183,7 @@ if st.button("🚀 Start analyse"):
             s_1 = 14
             s_2 = 10
             fig3, (ax1, ax2) = plt.subplots(2, 1, figsize=(s_1, s_2), sharex=True)
-            fig3, ax1, ax2, results_df = plot_monthly_temperature_debiet(df_hourly, start_date, end_date, delta_T, 
+            fig3, ax1, ax2, results_df = plot_monthly_temperature_debiet_v2(df_hourly, start_date, end_date, delta_T, 
                                             min_loz_month, min_dif, threshold_temp_month,
                                             maintenance, alleen_temp, titel=titel, 
                                             fontsize=15, t_lim=[0, 30],
