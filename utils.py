@@ -346,7 +346,7 @@ def calculate_temperature_adjustments_month_v2(
     df_hourly['Draaiuren'] = df_hourly.groupby('Year')['Above_Threshold'].cumsum()
 
     return df_hourly, monthly_summary, yearly_summary
-``
+
 
 
 
