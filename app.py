@@ -34,41 +34,6 @@ with st.sidebar:
     end_date = st.date_input("Eind datum", value=default_end)
     start_date_str = start_date.strftime('%d-%m-%Y')
     end_date_str = end_date.strftime('%d-%m-%Y')
-
-    # st.header("⚙️ Uitgangspunten standaard")
-    # delta_T = st.slider("Temperatuur verschil (K)", min_value=2, max_value=12, value=10)
-    # maintenance = st.number_input("Onderhouds factor", min_value=0.0, max_value=1.0, value=0.2, step=0.01)
-    # min_dif = st.selectbox("Minimaal temperatuur verschil (K)", options=[2, 3, 4, 5], index=1)
-
-    # st.header("⚙️ Uitgangspunten uitgebreid")
-    # use_monthly_loz = st.checkbox("Maandelijkse minimale lozingstemperaturen", value=False)
-    # min_loz_month = []
-    # if use_monthly_loz:
-    #     st.subheader("🌡️ Monthly Minimum Lozing Temperatures")
-    #     months = ["Jan", "Feb", "Mar", "Apr", "Mei", "Jun", 
-    #               "Jul", "Aug", "Sep", "Okt", "Nov", "Dec"]
-    #     for month in months:
-    #         val = st.number_input(f"{month}", min_value=0, max_value=30)
-    #         min_loz_month.append(val)
-    # else:
-    #     loz_temp = st.number_input("Jaarlijkse minimale lozingstemperatuur", min_value=0, max_value=30, value=12)
-    #     min_loz_month = [loz_temp] * 12
-    # threshold_temp_month = [temp + min_dif for temp in min_loz_month]
-    # use_monthly_deltaT = st.checkbox("Maandelijkse temperatuurverschillen (ΔT) instellen", value=False)
-    # # Houd zowel een scalar (fallback) als een per-maand container beschikbaar
-    # delta_T_per_month = {}
-    
-    # if use_monthly_deltaT:
-    #     st.subheader("🌡️ Maandelijkse ΔT (K)")
-    #     months = ["Jan", "Feb", "Mar", "Apr", "Mei", "Jun", 
-    #               "Jul", "Aug", "Sep", "Okt", "Nov", "Dec"]
-    #     # Gebruik sliders per maand, met dezelfde grenzen als globaal
-    #     for m in months:
-    #         delta_T_per_month[m] = st.slider(
-    #             f"ΔT {m} (K)",
-    #             min_value=0, max_value=12, value=5,  # start vanaf globale waarde
-    #             key=f"deltaT_{m}"  # unieke sleutel per widget
-    #         )
     
     st.header("⚙️ Uitgangspunten standaard")
     delta_T_global = st.slider("Temperatuur verschil (K)", min_value=2, max_value=12, value=10)
@@ -123,6 +88,7 @@ with st.sidebar:
     
     if auto_mode == "Aquathermie voor alleen regeneratie bodemenergiesysteem":
         automatic = True
+        modus = "automatic"
         st.subheader("Instellingen: Alleen regeneratie")
         delta_T1 = st.slider("Temperatuur verschil (K), ≥16°C", min_value=3, max_value=12, value=10)
         auto_values = (delta_T1, 0, 0)
@@ -130,6 +96,7 @@ with st.sidebar:
     elif auto_mode == "Aquathermie voor regeneratie en directe levering":
         automatic = True
         st.subheader("Instellingen: Regeneratie + directe levering")
+        modus = "automatic"
         delta_T1 = st.slider("Temperatuur verschil (K), ≥16°C", min_value=5, max_value=12, value=10)
         delta_T2 = st.slider("Temperatuur verschil (K), 10–16°C", min_value=3, max_value=10, value=3)
         delta_T3 = st.slider("Temperatuur verschil (K), 2–10°C", min_value=3, max_value=8, value=3)
@@ -138,6 +105,7 @@ with st.sidebar:
     elif auto_mode == "Aquathermie voor directe levering":
         automatic = True
         st.subheader("Instellingen: Directe levering")
+        modus = "automatic"
         delta_T_all = st.slider("Temperatuur verschil (K) voor alle bereiken", min_value=2, max_value=12, value=10)
         auto_values = (delta_T_all, delta_T_all, delta_T_all)
     
@@ -145,10 +113,13 @@ with st.sidebar:
     if not automatic:
         if use_monthly_deltaT:
             delta_T_input = delta_T_per_month  # list of 12 values
+            modus = None
         else:
             delta_T_input = delta_T_global
+            modus = 'stamdaard'
     else:
         delta_T_input = None  # ignored in automatic mode
+        modus = 'automatic'
 
     
 
@@ -372,12 +343,20 @@ if st.button("🚀 Start analyse"):
             s_1 = 14
             s_2 = 10
             fig3, (ax1, ax2) = plt.subplots(2, 1, figsize=(s_1, s_2), sharex=True)
-            fig3, ax1, ax2, results_df = plot_monthly_temperature_debiet_v2(df_hourly, start_date, end_date, delta_T, 
-                                            min_loz_month, min_dif, threshold_temp_month,
-                                            maintenance, alleen_temp, titel=titel, 
-                                            fontsize=15, t_lim=[0, 30],
-                                            draaiseizoen_shade=True, wko=True,
-                                            s1=s_1, s2=s_2)
+            # fig3, ax1, ax2, results_df = plot_monthly_temperature_debiet_v2(df_hourly, start_date, end_date, delta_T, 
+            #                                 min_loz_month, min_dif, threshold_temp_month,
+            #                                 maintenance, alleen_temp, titel=titel, 
+            #                                 fontsize=15, t_lim=[0, 30],
+            #                                 draaiseizoen_shade=True, wko=True,
+            #                                 s1=s_1, s2=s_2)
+            
+            fig3, ax1, ax2, results_df = plot_monthly_temperature_debiet_v2(df_hourly, start_date, end_date,
+                                                                            delta_T_input, min_loz_month, min_dif, threshold_temp_month,
+                                                                            maintenance, alleen_temp=False, titel=titel,
+                                                                            fontsize=15, t_lim=[0, 30],
+                                                                            draaiseizoen_shade=True, wko=True,
+                                                                            s1=s_1, s2=s_2,
+                                                                            mode=modus)
             # add_logo(fig3, zoom=0.1, logo_path=logopath, position=(0.8, 0.99))
 
             st.pyplot(fig3)

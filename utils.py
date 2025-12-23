@@ -311,8 +311,6 @@ def calculate_temperature_adjustments_month_v2(
     return df_hourly, monthly_summary, yearly_summary
 
 
-
-
 def plot_monthly_temperature_debiet(
     df_final, start_date, end_date, delta_T, min_loz, min_dif, threshold_temp,
     maintenance_factor, alleen_temp, titel='naam',
@@ -365,9 +363,6 @@ def plot_monthly_temperature_debiet(
                     va='bottom',
                     bbox=dict(facecolor='white', alpha=0.8)
                 )
-
-
-
 
     # Plot discharge data
     ax2.scatter(df.index, df['debiet'], alpha=0.5, color=blue, s=1, label='Gemeten (uurlijks)')
@@ -537,16 +532,20 @@ import matplotlib.pyplot as plt
 # red = '#d62728'
 # blue = '#1f77b4'
 
+
+
 def plot_monthly_temperature_debiet_v2(
     df_final, start_date, end_date, delta_T, min_loz, min_dif, threshold_temp,
     maintenance_factor, alleen_temp, titel='naam',
     fontsize=15, t_lim=[0, 30],
-    draaiseizoen_shade=True, wko=True, s1=10, s2=10
+    draaiseizoen_shade=True, wko=True, s1=10, s2=10,
+    mode="standaard", auto_mode=None, auto_values=None
 ):
     """
-    Plots water temperature and flow rate data with optional logo, seasonal shading, and summary statistics.
+    Plots water temperature and flow rate data with optionele tekstbox afhankelijk van modus.
 
     Parameters
+    ----------
     ----------
     delta_T : float OR list-like(12) OR dict
         - Scalar: single ΔT cap; labels show that scalar.
@@ -555,7 +554,16 @@ def plot_monthly_temperature_debiet_v2(
     min_loz : int OR list-like(12)
         - Scalar: single minimum lozing temperature (draws horizontal line).
         - List-like 12: monthly minima; label summarizes (equal value or min–max).
+
+    mode : str
+        'standaard', 'uitgebreid', of 'automatic'
+    auto_mode : str
+        Naam van automatische modus (alleen bij mode='automatic')
+    auto_values : tuple
+        Waarden voor automatische modus (alleen bij mode='automatic')
     """
+    
+    
 
     # ---------------------------
     # Helpers for flexible inputs
@@ -718,52 +726,49 @@ def plot_monthly_temperature_debiet_v2(
     ax1.grid(True, which='both', axis='x')
     ax1.grid(True, which='both', axis='y')
     ax1.set_ylim(t_lim[0], t_lim[1])
-
+  
     # -------------------
     # Summary statistics
     # -------------------
     avg_draaiuren = df[df['Draaiuren'] > 0].groupby(df.index.to_series().dt.year)['Draaiuren'].max().mean()
     avg_delta_T_all_years = df.groupby(df.index.year)['Yearly_Avg_delta_T'].mean().mean()
     avg_bron = df['Average_bron'].mean()
-    debiet_inschatting = percentile_10th * 0.1  # m3/s
+    percentile_10th = df['debiet'].quantile(0.1)
 
-    # Thermal power (W) — note: not shown in text by default
-    W = debiet_inschatting * 998 * 4185 * avg_delta_T_all_years
+    # Tekst voor standaard en automatic
+    if mode == "standaard":
+        deltaT_label_text, _ = summarize_deltaT_for_label(delta_T)
+        min_loz_text = summarize_min_loz_for_label(min_loz)
+        text_content = (
+            f"$\\bf{{TEO}}$\n"
+            f"$\\bf{{Uitgangspunten}}$\n"
+            f"ΔT max: {deltaT_label_text}\n"
+            f"{min_loz_text}\n\n"
+            f"$\\mathbf{{Resultaten}}$\n"
+            f"Gem. draaiuren = {avg_draaiuren:,.0f}".replace(',', '.') + "\n"
+            f"Ontwerp draaiuren = {(avg_draaiuren / (1 + maintenance_factor)):,.0f}".replace(',', '.') + "\n"
+            f"Gem. ΔT = {avg_delta_T_all_years:.2f}".replace('.', ',') + " K\n"
+            f"Gem. innametemp = {avg_bron:.2f}".replace('.', ',') + " °C"
+        )
 
-    # Energy estimate in MWh/year (kept for future use)
-    MWH = avg_draaiuren / (1 + maintenance_factor) * W / 10**6
+    elif mode == "automatic":
+        # Toon naam van automatische modus en waarden
+        auto_text = f"Modus: {auto_mode}\nΔT waarden: ≥16°C={auto_values[0]} | 10–16°C={auto_values[1]} | 2–10°C={auto_values[2]}"
+        text_content = (
+            f"$\\bf{{TEO}}$\n"
+            f"$\\bf{{Automatisch}}$\n"
+            f"{auto_text}\n\n"
+            f"$\\mathbf{{Resultaten}}$\n"
+            f"Gem. draaiuren = {avg_draaiuren:,.0f}".replace(',', '.') + "\n"
+            f"Gem. ΔT = {avg_delta_T_all_years:.2f}".replace('.', ',') + " K\n"
+            f"Gem. innametemp = {avg_bron:.2f}".replace('.', ',') + " °C"
+        )
 
-    plot_type = 'TEO'
-    # Build ΔT label for scalar vs monthly
-    deltaT_label_text, deltaT_table_value = summarize_deltaT_for_label(delta_T)
-    min_loz_text = summarize_min_loz_for_label(min_loz)
+    else:  # uitgebreid
+        text_content = None  # Geen uitgangspunten tonen
 
-    # Results for table/export — store ΔT as a human-readable string if monthly
-    results_data = {
-        "Plot Type": [plot_type],
-        "ΔT max (Kelvin)": [deltaT_table_value],
-        "Min. Lozingstemperatuur": [min_loz_text],
-        "Gem. aantal draaiuren": [avg_draaiuren],
-        "Ontwerp draaiuren": [avg_draaiuren / (1 + maintenance_factor)],
-        "Gem. ΔT (Kelvin)": [avg_delta_T_all_years],
-        "Gem. innametemperatuur (°C)": [avg_bron]
-        # "E (MWh/jaar)": [MWH]
-    }
-    results_df = pd.DataFrame(results_data)
-
-    # Right-side text box (suppressed when alleen_temp=True)
-    text_content = (
-        f"$\\bf{{{plot_type}}}$\n"
-        f"$\\bf{{Uitgangspunten}}$\n"
-        f"ΔT max: {deltaT_label_text}\n"
-        f"{min_loz_text}\n\n"
-        f"$\\mathbf{{Resultaten}}$\n"
-        f"Gem. aantal draaiuren = {avg_draaiuren:,.0f}".replace(',', '.') + "\n"
-        f"Ontwerp draaiuren = {(avg_draaiuren / (1 + maintenance_factor)):,.0f}".replace(',', '.') + "\n"
-        "Gem." + f"ΔT = {avg_delta_T_all_years:.2f}".replace('.', ',') + " Kelvin\n"
-        "Gem." + f" innametemperatuur = {avg_bron:.2f}".replace('.', ',') + " °C"
-    )
-    if not alleen_temp:
+    # Voeg tekstbox toe als nodig
+    if not alleen_temp and text_content:
         fig.text(
             0.88, 0.90, text_content,
             fontsize=fontsize - 2,
@@ -773,8 +778,8 @@ def plot_monthly_temperature_debiet_v2(
 
     ax1.legend(loc='upper left', fontsize=fontsize-2, ncol=2)
     fig.tight_layout()
+    return fig, ax1, ax2
 
-    return fig, ax1, ax2, results_data
 
 
 def plot_monthly_temperature_v2(
