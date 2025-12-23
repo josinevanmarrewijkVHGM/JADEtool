@@ -169,8 +169,6 @@ def calculate_temperature_adjustments_month(df, threshold_temp_month, min_dif, d
     return df_hourly, monthly_summary, yearly_summary 
 
 
-
-
 def calculate_temperature_adjustments_month_v2(
     df,
     threshold_temp_month,
