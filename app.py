@@ -113,10 +113,10 @@ with st.sidebar:
     if not automatic:
         if use_monthly_deltaT:
             delta_T_input = delta_T_per_month  # list of 12 values
-            modus = None
+            modus = 'uitgebreid'
         else:
             delta_T_input = delta_T_global
-            modus = 'stamdaard'
+            modus = 'standaard'
     else:
         delta_T_input = None  # ignored in automatic mode
         modus = 'automatic'
@@ -348,10 +348,10 @@ if st.button("🚀 Start analyse"):
             #                                 fontsize=15, t_lim=[0, 30],
             #                                 draaiseizoen_shade=True, wko=True,
             #                                 s1=s_1, s2=s_2)
-            
+            print(modus)
             fig3, ax1, ax2, results_df = plot_monthly_temperature_debiet_v2(df_hourly, start_date, end_date,
                                                                             delta_T_input, min_loz_month, min_dif, threshold_temp_month,
-                                                                            maintenance, alleen_temp=False, titel=titel,
+                                                                            maintenance, titel=titel,
                                                                             fontsize=15, t_lim=[0, 30],
                                                                             draaiseizoen_shade=True, wko=True,
                                                                             s1=s_1, s2=s_2,

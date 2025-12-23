@@ -536,7 +536,7 @@ import matplotlib.pyplot as plt
 
 def plot_monthly_temperature_debiet_v2(
     df_final, start_date, end_date, delta_T, min_loz, min_dif, threshold_temp,
-    maintenance_factor, alleen_temp, titel='naam',
+    maintenance_factor, titel='naam',
     fontsize=15, t_lim=[0, 30],
     draaiseizoen_shade=True, wko=True, s1=10, s2=10,
     mode="standaard", auto_mode=None, auto_values=None
@@ -768,7 +768,7 @@ def plot_monthly_temperature_debiet_v2(
         text_content = None  # Geen uitgangspunten tonen
 
     # Voeg tekstbox toe als nodig
-    if not alleen_temp and text_content:
+    if text_content:
         fig.text(
             0.88, 0.90, text_content,
             fontsize=fontsize - 2,
