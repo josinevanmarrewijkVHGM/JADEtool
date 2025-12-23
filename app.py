@@ -172,7 +172,13 @@ if st.button("🚀 Start analyse"):
     if temp_file and discharge_file:
         st.write("Files uploaded successfully.")
         st.write(f"Start: {start_date_str}, Eind datum: {end_date_str}")
-        st.write(f"Delta T: {delta_T} Kelvin, Onderhoudsfactor: {maintenance}, Minimaal verschil: {min_dif} Kelvin")
+        try:
+            st.write(f"Delta T: {delta_T_global} Kelvin, Onderhoudsfactor: {maintenance}, Minimaal verschil: {min_dif} Kelvin")
+        except:
+            st.write(f"Delta T: {delta_T_per_month} Kelvin, Onderhoudsfactor: {maintenance}, Minimaal verschil: {min_dif} Kelvin")
+        finally:
+            st.write(f"Automatic mode {auto_mode}, {auto_values}, Onderhoudsfactor: {maintenance}, Minimaal verschil: {min_dif} Kelvin")
+
         st.write(f"Minimale innametemperatuur (per maand): {threshold_temp_month} °C")
         plot_debiet = True
 
