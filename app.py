@@ -48,13 +48,28 @@ with st.sidebar:
         months = ["Jan", "Feb", "Mar", "Apr", "Mei", "Jun", 
                   "Jul", "Aug", "Sep", "Okt", "Nov", "Dec"]
         for month in months:
-            val = st.number_input(f"{month}", min_value=0, max_value=25)
+            val = st.number_input(f"{month}", min_value=0, max_value=30)
             min_loz_month.append(val)
     else:
-        loz_temp = st.number_input("Jaarlijkse minimale lozingstemperatuur", min_value=0, max_value=25, value=12)
+        loz_temp = st.number_input("Jaarlijkse minimale lozingstemperatuur", min_value=0, max_value=30, value=12)
         min_loz_month = [loz_temp] * 12
 
     threshold_temp_month = [temp + min_dif for temp in min_loz_month]
+
+    # --- NIEUW: Maandelijkse delta_T ---
+    use_monthly_deltaT = st.checkbox("Maandelijkse temperatuurverschillen (ΔT) instellen", value=False)
+    
+    # Houd zowel een scalar (fallback) als een per-maand container beschikbaar
+    delta_T_per_month = {}
+    if use_monthly_deltaT:
+        st.subheader("🌡️ Maandelijkse ΔT (K)")
+        # Gebruik sliders per maand, met dezelfde grenzen als globaal
+        for m in months:
+            delta_T_per_month[m] = st.slider(
+                f"ΔT {m} (K)",
+                min_value=0, max_value=12, value=delta_T,  # start vanaf globale waarde
+                key=f"deltaT_{m}"  # unieke sleutel per widget
+            )
 
     st.header("📊 Keuze grafieken")
     show_fig1 = st.checkbox(f"1. Data visualisatie {titel}", value=True)
