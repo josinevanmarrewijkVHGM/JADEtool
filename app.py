@@ -368,7 +368,7 @@ if st.button("🚀 Start analyse"):
             st.download_button(
                 label="📥 Download grafiek Aquathermie Data Explorer als PNG",
                 data=buf,
-                file_name=f"JADE_{delta_T}_{titel}.png",
+                file_name=f"JADE_{titel}.png",
                 mime="image/png"
             )
 

@@ -885,9 +885,9 @@ def plot_monthly_temperature_v2(
         f"$\\bf{{TEO}}$\n"
         f"$\\bf{{Uitgangspunten}}$\n"
         f"ΔT max: {deltaT_label}\n"
-        f"Gem. aantal draaiuren = {avg_draaiuren:,.0f}".replace(',', '.') + "\n"
-        f"Gem. ΔT = {avg_delta_T_all_years:.2f}".replace('.', ',') + " K\n"
-        f"Gem. innametemperatuur = {avg_bron:.2f}".replace('.', ',') + " °C"
+        f"Aantal draaiuren = {avg_draaiuren:,.0f}".replace(',', '.') + "\n"
+        f"ΔT gem = {avg_delta_T_all_years:.2f}".replace('.', ',') + " K\n"
+        f"Innametemperatuur gem = {avg_bron:.2f}".replace('.', ',') + " °C"
     )
     if not alleen_temp:
         fig.text(0.88, 0.90, text_content, fontsize=fontsize-2,
