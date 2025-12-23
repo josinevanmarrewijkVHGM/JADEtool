@@ -150,7 +150,7 @@ if st.button("🚀 Start analyse"):
             ax1.set_xlabel('Jaar', fontsize=14)
             ax1.set_title('Jaarlijkse samenvatting: Draaiuren, vollasturen en temperatuur', fontsize=16)
             ax1.set_xticks(positions_year - bar_width / 2)
-            ax1.set_xticklabels(yearly_summary['YearMonth'], fontsize=12)
+            # ax1.set_xticklabels(yearly_summary['YearMonth'], fontsize=12)
             
             for bar in bars_vollasturen:
                 yval = bar.get_height()
