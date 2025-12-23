@@ -268,7 +268,7 @@ if st.button("🚀 Start analyse"):
                 line_cap_max, = ax2.plot(
                     positions_year + bar_width / 2,
                     deltaT_cap_yearly_max.values,
-                    color='orange', linestyle='--', linewidth=1.5, label='ΔT cap (max per jaar)'
+                    color='red', linestyle='--', linewidth=1.5, label='ΔT cap (max per jaar)'
                 )
             else:
                 line_cap_max = None
