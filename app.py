@@ -35,44 +35,122 @@ with st.sidebar:
     start_date_str = start_date.strftime('%d-%m-%Y')
     end_date_str = end_date.strftime('%d-%m-%Y')
 
-    st.header("⚙️ Uitgangspunten")
-    delta_T = st.slider("Temperatuur verschil (K)", min_value=2, max_value=12, value=10)
+    # st.header("⚙️ Uitgangspunten standaard")
+    # delta_T = st.slider("Temperatuur verschil (K)", min_value=2, max_value=12, value=10)
+    # maintenance = st.number_input("Onderhouds factor", min_value=0.0, max_value=1.0, value=0.2, step=0.01)
+    # min_dif = st.selectbox("Minimaal temperatuur verschil (K)", options=[2, 3, 4, 5], index=1)
+
+    # st.header("⚙️ Uitgangspunten uitgebreid")
+    # use_monthly_loz = st.checkbox("Maandelijkse minimale lozingstemperaturen", value=False)
+    # min_loz_month = []
+    # if use_monthly_loz:
+    #     st.subheader("🌡️ Monthly Minimum Lozing Temperatures")
+    #     months = ["Jan", "Feb", "Mar", "Apr", "Mei", "Jun", 
+    #               "Jul", "Aug", "Sep", "Okt", "Nov", "Dec"]
+    #     for month in months:
+    #         val = st.number_input(f"{month}", min_value=0, max_value=30)
+    #         min_loz_month.append(val)
+    # else:
+    #     loz_temp = st.number_input("Jaarlijkse minimale lozingstemperatuur", min_value=0, max_value=30, value=12)
+    #     min_loz_month = [loz_temp] * 12
+    # threshold_temp_month = [temp + min_dif for temp in min_loz_month]
+    # use_monthly_deltaT = st.checkbox("Maandelijkse temperatuurverschillen (ΔT) instellen", value=False)
+    # # Houd zowel een scalar (fallback) als een per-maand container beschikbaar
+    # delta_T_per_month = {}
+    
+    # if use_monthly_deltaT:
+    #     st.subheader("🌡️ Maandelijkse ΔT (K)")
+    #     months = ["Jan", "Feb", "Mar", "Apr", "Mei", "Jun", 
+    #               "Jul", "Aug", "Sep", "Okt", "Nov", "Dec"]
+    #     # Gebruik sliders per maand, met dezelfde grenzen als globaal
+    #     for m in months:
+    #         delta_T_per_month[m] = st.slider(
+    #             f"ΔT {m} (K)",
+    #             min_value=0, max_value=12, value=5,  # start vanaf globale waarde
+    #             key=f"deltaT_{m}"  # unieke sleutel per widget
+    #         )
+    
+    st.header("⚙️ Uitgangspunten standaard")
+    delta_T_global = st.slider("Temperatuur verschil (K)", min_value=2, max_value=12, value=10)
     maintenance = st.number_input("Onderhouds factor", min_value=0.0, max_value=1.0, value=0.2, step=0.01)
     min_dif = st.selectbox("Minimaal temperatuur verschil (K)", options=[2, 3, 4, 5], index=1)
-
+    
+    st.header("⚙️ Uitgangspunten uitgebreid")
     use_monthly_loz = st.checkbox("Maandelijkse minimale lozingstemperaturen", value=False)
-
+    months = ["Jan", "Feb", "Mar", "Apr", "Mei", "Jun", "Jul", "Aug", "Sep", "Okt", "Nov", "Dec"]
+    
+    # Lozing temperatures
     min_loz_month = []
     if use_monthly_loz:
         st.subheader("🌡️ Monthly Minimum Lozing Temperatures")
-        months = ["Jan", "Feb", "Mar", "Apr", "Mei", "Jun", 
-                  "Jul", "Aug", "Sep", "Okt", "Nov", "Dec"]
-        for month in months:
-            val = st.number_input(f"{month}", min_value=0, max_value=30)
+        for m in months:
+            val = st.number_input(f"{m}", min_value=0, max_value=30, value=12)
             min_loz_month.append(val)
     else:
         loz_temp = st.number_input("Jaarlijkse minimale lozingstemperatuur", min_value=0, max_value=30, value=12)
         min_loz_month = [loz_temp] * 12
-
+    
+    # Threshold temps
     threshold_temp_month = [temp + min_dif for temp in min_loz_month]
-
-    # --- NIEUW: Maandelijkse delta_T ---
+    
+    # Monthly ΔT option
     use_monthly_deltaT = st.checkbox("Maandelijkse temperatuurverschillen (ΔT) instellen", value=False)
-    
-    # Houd zowel een scalar (fallback) als een per-maand container beschikbaar
-    delta_T_per_month = {}
-    
+    delta_T_per_month = []
     if use_monthly_deltaT:
         st.subheader("🌡️ Maandelijkse ΔT (K)")
-        months = ["Jan", "Feb", "Mar", "Apr", "Mei", "Jun", 
-                  "Jul", "Aug", "Sep", "Okt", "Nov", "Dec"]
-        # Gebruik sliders per maand, met dezelfde grenzen als globaal
         for m in months:
-            delta_T_per_month[m] = st.slider(
-                f"ΔT {m} (K)",
-                min_value=0, max_value=12, value=5,  # start vanaf globale waarde
-                key=f"deltaT_{m}"  # unieke sleutel per widget
-            )
+            val = st.slider(f"ΔT {m} (K)", min_value=2, max_value=12, value=delta_T_global, key=f"deltaT_{m}")
+            delta_T_per_month.append(val)
+
+            
+    st.header("⚙️ Uitgangspunten automatisch")
+    # (value1 for ≥16°C, value2 for 10–16°C, value3 for 2–10°C)
+
+    # Mode selection
+    auto_mode = st.radio(
+        "Kies automatische modus:",
+        options=[
+            "Geen automatische modus",
+            "Aquathermie voor alleen regeneratie bodemenergiesysteem",
+            "Aquathermie voor regeneratie en directe levering",
+            "Aquathermie voor directe levering"
+        ],
+        index=0
+    )
+    
+    automatic = False
+    auto_values = (0, 0, 0)  # default
+    
+    if auto_mode == "Aquathermie voor alleen regeneratie bodemenergiesysteem":
+        automatic = True
+        st.subheader("Instellingen: Alleen regeneratie")
+        delta_T1 = st.slider("Temperatuur verschil (K), ≥16°C", min_value=3, max_value=12, value=10)
+        auto_values = (delta_T1, 0, 0)
+    
+    elif auto_mode == "Aquathermie voor regeneratie en directe levering":
+        automatic = True
+        st.subheader("Instellingen: Regeneratie + directe levering")
+        delta_T1 = st.slider("Temperatuur verschil (K), ≥16°C", min_value=5, max_value=12, value=10)
+        delta_T2 = st.slider("Temperatuur verschil (K), 10–16°C", min_value=3, max_value=10, value=3)
+        delta_T3 = st.slider("Temperatuur verschil (K), 2–10°C", min_value=3, max_value=8, value=3)
+        auto_values = (delta_T1, delta_T2, delta_T3)
+    
+    elif auto_mode == "Aquathermie voor directe levering":
+        automatic = True
+        st.subheader("Instellingen: Directe levering")
+        delta_T_all = st.slider("Temperatuur verschil (K) voor alle bereiken", min_value=2, max_value=12, value=10)
+        auto_values = (delta_T_all, delta_T_all, delta_T_all)
+    
+    # --- Determine delta_T input for non-automatic modes ---
+    if not automatic:
+        if use_monthly_deltaT:
+            delta_T_input = delta_T_per_month  # list of 12 values
+        else:
+            delta_T_input = delta_T_global
+    else:
+        delta_T_input = None  # ignored in automatic mode
+
+    
 
     st.header("📊 Keuze grafieken")
     show_fig1 = st.checkbox(f"1. Data visualisatie {titel}", value=True)

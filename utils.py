@@ -176,38 +176,19 @@ def calculate_temperature_adjustments_month_v2(
     delta_T,
     min_loz_month,
     max_deltaT=None,
-    method=None
+    method=None,
+    automatic=False,
+    auto_values=(8, 6, 4)  # (value1 for ≥16°C, value2 for 10–16°C, value3 for 2–10°C)
 ):
     """
     Calculate temperature adjustments based on monthly threshold temperatures and other parameters.
 
     Parameters
     ----------
-    df : DataFrame
-        Datetime-indexed dataframe with column 'temperatuur' (°C).
-    threshold_temp_month : list-like of length 12
-        Monthly threshold temperatures, order Jan..Dec.
-    min_dif : number
-        Minimum temperature difference parameter (kept for compatibility).
-    delta_T : number OR list-like length 12 OR dict
-        - Scalar: single cap (K) applied to all months.
-        - List/tuple/np.ndarray/pd.Series: 12 values for Jan..Dec.
-        - Dict: either {1..12 -> cap} or {"Jan".."Dec" -> cap}.
-    min_loz_month : list-like of length 12
-        Monthly minimum lozing temperatures, order Jan..Dec.
-    max_deltaT : number/list-like/dict or None
-        Optional; if None, defaults to delta_T (kept for compatibility).
-    method : str or None
-        If 'estimation', resamples hourly and interpolates; otherwise hourly mean.
-
-    Returns
-    -------
-    df_hourly : DataFrame
-        Hourly dataframe with calculations.
-    monthly_summary : DataFrame
-        Per-month summary with Count, Hours, Avg_del_T, Vollast_uren.
-    yearly_summary : DataFrame
-        Per-year summary with Draaiuren, Gemiddelde_delta_T, Vollast_uren.
+    automatic : bool
+        If True, delta_T is chosen dynamically based on measured temperature ranges.
+    auto_values : tuple of 3 floats
+        Values for delta_T when T ≥16°C, 10–16°C, and 2–10°C respectively.
     """
 
     # --- Resampling ---
@@ -220,15 +201,15 @@ def calculate_temperature_adjustments_month_v2(
     try:
         df_hourly['Month'] = df_hourly.index.month
     except ValueError:
-        print("Error: Verkeerd datumbereik geselecteerd: het csv-document bevat geen data in de geselecteerde periode.")
+        print("Error: Verkeerd datumbereik geselecteerd.")
         return None
     df_hourly['Year'] = df_hourly.index.year
 
-    # --- Validate monthly inputs ---
+    # Validate monthly inputs
     if len(threshold_temp_month) != 12:
-        raise ValueError("threshold_temp_month must have 12 values (Jan..Dec).")
+        raise ValueError("threshold_temp_month must have 12 values.")
     if len(min_loz_month) != 12:
-        raise ValueError("min_loz_month must have 12 values (Jan..Dec).")
+        raise ValueError("min_loz_month must have 12 values.")
 
     # Maps for monthly values
     threshold_temp_map = {month: temp for month, temp in enumerate(threshold_temp_month, start=1)}
@@ -237,46 +218,45 @@ def calculate_temperature_adjustments_month_v2(
     min_loz_map = {month: temp for month, temp in enumerate(min_loz_month, start=1)}
     df_hourly['Min_Lozingstemperatuur'] = df_hourly['Month'].map(min_loz_map)
 
-    # --- delta_T handling (scalar or monthly) ---
-    months_short = ["Jan", "Feb", "Mar", "Apr", "Mei", "Jun", "Jul", "Aug", "Sep", "Okt", "Nov", "Dec"]
-
-    def to_month_map_12(x):
-        """Convert delta_T to {1..12: value} if monthly; return (map, is_scalar)."""
-        if np.isscalar(x):
-            return None, True
-        if isinstance(x, (list, tuple, np.ndarray, pd.Series)):
-            if len(x) != 12:
-                raise ValueError("delta_T list-like must have length 12 (Jan..Dec).")
-            return {i+1: float(x[i]) for i in range(12)}, False
-        if isinstance(x, dict):
-            if all(k in range(1, 13) for k in x.keys()):
-                return {int(k): float(v) for k, v in x.items()}, False
-            name_to_idx = {m: i+1 for i, m in enumerate(months_short)}
-            if all(str(k) in name_to_idx for k in x.keys()):
-                return {name_to_idx[str(k)]: float(v) for k, v in x.items()}, False
-            raise ValueError("delta_T dict keys must be 1..12 or month names like 'Jan'..'Dec'.")
-        raise TypeError("delta_T must be a number, a 12-long list-like, or a dict.")
-
-    deltaT_map, deltaT_is_scalar = to_month_map_12(delta_T)
-    if deltaT_is_scalar:
-        cap_scalar = float(delta_T)
-        df_hourly['DeltaT_Cap'] = cap_scalar
+    # --- DeltaT logic ---
+    if automatic:
+        # Dynamic assignment based on measured temperature
+        cond1 = df_hourly['temperatuur'] >= 16
+        cond2 = (df_hourly['temperatuur'] >= 10) & (df_hourly['temperatuur'] < 16)
+        cond3 = (df_hourly['temperatuur'] >= 2) & (df_hourly['temperatuur'] < 10)
+        df_hourly['DeltaT_Cap'] = np.select([cond1, cond2, cond3],
+                                            [auto_values[0], auto_values[1], auto_values[2]],
+                                            default=auto_values[2])  # fallback to lowest
     else:
-        df_hourly['DeltaT_Cap'] = df_hourly['Month'].map(deltaT_map)
+        # Original scalar or monthly logic
+        months_short = ["Jan", "Feb", "Mar", "Apr", "Mei", "Jun", "Jul", "Aug", "Sep", "Okt", "Nov", "Dec"]
 
-    # Keep max_deltaT for compatibility (not used further)
-    if max_deltaT is None:
-        max_deltaT = delta_T
+        def to_month_map_12(x):
+            if np.isscalar(x):
+                return None, True
+            if isinstance(x, (list, tuple, np.ndarray, pd.Series)):
+                if len(x) != 12:
+                    raise ValueError("delta_T list-like must have length 12.")
+                return {i+1: float(x[i]) for i in range(12)}, False
+            if isinstance(x, dict):
+                if all(k in range(1, 13) for k in x.keys()):
+                    return {int(k): float(v) for k, v in x.items()}, False
+                name_to_idx = {m: i+1 for i, m in enumerate(months_short)}
+                if all(str(k) in name_to_idx for k in x.keys()):
+                    return {name_to_idx[str(k)]: float(v) for k, v in x.items()}, False
+                raise ValueError("delta_T dict keys must be 1..12 or month names.")
+            raise TypeError("delta_T must be scalar, list(12), or dict.")
 
-    # --- Determine above-threshold hours (two consecutive hours condition) ---
+        deltaT_map, deltaT_is_scalar = to_month_map_12(delta_T)
+        if deltaT_is_scalar:
+            df_hourly['DeltaT_Cap'] = float(delta_T)
+        else:
+            df_hourly['DeltaT_Cap'] = df_hourly['Month'].map(deltaT_map)
+
+    # --- Above threshold logic ---
     df_hourly['Above_Threshold'] = (df_hourly['temperatuur'] > df_hourly['Threshold_Temperature']).astype(int)
     df_hourly['Above_Threshold'] = (
-        df_hourly['Above_Threshold']
-        .rolling(window=2, min_periods=2)
-        .sum()
-        .shift(-1)
-        .fillna(0)
-        .astype(int)
+        df_hourly['Above_Threshold'].rolling(window=2, min_periods=2).sum().shift(-1).fillna(0).astype(int)
     )
     df_hourly['Above_Threshold'] = (df_hourly['Above_Threshold'] == 2).astype(int)
 
@@ -287,63 +267,49 @@ def calculate_temperature_adjustments_month_v2(
         df_hourly['temperatuur'] - df_hourly['Min_Lozingstemperatuur'],
         np.nan
     )
-
-    # Clip per row by monthly/constant cap
     df_hourly['Temp_Difference'] = np.where(
         df_hourly['Temp_Difference'].notna(),
         np.minimum(df_hourly['Temp_Difference'], df_hourly['DeltaT_Cap']),
         np.nan
     )
-
     df_hourly['Lozingstemperatuur'] = np.where(
         df_hourly['Above_Threshold'] == 1,
         df_hourly['temperatuur'] - df_hourly['Temp_Difference'],
         np.nan
     )
 
-    # Hourly Vollast contribution (robust for varying caps; avoid division by zero)
+    # Vollast contribution
     df_hourly['Vollast_uren_contrib'] = np.where(
         (df_hourly['Above_Threshold'] == 1) & (df_hourly['DeltaT_Cap'] > 0),
         df_hourly['Temp_Difference'] / df_hourly['DeltaT_Cap'],
         0.0
     )
 
-    # --- Summaries with safe grouping ---
+    # Summaries
     mask = df_hourly['Temp_Difference'].notna()
-
-    # Monthly summary: use a column or recompute on filtered index
     df_hourly['YearMonth'] = df_hourly.index.to_period('M')
     monthly_summary = (
-        df_hourly.loc[mask]
-        .groupby('YearMonth')
-        .agg(
+        df_hourly.loc[mask].groupby('YearMonth').agg(
             Count=('Temp_Difference', 'size'),
             Hours=('Above_Threshold', 'sum'),
             Avg_del_T=('Temp_Difference', 'mean'),
             Vollast_uren=('Vollast_uren_contrib', 'sum'),
-        )
-        .reset_index()
-    )
-    monthly_summary = monthly_summary.round({"Avg_del_T": 2, "Vollast_uren": 2})
+        ).reset_index()
+    ).round({"Avg_del_T": 2, "Vollast_uren": 2})
 
-    # Yearly summary: group by 'Year' to keep it simple
     yearly_summary = (
-        df_hourly.loc[mask]
-        .groupby('Year')
-        .agg(
+        df_hourly.loc[mask].groupby('Year').agg(
             Draaiuren=('Above_Threshold', 'sum'),
             Gemiddelde_delta_T=('Temp_Difference', 'mean'),
             Vollast_uren=('Vollast_uren_contrib', 'sum'),
-        )
-        .reset_index()
-    )
-    yearly_summary = yearly_summary.round({"Gemiddelde_delta_T": 2, "Vollast_uren": 0})
+        ).reset_index()
+    ).round({"Gemiddelde_delta_T": 2, "Vollast_uren": 0})
 
-    # Optional: yearly average per row (kept from your original but not needed for summaries)
     df_hourly['Yearly_Avg_delta_T'] = df_hourly.groupby(df_hourly.index.year)['Temp_Difference'].transform('mean')
     df_hourly['Draaiuren'] = df_hourly.groupby('Year')['Above_Threshold'].cumsum()
 
     return df_hourly, monthly_summary, yearly_summary
+
 
 
 
