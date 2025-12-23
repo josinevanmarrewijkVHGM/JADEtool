@@ -204,57 +204,162 @@ if st.button("🚀 Start analyse"):
             st.pyplot(fig)
         
         # Berekeningen
+
         df_hourly, monthly_summary, yearly_summary = calculate_temperature_adjustments_month_v2(
-            final_df, threshold_temp_month, min_dif, delta_T, min_loz_month, max_deltaT=delta_T, method='estimation'
+            final_df,
+            threshold_temp_month,
+            min_dif,
+            delta_T_input,
+            min_loz_month,
+            max_deltaT=delta_T_input,
+            method='estimation',
+            automatic=automatic,
+            auto_values=auto_values
         )
+
+
         if show_fig2:
             # Figuur 2: jaarlijkse samenvatting
             st.markdown("---")
             st.subheader("📊 Jaarlijkse samenvatting draaiuren en vollasturen")
             st.dataframe(yearly_summary)
-            
+            delta_T= delta_T_input
+        
+            # --- Build ΔT reference per year robustly for scalar/monthly/automatic ---
+            # df_hourly must include 'Year' and 'DeltaT_Cap' from calculate_temperature_adjustments_month_v2
+            if 'DeltaT_Cap' not in df_hourly.columns:
+                st.warning("DeltaT_Cap ontbreekt in df_hourly. Controleer de aanroep van calculate_temperature_adjustments_month_v2.")
+                # Fallback: compute from input when possible
+                # Scalar fallback:
+                if np.isscalar(delta_T):
+                    df_hourly['DeltaT_Cap'] = float(delta_T)
+                else:
+                    # Generic fallback: assume max yearly cap equals max of provided list/dict
+                    try:
+                        # Try to normalize delta_T_input into list of 12
+                        months_short = ["Jan", "Feb", "Mar", "Apr", "Mei", "Jun", "Jul", "Aug", "Sep", "Okt", "Nov", "Dec"]
+                        if isinstance(delta_T, dict):
+                            if all(k in range(1, 13) for k in delta_T.keys()):
+                                monthly_caps = [float(delta_T[i]) for i in range(1, 13)]
+                            else:
+                                name_to_idx = {m: i+1 for i, m in enumerate(months_short)}
+                                monthly_caps = [float(delta_T[m]) for m in months_short]
+                        else:
+                            monthly_caps = list(delta_T)  # list/tuple/array
+                        df_hourly['DeltaT_Cap'] = np.nan  # unknown per hour; just avoid crash
+                    except Exception:
+                        df_hourly['DeltaT_Cap'] = np.nan
+        
+            # Derive per-year lines (dashed: max cap; dotted: mean cap)
+            # Use only rows that contributed to calculations (Above_Threshold relevant)
+            mask_caps = df_hourly['DeltaT_Cap'].notna()
+            deltaT_cap_yearly_max = (
+                df_hourly.loc[mask_caps]
+                .groupby('Year')['DeltaT_Cap']
+                .max()
+                .reindex(yearly_summary['Year'])
+            )
+            deltaT_cap_yearly_mean = (
+                df_hourly.loc[mask_caps]
+                .groupby('Year')['DeltaT_Cap']
+                .mean()
+                .reindex(yearly_summary['Year'])
+            )
+        
             fig1, ax1 = plt.subplots(figsize=(8, 4))
             positions_year = np.arange(len(yearly_summary))
             bar_width = 0.4
-            
-            bars_draaiuren = ax1.bar(positions_year, yearly_summary['Draaiuren'], bar_width, label='Draaiuren', color='red', edgecolor='black', alpha=0.7)
-            bars_vollasturen = ax1.bar(positions_year + bar_width, yearly_summary['Vollast_uren'], bar_width, label='Vollast uren', color='blue', edgecolor='black', alpha=0.7)
-            
+        
+            # Bars
+            bars_draaiuren = ax1.bar(
+                positions_year, yearly_summary['Draaiuren'], bar_width,
+                label='Draaiuren', color='red', edgecolor='black', alpha=0.7
+            )
+            bars_vollasturen = ax1.bar(
+                positions_year + bar_width, yearly_summary['Vollast_uren'], bar_width,
+                label='Vollast uren', color='blue', edgecolor='black', alpha=0.7
+            )
+        
             ax1.set_ylabel('Vollasturen (uren)', color='blue', fontsize=14)
             ax1.tick_params(axis='y', labelcolor='blue')
             ax1.grid(True)
-            
+        
+            # Twin axis for temperatures
             ax2 = ax1.twinx()
-            line_temp, = ax2.plot(positions_year + bar_width / 2, yearly_summary['Gemiddelde_delta_T'], color='red', marker='o')
-            line_max = ax2.axhline(y=delta_T, color='orange', linestyle='--', linewidth=0.5, label='max delta T')
+            line_temp, = ax2.plot(
+                positions_year + bar_width / 2,
+                yearly_summary['Gemiddelde_delta_T'],
+                color='red', marker='o', label='Gem. ΔT'
+            )
+        
+            # Reference ΔT caps (varying input friendly)
+            # Plot yearly max cap (dashed) and yearly mean cap (dotted)
+            if deltaT_cap_yearly_max.notna().any():
+                line_cap_max, = ax2.plot(
+                    positions_year + bar_width / 2,
+                    deltaT_cap_yearly_max.values,
+                    color='orange', linestyle='--', linewidth=1.5, label='ΔT cap (max per jaar)'
+                )
+            else:
+                line_cap_max = None
+        
+            if deltaT_cap_yearly_mean.notna().any():
+                line_cap_mean, = ax2.plot(
+                    positions_year + bar_width / 2,
+                    deltaT_cap_yearly_mean.values,
+                    color='orange', linestyle=':', linewidth=1.5, label='ΔT cap (gem. per jaar)'
+                )
+            else:
+                line_cap_mean = None
+        
             ax2.set_ylabel('Gemiddelde afkoeling (°K)', color='k', fontsize=14)
             ax2.tick_params(axis='y', labelcolor='k')
-            ax2.set_ylim(0, delta_T + 2)
-            
+        
+            # Dynamic y-limit: consider actual averages + caps
+            ylim_candidates = [yearly_summary['Gemiddelde_delta_T'].max()]
+            if line_cap_max is not None:
+                ylim_candidates.append(np.nanmax(deltaT_cap_yearly_max.values))
+            if line_cap_mean is not None:
+                ylim_candidates.append(np.nanmax(deltaT_cap_yearly_mean.values))
+            # If still empty, fallback to a sensible default (e.g., scalar delta_T or 12)
+            if not ylim_candidates or np.isnan(ylim_candidates).all():
+                try:
+                    ylim_candidates.append(float(delta_T) if np.isscalar(delta_T) else 12.0)
+                except Exception:
+                    ylim_candidates.append(12.0)
+            ax2.set_ylim(0, max(ylim_candidates) + 2)
+        
             ax1.set_xlabel('Jaar', fontsize=14)
             ax1.set_title('Jaarlijkse samenvatting: Draaiuren, vollasturen en temperatuur', fontsize=16)
             ax1.set_xticks(positions_year - bar_width / 2)
             ax1.set_xticklabels(yearly_summary['Year'], fontsize=12)
-            
+        
+            # Value labels for bars
             for bar in bars_vollasturen:
                 yval = bar.get_height()
                 ax1.text(bar.get_x() + bar.get_width()/2, yval + 10, f'{yval:.0f}', ha='center', va='bottom', fontsize=13, color='black')
-            
+        
             for bar in bars_draaiuren:
                 yval = bar.get_height()
-
-            ax1.text(bar.get_x() + bar.get_width()/2, yval + 10, f'{yval:.0f}', ha='center', va='bottom', fontsize=13, color='black')
-            
+                ax1.text(bar.get_x() + bar.get_width()/2, yval + 10, f'{yval:.0f}', ha='center', va='bottom', fontsize=13, color='black')
+        
+            # Point labels for average ΔT
             for x, y in zip(positions_year + bar_width / 2, yearly_summary['Gemiddelde_delta_T']):
                 ax2.text(x, y, f'{y:.1f}°K', ha='center', va='bottom', fontsize=13, color='black')
-            
+        
             # Gecombineerde legenda op figuurniveau
             handles1, labels1 = ax1.get_legend_handles_labels()
             handles2, labels2 = ax2.get_legend_handles_labels()
-            fig1.legend(handles1 + handles2, labels1 + labels2, loc='upper center', ncol=3, bbox_to_anchor=(0.5, 1.05))
-            
+            # Remove None handles if caps were missing
+            merged_handles = [h for h in handles1 + handles2 if h is not None]
+            merged_labels = []
+            for h in handles1 + handles2:
+                if h is not None:
+                    idx = (handles1 + handles2).index(h)
+                    merged_labels.append((labels1 + labels2)[idx])
+            fig1.legend(merged_handles, merged_labels, loc='upper center', ncol=3, bbox_to_anchor=(0.5, 1.05))
+        
             fig1.tight_layout(pad=2.0)
-            plt.show()
             st.pyplot(fig1)
 
         
