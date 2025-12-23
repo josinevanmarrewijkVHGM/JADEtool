@@ -758,10 +758,10 @@ def plot_monthly_temperature_debiet_v2(
             f"$\\bf{{TEO}}$\n"
             f"$\\bf{{Automatisch}}$\n"
             f"{auto_text}\n\n"
-            f"$\\mathbf{{Resultaten}}$\n"
-            f"Gem. draaiuren = {avg_draaiuren:,.0f}".replace(',', '.') + "\n"
-            f"Gem. ΔT = {avg_delta_T_all_years:.2f}".replace('.', ',') + " K\n"
-            f"Gem. innametemp = {avg_bron:.2f}".replace('.', ',') + " °C"
+            f"$\\mathbf{{Resultaten (gemiddeld)}}$\n"
+            f"Draaiuren = {avg_draaiuren:,.0f}".replace(',', '.') + "\n"
+            f"ΔT = {avg_delta_T_all_years:.2f}".replace('.', ',') + " K\n"
+            f"Innametemp = {avg_bron:.2f}".replace('.', ',') + " °C"
         )
 
     else:  # uitgebreid
