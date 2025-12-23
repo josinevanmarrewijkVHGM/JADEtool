@@ -121,7 +121,6 @@ with st.sidebar:
         delta_T_input = None  # ignored in automatic mode
         modus = 'automatic'
 
-    
 
     st.header("📊 Keuze grafieken")
     show_fig1 = st.checkbox(f"1. Data visualisatie {titel}", value=True)
