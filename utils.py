@@ -169,6 +169,187 @@ def calculate_temperature_adjustments_month(df, threshold_temp_month, min_dif, d
     return df_hourly, monthly_summary, yearly_summary 
 
 
+def calculate_temperature_adjustments_month_v2(
+    df,
+    threshold_temp_month,
+    min_dif,
+    delta_T,
+    min_loz_month,
+    max_deltaT=None,
+    method=None
+):
+    """
+    Calculate temperature adjustments based on monthly threshold temperatures and other parameters.
+
+    Parameters
+    ----------
+    df : DataFrame
+        Datetime-indexed dataframe that must contain column 'temperatuur' (°C).
+    threshold_temp_month : list-like of length 12
+        Monthly threshold temperatures, order Jan..Dec.
+    min_dif : number
+        Minimum temperature difference parameter (currently not used in this function, kept for compatibility).
+    delta_T : number OR list-like length 12 OR dict
+        - Scalar: single cap (K) applied to all months.
+        - List/tuple/np.ndarray/pd.Series: 12 values for Jan..Dec.
+        - Dict: either {1..12 -> cap} or {"Jan".."Dec" -> cap}.
+    min_loz_month : list-like of length 12
+        Monthly minimum lozing temperatures, order Jan..Dec.
+    max_deltaT : number OR list-like length 12 OR dict or None
+        Optional. If None, defaults to delta_T (kept for compatibility; not used further).
+    method : str or None
+        If 'estimation', resamples hourly and interpolates linearly; otherwise hourly mean.
+
+    Returns
+    -------
+    df_hourly : DataFrame
+        Hourly dataframe with intermediate calculations.
+    monthly_summary : DataFrame
+        Per-month summary with Count, Hours, Avg_del_T, Vollast_uren.
+    yearly_summary : DataFrame
+        Per-year summary with Draaiuren, Gemiddelde_delta_T, Vollast_uren.
+    """
+
+    # --- Resampling / estimation ---
+    if method == 'estimation':
+        df_hourly = df.resample('H').interpolate(method='linear')
+    else:
+        df_hourly = df.resample('H').mean()
+
+    # Validate datetime index
+    try:
+        df_hourly['Month'] = df_hourly.index.month
+    except ValueError:
+        print("Error: Verkeerd datumbereik geselecteerd: het csv-document bevat geen data in de geselecteerde periode.")
+        return None
+    df_hourly['Year'] = df_hourly.index.year
+
+    # --- Maps for monthly values ---
+    # Threshold temps
+    if len(threshold_temp_month) != 12:
+        raise ValueError("threshold_temp_month must have 12 values (Jan..Dec).")
+    threshold_temp_map = {month: temp for month, temp in enumerate(threshold_temp_month, start=1)}
+    df_hourly['Threshold_Temperature'] = df_hourly['Month'].map(threshold_temp_map)
+
+    # Min lozing
+    if len(min_loz_month) != 12:
+        raise ValueError("min_loz_month must have 12 values (Jan..Dec).")
+    min_loz_map = {month: temp for month, temp in enumerate(min_loz_month, start=1)}
+    df_hourly['Min_Lozingstemperatuur'] = df_hourly['Month'].map(min_loz_map)
+
+    # --- Handle delta_T as scalar or monthly list/dict ---
+    months_short = ["Jan", "Feb", "Mar", "Apr", "Mei", "Jun", "Jul", "Aug", "Sep", "Okt", "Nov", "Dec"]
+
+    def to_month_map_12(x):
+        """Convert list/tuple/array/Series/dict to {1..12: value} map. Return (map, is_scalar)."""
+        # scalar
+        if np.isscalar(x):
+            return None, True
+        # list-like of length 12
+        if isinstance(x, (list, tuple, np.ndarray, pd.Series)):
+            if len(x) != 12:
+                raise ValueError("delta_T list-like must have length 12 (Jan..Dec).")
+            return {i+1: float(x[i]) for i in range(12)}, False
+        # dict
+        if isinstance(x, dict):
+            # Keys may be 1..12 or month names
+            if all(k in range(1, 13) for k in x.keys()):
+                return {int(k): float(v) for k, v in x.items()}, False
+            # Try month names
+            name_to_idx = {m: i+1 for i, m in enumerate(months_short)}
+            if all(str(k) in name_to_idx for k in x.keys()):
+                return {name_to_idx[str(k)]: float(v) for k, v in x.items()}, False
+            raise ValueError("delta_T dict keys must be 1..12 or month names like 'Jan'..'Dec'.")
+        raise TypeError("delta_T must be a number, a 12-long list-like, or a dict.")
+
+    deltaT_map, deltaT_is_scalar = to_month_map_12(delta_T)
+
+    if deltaT_is_scalar:
+        deltaT_scalar = float(delta_T)
+        df_hourly['DeltaT_Cap'] = deltaT_scalar
+    else:
+        df_hourly['DeltaT_Cap'] = df_hourly['Month'].map(deltaT_map)
+
+    # Optional max_deltaT (kept for API compatibility)
+    if max_deltaT is None:
+        max_deltaT = delta_T
+    # If needed later, you can build a similar map for max_deltaT.
+
+    # --- Determine above-threshold hours (two consecutive hours condition) ---
+    df_hourly['Above_Threshold'] = (df_hourly['temperatuur'] > df_hourly['Threshold_Temperature']).astype(int)
+    df_hourly['Above_Threshold'] = (
+        df_hourly['Above_Threshold']
+        .rolling(window=2, min_periods=2)
+        .sum()
+        .shift(-1)
+        .fillna(0)
+        .astype(int)
+    )
+    df_hourly['Above_Threshold'] = (df_hourly['Above_Threshold'] == 2).astype(int)
+
+    # --- Core temperatures & clipping with per-row cap ---
+    df_hourly['Average_bron'] = np.where(df_hourly['Above_Threshold'] == 1, df_hourly['temperatuur'], np.nan)
+    df_hourly['Temp_Difference'] = np.where(
+        df_hourly['Above_Threshold'] == 1,
+        df_hourly['temperatuur'] - df_hourly['Min_Lozingstemperatuur'],
+        np.nan
+    )
+
+    # Clip Temp_Difference by DeltaT_Cap per row (np.minimum handles Series-wise cap)
+    df_hourly['Temp_Difference'] = np.where(
+        df_hourly['Temp_Difference'].notna(),
+        np.minimum(df_hourly['Temp_Difference'], df_hourly['DeltaT_Cap']),
+        np.nan
+    )
+
+    df_hourly['Lozingstemperatuur'] = np.where(
+        df_hourly['Above_Threshold'] == 1,
+        df_hourly['temperatuur'] - df_hourly['Temp_Difference'],
+        np.nan
+    )
+
+    # Yearly rolling stats (as in your original)
+    df_hourly['Yearly_Avg_delta_T'] = df_hourly.groupby(df_hourly.index.year)['Temp_Difference'].transform('mean')
+    df_hourly['Draaiuren'] = df_hourly.groupby('Year')['Above_Threshold'].cumsum()
+
+    # --- Vollast_uren contribution at hourly level (robust for varying caps) ---
+    df_hourly['Vollast_uren_contrib'] = np.where(
+        (df_hourly['Above_Threshold'] == 1) & (df_hourly['DeltaT_Cap'] > 0),
+        df_hourly['Temp_Difference'] / df_hourly['DeltaT_Cap'],
+        0.0
+    )
+
+    # --- Monthly summary ---
+    mask = df_hourly['Temp_Difference'].notna()
+    yearmonth = df_hourly.index.to_period('M')
+    monthly_summary = (
+        df_hourly[mask]
+        .groupby(yearmonth)
+        .agg(
+            Count=('Temp_Difference', 'size'),
+            Hours=('Above_Threshold', 'sum'),
+            Avg_del_T=('Temp_Difference', 'mean'),
+            Vollast_uren=('Vollast_uren_contrib', 'sum'),
+        )
+        .reset_index()
+        .rename(columns={'index': 'YearMonth', df_hourly.index.name or 'index': 'YearMonth'})
+    )
+    monthly_summary = monthly_summary.round({"Avg_del_T": 2, "Vollast_uren": 2})
+
+    # --- Yearly summary (aggregate from hourly; Vollast_uren via hourly contrib) ---
+    yearly_summary = (
+        df_hourly[mask]
+        .groupby('Year')
+        .agg(
+            Draaiuren=('Above_Threshold', 'sum'),
+            Gemiddelde_delta_T=('Temp_Difference', 'mean'),
+            Vollast_uren=('Vollast_uren_contrib', 'sum'),
+        )
+        .reset_index()
+    )
+    yearly_summary = yearly_summary.round({"Gemiddelde_delta_T": 2, "Vollast_uren": 0})
+
+    return df_hourly, monthly_summary, yearly_summary
 
 
 def plot_monthly_temperature_debiet(
