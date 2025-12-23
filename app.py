@@ -61,13 +61,16 @@ with st.sidebar:
     
     # Houd zowel een scalar (fallback) als een per-maand container beschikbaar
     delta_T_per_month = {}
+    
     if use_monthly_deltaT:
         st.subheader("🌡️ Maandelijkse ΔT (K)")
+        months = ["Jan", "Feb", "Mar", "Apr", "Mei", "Jun", 
+                  "Jul", "Aug", "Sep", "Okt", "Nov", "Dec"]
         # Gebruik sliders per maand, met dezelfde grenzen als globaal
         for m in months:
             delta_T_per_month[m] = st.slider(
                 f"ΔT {m} (K)",
-                min_value=0, max_value=12, value=delta_T,  # start vanaf globale waarde
+                min_value=0, max_value=12, value=5,  # start vanaf globale waarde
                 key=f"deltaT_{m}"  # unieke sleutel per widget
             )
 
