@@ -40,7 +40,6 @@ with st.sidebar:
     maintenance = st.number_input("Onderhouds factor", min_value=0.0, max_value=1.0, value=0.2, step=0.01)
     min_dif = st.selectbox("Minimaal temperatuur verschil (K)", options=[2, 3, 4, 5], index=1)
     loz_temp = st.number_input("Jaarlijkse minimale lozingstemperatuur", min_value=0, max_value=30, value=12)
-    use_monthly = False
     
     st.header("⚙️ Uitgangspunten uitgebreid")
     use_monthly_loz = st.checkbox("Maandelijkse minimale lozingstemperaturen", value=False)
@@ -54,8 +53,8 @@ with st.sidebar:
         for m in months:
             val = st.number_input(f"{m}", min_value=0, max_value=30, value=12)
             min_loz_month.append(val)
-        use_monthly = True
     else:
+        use_monthly = False
         min_loz_month = [loz_temp] * 12
     
     # Threshold temps
