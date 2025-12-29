@@ -547,7 +547,6 @@ def plot_monthly_temperature_debiet_v2(
         Waarden voor automatische modus (alleen bij mode='automatic')
     """
     
-    
 
     # ---------------------------
     # Helpers for flexible inputs
