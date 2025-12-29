@@ -524,7 +524,8 @@ def plot_monthly_temperature_debiet_v2(
     fontsize=15, t_lim=[0, 30],
     draaiseizoen_shade=True, wko=True, s1=10, s2=10,
     mode="standaard", auto_mode=None, auto_values=None
-):
+    mode="standaard", auto_mode=None, auto_values=None):
+    
     """
     Plots water temperature and flow rate data with optionele tekstbox afhankelijk van modus.
 
@@ -545,12 +546,13 @@ def plot_monthly_temperature_debiet_v2(
         Naam van automatische modus (alleen bij mode='automatic')
     auto_values : tuple
         Waarden voor automatische modus (alleen bij mode='automatic')
+        
     """
     
-
     # ---------------------------
     # Helpers for flexible inputs
     # ---------------------------
+    
     months_short = ["Jan", "Feb", "Mar", "Apr", "Mei", "Jun", "Jul", "Aug", "Sep", "Okt", "Nov", "Dec"]
     
     def to_month_map_12(x):
