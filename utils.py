@@ -511,12 +511,9 @@ def plot_monthly_temperature_debiet(
 
 import matplotlib.pyplot as plt
 
-
 # Expect that colors 'red' and 'blue' are defined somewhere in your module, e.g.:
 # red = '#d62728'
 # blue = '#1f77b4'
-
-
 
 def plot_monthly_temperature_debiet_v2(
     df_final, start_date, end_date, delta_T, min_loz, min_dif, threshold_temp,
@@ -524,7 +521,7 @@ def plot_monthly_temperature_debiet_v2(
     fontsize=15, t_lim=[0, 30],
     draaiseizoen_shade=True, wko=True, s1=10, s2=10,
     mode="standaard", auto_mode=None, auto_values=None
-    mode="standaard", auto_mode=None, auto_values=None):
+    ):
     
     """
     Plots water temperature and flow rate data with optionele tekstbox afhankelijk van modus.

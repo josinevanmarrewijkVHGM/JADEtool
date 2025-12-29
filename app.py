@@ -136,7 +136,7 @@ if st.button("🚀 Start analyse"):
         try:
             st.write(f"Delta T: {delta_T_global} Kelvin, Onderhoudsfactor: {maintenance}, Minimaal verschil: {min_dif} Kelvin")
         except:
-            st.write(f"Delta T: {delta_T_per_month} Kelvin, Onderhoudsfactor: {maintenance}, Minimaal verschil: {min_dif} Kelvin")
+            st.write(f"Delta T: {delta_T_global} Kelvin, Onderhoudsfactor: {maintenance}, Minimaal verschil: {min_dif} Kelvin")
         finally:
             st.write(f"Automatic mode {auto_mode}, {auto_values}, Onderhoudsfactor: {maintenance}, Minimaal verschil: {min_dif} Kelvin")
 
