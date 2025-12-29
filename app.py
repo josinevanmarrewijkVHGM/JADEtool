@@ -50,11 +50,14 @@ with st.sidebar:
     if use_monthly_loz:
         st.subheader("🌡️ Maandelijkse minimum lozingstemperatuur")
         use_monthly = True
+        modus = 'uitgebreid'
+
         for m in months:
             val = st.number_input(f"{m}", min_value=0, max_value=30, value=12)
             min_loz_month.append(val)
     else:
         use_monthly = False
+        modus = 'standaard'
         min_loz_month = [loz_temp] * 12
     
     # Threshold temps
@@ -286,13 +289,7 @@ if st.button("🚀 Start analyse"):
             s_1 = 14
             s_2 = 10
             fig3, (ax1, ax2) = plt.subplots(2, 1, figsize=(s_1, s_2), sharex=True)
-            # fig3, ax1, ax2, results_df = plot_monthly_temperature_debiet_v2(df_hourly, start_date, end_date, delta_T, 
-            #                                 min_loz_month, min_dif, threshold_temp_month,
-            #                                 maintenance, alleen_temp, titel=titel, 
-            #                                 fontsize=15, t_lim=[0, 30],
-            #                                 draaiseizoen_shade=True, wko=True,
-            #                                 s1=s_1, s2=s_2)
-            print(modus)
+
             fig3, ax1, ax2, results_df = plot_monthly_temperature_debiet_v2(df_hourly, start_date, end_date,
                                                                             delta_T_input, min_loz_month, min_dif, threshold_temp_month,
                                                                             maintenance, titel=titel,
