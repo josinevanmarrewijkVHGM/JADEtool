@@ -49,6 +49,7 @@ with st.sidebar:
     min_loz_month = []
     if use_monthly_loz:
         st.subheader("🌡️ Maandelijkse minimum lozingstemperatuur")
+        use_monthly = True
         for m in months:
             val = st.number_input(f"{m}", min_value=0, max_value=30, value=12)
             min_loz_month.append(val)
