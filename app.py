@@ -54,7 +54,6 @@ with st.sidebar:
             min_loz_month.append(val)
         use_monthly = True
     else:
-        loz_temp = st.number_input("Jaarlijkse minimale lozingstemperatuur", min_value=0, max_value=30, value=12)
         min_loz_month = [loz_temp] * 12
     
     # Threshold temps
