@@ -78,7 +78,8 @@ with st.sidebar:
     
     automatic = False
     auto_values = (0, 0, 0)  # default
-    
+    min_loz_month = []
+
     if auto_mode == "Aquathermie voor alleen regeneratie bodemenergiesysteem":
         min_loz_month = [10,10,10,10,10,10,10,10,10,10,10,10]
         automatic = True
