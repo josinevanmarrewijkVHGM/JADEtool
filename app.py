@@ -83,6 +83,7 @@ with st.sidebar:
     auto_values = (0, 0, 0)  # default
     
     if auto_mode == "Aquathermie voor alleen regeneratie bodemenergiesysteem":
+        min_loz_month = [10,10,10,10,10,10,10,10,10,10,10,10]
         automatic = True
         modus = "automatic"
         st.subheader("Instellingen: Alleen regeneratie")
@@ -90,6 +91,7 @@ with st.sidebar:
         auto_values = (delta_T1, 0, 0)
     
     elif auto_mode == "Aquathermie voor regeneratie en directe levering":
+        min_loz_month = [2,2,2,2,2,2,2,2,2,2,2,2]
         automatic = True
         st.subheader("Instellingen: Regeneratie + directe levering")
         modus = "automatic"
@@ -100,6 +102,7 @@ with st.sidebar:
     
     elif auto_mode == "Aquathermie voor directe levering":
         automatic = True
+        min_loz_month = [2,2,2,2,2,2,2,2,2,2,2,2]
         st.subheader("Instellingen: Directe levering")
         modus = "automatic"
         delta_T_all = st.slider("Temperatuur verschil (K) voor alle bereiken", min_value=2, max_value=6, value=6)
