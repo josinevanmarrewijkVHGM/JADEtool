@@ -105,10 +105,6 @@ with st.sidebar:
     # --- Determine delta_T input for non-automatic modes ---
     if not automatic:
         delta_T_input = delta_T_global
-        if use_monthly:
-            modus = 'uitgebreid'
-        else:
-            modus = 'standaard'
     else:
         delta_T_input = None  # ignored in automatic mode
         modus = 'automatic'
