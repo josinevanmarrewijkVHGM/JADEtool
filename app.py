@@ -60,10 +60,7 @@ with st.sidebar:
         modus = 'standaard'
         min_loz_month = [loz_temp] * 12
     
-    # Threshold temps
-    threshold_temp_month = [temp + min_dif for temp in min_loz_month]
-    
-            
+
     st.header("⚙️ Uitgangspunten automatisch")
     # (value1 for ≥16°C, value2 for 10–16°C, value3 for 2–10°C)
 
@@ -114,7 +111,11 @@ with st.sidebar:
     else:
         delta_T_input = None  # ignored in automatic mode
         modus = 'automatic'
-
+        
+    # Threshold temps
+    threshold_temp_month = [temp + min_dif for temp in min_loz_month]
+    
+            
     st.header("📊 Keuze grafieken")
     show_fig1 = st.checkbox(f"1. Data visualisatie {titel}", value=True)
     show_fig2 = st.checkbox(f"2. Resultaten analyse ({start_date_str} to {end_date_str})", value=True)
