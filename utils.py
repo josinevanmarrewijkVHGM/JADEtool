@@ -229,29 +229,9 @@ def calculate_temperature_adjustments_month_v2(
                                             default=auto_values[2])  # fallback to lowest
     else:
         # Original scalar or monthly logic
-        months_short = ["Jan", "Feb", "Mar", "Apr", "Mei", "Jun", "Jul", "Aug", "Sep", "Okt", "Nov", "Dec"]
 
-        def to_month_map_12(x):
-            if np.isscalar(x):
-                return None, True
-            if isinstance(x, (list, tuple, np.ndarray, pd.Series)):
-                if len(x) != 12:
-                    raise ValueError("delta_T list-like must have length 12.")
-                return {i+1: float(x[i]) for i in range(12)}, False
-            if isinstance(x, dict):
-                if all(k in range(1, 13) for k in x.keys()):
-                    return {int(k): float(v) for k, v in x.items()}, False
-                name_to_idx = {m: i+1 for i, m in enumerate(months_short)}
-                if all(str(k) in name_to_idx for k in x.keys()):
-                    return {name_to_idx[str(k)]: float(v) for k, v in x.items()}, False
-                raise ValueError("delta_T dict keys must be 1..12 or month names.")
-            raise TypeError("delta_T must be scalar, list(12), or dict.")
+        df_hourly['DeltaT_Cap'] = float(delta_T)
 
-        deltaT_map, deltaT_is_scalar = to_month_map_12(delta_T)
-        if deltaT_is_scalar:
-            df_hourly['DeltaT_Cap'] = float(delta_T)
-        else:
-            df_hourly['DeltaT_Cap'] = df_hourly['Month'].map(deltaT_map)
 
     # --- Above threshold logic ---
     df_hourly['Above_Threshold'] = (df_hourly['temperatuur'] > df_hourly['Threshold_Temperature']).astype(int)
@@ -309,6 +289,10 @@ def calculate_temperature_adjustments_month_v2(
     df_hourly['Draaiuren'] = df_hourly.groupby('Year')['Above_Threshold'].cumsum()
 
     return df_hourly, monthly_summary, yearly_summary
+
+
+
+
 
 
 def plot_monthly_temperature_debiet(

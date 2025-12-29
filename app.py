@@ -39,7 +39,8 @@ with st.sidebar:
     delta_T_global = st.slider("Temperatuur verschil (K)", min_value=2, max_value=12, value=10)
     maintenance = st.number_input("Onderhouds factor", min_value=0.0, max_value=1.0, value=0.2, step=0.01)
     min_dif = st.selectbox("Minimaal temperatuur verschil (K)", options=[2, 3, 4, 5], index=1)
-    
+    loz_temp = st.number_input("Jaarlijkse minimale lozingstemperatuur", min_value=0, max_value=30, value=12)
+
     st.header("⚙️ Uitgangspunten uitgebreid")
     use_monthly_loz = st.checkbox("Maandelijkse minimale lozingstemperaturen", value=False)
     months = ["Jan", "Feb", "Mar", "Apr", "Mei", "Jun", "Jul", "Aug", "Sep", "Okt", "Nov", "Dec"]
@@ -47,10 +48,11 @@ with st.sidebar:
     # Lozing temperatures
     min_loz_month = []
     if use_monthly_loz:
-        st.subheader("🌡️ Monthly Minimum Lozing Temperatures")
+        st.subheader("🌡️ Maandelijkse minimum lozingstemperatuur")
         for m in months:
             val = st.number_input(f"{m}", min_value=0, max_value=30, value=12)
             min_loz_month.append(val)
+        use_monthly = True
     else:
         loz_temp = st.number_input("Jaarlijkse minimale lozingstemperatuur", min_value=0, max_value=30, value=12)
         min_loz_month = [loz_temp] * 12
@@ -58,15 +60,6 @@ with st.sidebar:
     # Threshold temps
     threshold_temp_month = [temp + min_dif for temp in min_loz_month]
     
-    # Monthly ΔT option
-    use_monthly_deltaT = st.checkbox("Maandelijkse temperatuurverschillen (ΔT) instellen", value=False)
-    delta_T_per_month = []
-    if use_monthly_deltaT:
-        st.subheader("🌡️ Maandelijkse ΔT (K)")
-        for m in months:
-            val = st.slider(f"ΔT {m} (K)", min_value=2, max_value=12, value=delta_T_global, key=f"deltaT_{m}")
-            delta_T_per_month.append(val)
-
             
     st.header("⚙️ Uitgangspunten automatisch")
     # (value1 for ≥16°C, value2 for 10–16°C, value3 for 2–10°C)
@@ -106,21 +99,19 @@ with st.sidebar:
         automatic = True
         st.subheader("Instellingen: Directe levering")
         modus = "automatic"
-        delta_T_all = st.slider("Temperatuur verschil (K) voor alle bereiken", min_value=2, max_value=12, value=10)
+        delta_T_all = st.slider("Temperatuur verschil (K) voor alle bereiken", min_value=2, max_value=6, value=6)
         auto_values = (delta_T_all, delta_T_all, delta_T_all)
     
     # --- Determine delta_T input for non-automatic modes ---
     if not automatic:
-        if use_monthly_deltaT:
-            delta_T_input = delta_T_per_month  # list of 12 values
+        delta_T_input = delta_T_global
+        if use_monthly:
             modus = 'uitgebreid'
         else:
-            delta_T_input = delta_T_global
             modus = 'standaard'
     else:
         delta_T_input = None  # ignored in automatic mode
         modus = 'automatic'
-
 
     st.header("📊 Keuze grafieken")
     show_fig1 = st.checkbox(f"1. Data visualisatie {titel}", value=True)
@@ -220,22 +211,6 @@ if st.button("🚀 Start analyse"):
                     except Exception:
                         df_hourly['DeltaT_Cap'] = np.nan
         
-            # Derive per-year lines (dashed: max cap; dotted: mean cap)
-            # Use only rows that contributed to calculations (Above_Threshold relevant)
-            mask_caps = df_hourly['DeltaT_Cap'].notna()
-            deltaT_cap_yearly_max = (
-                df_hourly.loc[mask_caps]
-                .groupby('Year')['DeltaT_Cap']
-                .max()
-                .reindex(yearly_summary['Year'])
-            )
-            deltaT_cap_yearly_mean = (
-                df_hourly.loc[mask_caps]
-                .groupby('Year')['DeltaT_Cap']
-                .mean()
-                .reindex(yearly_summary['Year'])
-            )
-        
             fig1, ax1 = plt.subplots(figsize=(8, 4))
             positions_year = np.arange(len(yearly_summary))
             bar_width = 0.4
@@ -262,41 +237,14 @@ if st.button("🚀 Start analyse"):
                 color='red', marker='o', label='Gem. ΔT'
             )
         
-            # Reference ΔT caps (varying input friendly)
-            # Plot yearly max cap (dashed) and yearly mean cap (dotted)
-            if deltaT_cap_yearly_max.notna().any():
-                line_cap_max, = ax2.plot(
-                    positions_year + bar_width / 2,
-                    deltaT_cap_yearly_max.values,
-                    color='red', linestyle='--', linewidth=1.5, label='ΔT cap (max per jaar)'
-                )
-            else:
-                line_cap_max = None
-        
-            if deltaT_cap_yearly_mean.notna().any():
-                line_cap_mean, = ax2.plot(
-                    positions_year + bar_width / 2,
-                    deltaT_cap_yearly_mean.values,
-                    color='orange', linestyle=':', linewidth=1.5, label='ΔT cap (gem. per jaar)'
-                )
-            else:
-                line_cap_mean = None
+ 
         
             ax2.set_ylabel('Gemiddelde afkoeling (°K)', color='k', fontsize=14)
             ax2.tick_params(axis='y', labelcolor='k')
         
             # Dynamic y-limit: consider actual averages + caps
             ylim_candidates = [yearly_summary['Gemiddelde_delta_T'].max()]
-            if line_cap_max is not None:
-                ylim_candidates.append(np.nanmax(deltaT_cap_yearly_max.values))
-            if line_cap_mean is not None:
-                ylim_candidates.append(np.nanmax(deltaT_cap_yearly_mean.values))
-            # If still empty, fallback to a sensible default (e.g., scalar delta_T or 12)
-            if not ylim_candidates or np.isnan(ylim_candidates).all():
-                try:
-                    ylim_candidates.append(float(delta_T) if np.isscalar(delta_T) else 12.0)
-                except Exception:
-                    ylim_candidates.append(12.0)
+
             ax2.set_ylim(0, max(ylim_candidates) + 2)
         
             ax1.set_xlabel('Jaar', fontsize=14)
@@ -397,10 +345,9 @@ if st.button("🚀 Start analyse"):
             ax2.grid()
             fig.tight_layout()
             ax2.legend(loc='upper right')
-            # add_logo(fig, zoom=0.2, logo_path=logopath, position=(0.95, 0.95))
             st.pyplot(fig)
         
-    #     #         # Berekeningen
+ # Berekeningen
         df_hourly, monthly_summary, yearly_summary = calculate_temperature_adjustments_month_v2(
                 final_df, threshold_temp_month, min_dif, delta_T, min_loz_month, max_deltaT=delta_T, method='estimation'
             )
