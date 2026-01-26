@@ -80,6 +80,7 @@ with st.sidebar:
     #     auto_values = (0, 0, 0)  # default
     #     min_loz_month = []
     if auto_mode == "Geen automatische modus":
+        auto_values = (delta_T_global, delta_T_global, delta_T_global)
         automatic = False
     
     if auto_mode == "Aquathermie voor alleen regeneratie bodemenergiesysteem":
