@@ -143,9 +143,10 @@ if st.button("🚀 Start analyse"):
             st.write(f"Delta T: {delta_T_input} Kelvin, Onderhoudsfactor: {maintenance}, Minimaal verschil: {min_dif} Kelvin")
         except:
             st.write(f"Delta T: {delta_T_global} Kelvin, Onderhoudsfactor: {maintenance}, Minimaal verschil: {min_dif} Kelvin")
-        finally:
+        try:
             st.write(f"Automatic mode {auto_mode}, {auto_values}, Onderhoudsfactor: {maintenance}, Minimaal verschil: {min_dif} Kelvin")
-
+        except:
+            st.write("Geen automatische modus")
         st.write(f"Minimale innametemperatuur (per maand): {threshold_temp_month} °C")
         plot_debiet = True
 
