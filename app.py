@@ -139,7 +139,7 @@ if st.button("🚀 Start analyse"):
         st.write("Files uploaded successfully.")
         st.write(f"Start: {start_date_str}, Eind datum: {end_date_str}")
         try:
-            st.write(f"Delta T: {delta_T_global} Kelvin, Onderhoudsfactor: {maintenance}, Minimaal verschil: {min_dif} Kelvin")
+            st.write(f"Delta T: {delta_T_input} Kelvin, Onderhoudsfactor: {maintenance}, Minimaal verschil: {min_dif} Kelvin")
         except:
             st.write(f"Delta T: {delta_T_global} Kelvin, Onderhoudsfactor: {maintenance}, Minimaal verschil: {min_dif} Kelvin")
         finally:
