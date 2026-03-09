@@ -773,7 +773,7 @@ def plot_monthly_temperature_debiet_v2(
 
 
 
-def plot_monthly_temperature_v2(
+def plot_monthly_temperature_v1(
     df_final, start_date, end_date, delta_T, min_loz, min_dif, threshold_temp,
     maintenance_factor, alleen_temp, titel='naam',
     fontsize=15, t_lim=[0, 30],
@@ -924,6 +924,227 @@ def plot_monthly_temperature_v2(
     fig.tight_layout()
     return fig, ax1
 
+def plot_monthly_temperature_v2(
+    df_final, start_date, end_date, delta_T, min_loz, min_dif, threshold_temp,
+    maintenance_factor, alleen_temp, titel='naam',
+    fontsize=15, t_lim=[0, 30],
+    draaiseizoen_shade=True, wko=True, s1=10, s2=10
+):
+    import numpy as np
+    import pandas as pd
+    import matplotlib.pyplot as plt
+    import matplotlib.dates as mdates
+
+    # -----------------------------
+    # Ensure datetime index
+    # -----------------------------
+    df = df_final.copy()
+    if not isinstance(df.index, pd.DatetimeIndex):
+        if "datetime" in df.columns:
+            df["datetime"] = pd.to_datetime(df["datetime"], errors="coerce")
+            df = df.set_index("datetime")
+            df = df[~df.index.isna()]
+        else:
+            raise ValueError("df_final must have a DatetimeIndex or a 'datetime' column.")
+
+    # -----------------------------
+    # Daily + rolling month
+    # -----------------------------
+    df_day = df.resample('D').mean()
+    df_month_rolling = df_day.select_dtypes(include='number').rolling(
+        window=30, center=True, min_periods=1
+    ).mean()
+
+    # Monthly mean (for plotting)
+    df_month = df_day.resample('M').mean()
+    df_month.index = pd.to_datetime(df_month.index).to_period('M').start_time
+
+    # -----------------------------
+    # ΔT input → scalar or monthly map
+    # -----------------------------
+    months_short = ["Jan", "Feb", "Mar", "Apr", "Mei", "Jun",
+                    "Jul", "Aug", "Sep", "Okt", "Nov", "Dec"]
+
+    def to_month_map_12(x):
+        """Return: (month_map, is_scalar, scalar_val)"""
+        if np.isscalar(x):
+            return None, True, float(x)
+
+        if isinstance(x, (list, tuple, np.ndarray, pd.Series)):
+            if len(x) != 12:
+                raise ValueError("delta_T list-like must have length 12.")
+            return {i+1: float(x[i]) for i in range(12)}, False, None
+
+        if isinstance(x, dict):
+            # numeric keys 1..12
+            if all(k in range(1,13) for k in x.keys()):
+                return {int(k): float(v) for k,v in x.items()}, False, None
+
+            # month name keys
+            name_to_idx = {m: i+1 for i,m in enumerate(months_short)}
+            if all(str(k) in name_to_idx for k in x.keys()):
+                return {name_to_idx[str(k)]: float(v) for k,v in x.items()}, False, None
+
+            raise ValueError("delta_T dict keys must be 1..12 or month names.")
+
+        raise TypeError("delta_T must be scalar, list(12) or dict.")
+
+    deltaT_map, is_scalar, scalar_val = to_month_map_12(delta_T)
+
+    # -----------------------------
+    # Set up figure
+    # -----------------------------
+    fig, ax1 = plt.subplots(1, 1, figsize=(s1, s2))
+    fig.suptitle(
+        f"\nAnalyse watertemperatuur en draaiuren\n{titel}",
+        fontsize=fontsize, x=0.5, ha='center', weight='bold'
+    )
+    ax1.set_title("Watertemperatuur", size=fontsize-2)
+
+    # -----------------------------
+    # Plot temperature data
+    # -----------------------------
+    ax1.scatter(df.index, df['temperatuur'], s=0.5, alpha=1,
+                label="Gemeten watertemperatuur")
+    ax1.plot(df_month_rolling['temperatuur'], color='red', lw=1.5,
+             label="Maandelijks gemiddelde")
+
+    if "Lozingstemperatuur" in df.columns:
+        df['Lozingstemperatuur'].plot(
+            ax=ax1,
+            label="Lozingstemperatuur",
+            linestyle='-',
+            color='g',
+            linewidth=1.5
+        )
+
+    # -----------------------------
+    # Min lozing / threshold temperature lines
+    # Use full scale (not xmin=start_date)
+    # -----------------------------
+    x_min, x_max = ax1.get_xlim()
+
+    if np.isscalar(min_loz):
+        ax1.hlines(
+            y=min_loz, xmin=x_min, xmax=x_max, ls='--', color='green',
+            label=f"Min. lozingstemperatuur {min_loz} °C"
+        )
+
+    if np.isscalar(threshold_temp):
+        ax1.hlines(
+            y=threshold_temp, xmin=x_min, xmax=x_max, ls=':', color='purple',
+            label=f"Min. innametemperatuur {threshold_temp} °C"
+        )
+        ax1.fill_between(
+            df.index, 0, threshold_temp,
+            color='blue', alpha=0.1
+        )
+
+    # -----------------------------
+    # ΔT Lines (scalar or monthly)
+    # -----------------------------
+    if is_scalar:
+        if scalar_val is not None and np.isfinite(scalar_val):
+            ax1.hlines(
+                y=scalar_val,
+                xmin=x_min, xmax=x_max,
+                colors='orange',
+                linestyles='--',
+                linewidth=1.2,
+                label=f"ΔT max: {scalar_val:.1f} K"
+            )
+    else:
+        # monthly segments
+        for month, val in deltaT_map.items():
+            # compute real dates
+            for year in range(df.index.min().year, df.index.max().year + 1):
+                m_start = pd.Timestamp(year=year, month=month, day=1)
+                m_end   = m_start + pd.offsets.MonthEnd(0)
+
+                # clip to visible range:
+                if m_end < start_date or m_start > end_date:
+                    continue
+
+                xs = max(m_start, start_date)
+                xe = max(xs, min(m_end, end_date))
+                ax1.hlines(
+                    y=val, xmin=xs, xmax=xe,
+                    color='orange', lw=1.5, alpha=0.8
+                )
+        ax1.plot([], [], color='orange', lw=2, label="ΔT per maand")
+
+    # -----------------------------
+    # X‑axis formatting
+    # -----------------------------
+    ax1.xaxis.set_major_locator(mdates.YearLocator())
+    ax1.xaxis.set_minor_locator(mdates.MonthLocator())
+    ax1.xaxis.set_major_formatter(mdates.DateFormatter('%Y-%b'))
+    ax1.xaxis.set_minor_formatter(mdates.DateFormatter('%b'))
+
+    plt.setp(ax1.get_xticklabels(which='major'),
+             fontsize=fontsize-2, rotation=90)
+
+    ax1.set_ylim(t_lim)
+    ax1.grid(True)
+
+    # -----------------------------
+    # Summary statistics (robust fix!)
+    # -----------------------------
+    # Avoid groupby-length mismatch by using the filtered index
+    if "Draaiuren" in df.columns:
+        mask = df['Draaiuren'] > 0
+        df_pos = df.loc[mask]
+
+        if df_pos.empty:
+            avg_draaiuren = 0.0
+        else:
+            avg_draaiuren = (
+                df_pos['Draaiuren'].resample("Y").max().mean()
+            )
+    else:
+        avg_draaiuren = 0.0
+
+    if "Yearly_Avg_delta_T" in df.columns:
+        avg_delta_T_all_years = df['Yearly_Avg_delta_T'].resample("Y").mean().mean()
+    else:
+        avg_delta_T_all_years = np.nan
+
+    if "Average_bron" in df.columns:
+        avg_bron = df['Average_bron'].mean()
+    else:
+        avg_bron = np.nan
+
+    # -----------------------------
+    # Text box (only if not temp-only)
+    # -----------------------------
+    if is_scalar:
+        deltaT_label = f"{scalar_val} K"
+    else:
+        vals = np.array(list(deltaT_map.values()))
+        deltaT_label = f"variabel (gem. {vals.mean():.2f} K; min {vals.min()} – max {vals.max()})"
+
+    if not alleen_temp:
+        text_content = (
+            f"$\\bf{{TEO}}$\n"
+            f"$\\bf{{Uitgangspunten}}$\n"
+            f"ΔT max: {deltaT_label}\n"
+            f"Aantal draaiuren = {avg_draaiuren:,.0f}".replace(",", ".") + "\n"
+            f"ΔT gem = {avg_delta_T_all_years:.2f}".replace(".", ",") + " K\n"
+            f"Innametemperatuur gem = {avg_bron:.2f}".replace(".", ",") + " °C"
+        )
+
+        fig.text(
+            0.88, 0.90,
+            text_content,
+            fontsize=fontsize-2,
+            bbox=dict(facecolor='k', alpha=0.1, edgecolor='black'),
+            ha='center'
+        )
+
+    ax1.legend(loc='upper left', fontsize=fontsize-2)
+    fig.tight_layout()
+
+    return fig, ax1
         
 from PIL import Image
 
