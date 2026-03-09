@@ -330,7 +330,11 @@ if st.button("🚀 Start analyse"):
     #     # Your code here
         st.write("Temperature file uploaded successfully.")
         st.write(f"Start Date: {start_date_str}, End Date: {end_date_str}")
-        st.write(f"Delta T: {delta_T} Kelvin, Maintenance: {maintenance}, Minimaal verschil: {min_dif} Kelvin")
+        try:
+            st.write(f"Delta T: {delta_T} Kelvin, Maintenance: {maintenance}, Minimaal verschil: {min_dif} Kelvin")
+        except: 
+            st.write(f"Delta T: {delta_T_global} Kelvin, Maintenance: {maintenance}, Minimaal verschil: {min_dif} Kelvin")
+
         st.write(f"Threshold Temperatures: {threshold_temp_month} °C")
         dicharge_file = None
         final_df = process_data(discharge_file, temp_file, start_date, end_date)
