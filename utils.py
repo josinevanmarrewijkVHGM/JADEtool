@@ -842,20 +842,12 @@ def plot_monthly_temperature_v2(
                    label=f'Min. innametemperatuur {threshold_temp} °C')
         ax1.fill_between(df.index, 0, threshold_temp, color='blue', alpha=0.1)
 
-    # Format axes
-    ax1.xaxis.set_major_locator(mdates.YearLocator())
-    ax1.xaxis.set_minor_locator(mdates.MonthLocator())
-    ax1.xaxis.set_major_formatter(mdates.DateFormatter('%Y-%b'))
-    ax1.xaxis.set_minor_formatter(mdates.DateFormatter('%b'))
-    plt.setp(ax1.get_xticklabels(which='major'), fontsize=fontsize-2, rotation=90)
-    ax1.set_ylim(t_lim)
-    
-        
     if scalar_val is not None and np.isfinite(float(scalar_val)):
-        x_min, x_max = ax1.get_xlim()  # data coords (numbers, even for datetime axis)
-        ax1.hlines(
-            y=float(scalar_val), xmin=x_min, xmax=x_max,
-            colors='orange', linestyles='--', linewidth=0.8,
+        ax1.axhline(
+            y=float(scalar_val),
+            color='orange',
+            ls='--',
+            linewidth=0.8,
             label=f"ΔT max: {float(scalar_val):.1f} K",
         )
     else:
@@ -871,6 +863,36 @@ def plot_monthly_temperature_v2(
             x_end = min(month_end, end_date)
             ax1.hlines(y=val, xmin=x_start, xmax=x_end, color='orange', lw=2, alpha=0.7)
         ax1.plot([], [], color='orange', lw=2, label='ΔT per maand')
+
+    # Format axes
+    ax1.xaxis.set_major_locator(mdates.YearLocator())
+    ax1.xaxis.set_minor_locator(mdates.MonthLocator())
+    ax1.xaxis.set_major_formatter(mdates.DateFormatter('%Y-%b'))
+    ax1.xaxis.set_minor_formatter(mdates.DateFormatter('%b'))
+    plt.setp(ax1.get_xticklabels(which='major'), fontsize=fontsize-2, rotation=90)
+    ax1.set_ylim(t_lim)
+    
+    
+    # if scalar_val is not None and np.isfinite(float(scalar_val)):
+    #     x_min, x_max = ax1.get_xlim()  # data coords (numbers, even for datetime axis)
+    #     ax1.hlines(
+    #         y=float(scalar_val), xmin=x_min, xmax=x_max,
+    #         colors='orange', linestyles='--', linewidth=0.8,
+    #         label=f"ΔT max: {float(scalar_val):.1f} K",
+    #     )
+    # else:
+    #     # Draw per-month segments
+    #     for month, val in deltaT_map.items():
+    #         # Get start and end of this month in the data range
+    #         month_start = pd.Timestamp(year=df.index.min().year, month=month, day=1)
+    #         month_end = month_start + pd.offsets.MonthEnd(0)
+    #         # Clip to plot range
+    #         if month_end < start_date or month_start > end_date:
+    #             continue
+    #         x_start = max(month_start, start_date)
+    #         x_end = min(month_end, end_date)
+    #         ax1.hlines(y=val, xmin=x_start, xmax=x_end, color='orange', lw=2, alpha=0.7)
+    #     ax1.plot([], [], color='orange', lw=2, label='ΔT per maand')
 
     ax1.grid(True)
 
