@@ -773,156 +773,156 @@ def plot_monthly_temperature_debiet_v2(
 
 
 
-def plot_monthly_temperature_v1(
-    df_final, start_date, end_date, delta_T, min_loz, min_dif, threshold_temp,
-    maintenance_factor, alleen_temp, titel='naam',
-    fontsize=15, t_lim=[0, 30],
-    draaiseizoen_shade=True, wko=True, s1=10, s2=10
-):
-    df = df_final.copy()
-    df_day = df.resample('D').mean()
-    df_month_rolling = df_day.select_dtypes(include='number').rolling(window=30, center=True, min_periods=1).mean()
-    df_month = df_day.resample('M').mean()
-    df_month.index = pd.to_datetime(df_month.index).to_period('M').start_time
+# def plot_monthly_temperature_v1(
+#     df_final, start_date, end_date, delta_T, min_loz, min_dif, threshold_temp,
+#     maintenance_factor, alleen_temp, titel='naam',
+#     fontsize=15, t_lim=[0, 30],
+#     draaiseizoen_shade=True, wko=True, s1=10, s2=10
+# ):
+#     df = df_final.copy()
+#     df_day = df.resample('D').mean()
+#     df_month_rolling = df_day.select_dtypes(include='number').rolling(window=30, center=True, min_periods=1).mean()
+#     df_month = df_day.resample('M').mean()
+#     df_month.index = pd.to_datetime(df_month.index).to_period('M').start_time
 
-    # Detect scalar vs monthly ΔT
-    months_short = ["Jan", "Feb", "Mar", "Apr", "Mei", "Jun", "Jul", "Aug", "Sep", "Okt", "Nov", "Dec"]
-    def to_month_map_12(x):
-        if np.isscalar(x):
-            return None, True, float(x)
-        if isinstance(x, (list, tuple, np.ndarray, pd.Series)):
-            if len(x) != 12:
-                raise ValueError("delta_T list-like must have length 12.")
-            return {i+1: float(x[i]) for i in range(12)}, False, None
-        if isinstance(x, dict):
-            if all(k in range(1, 13) for k in x.keys()):
-                return {int(k): float(v) for k, v in x.items()}, False, None
-            name_to_idx = {m: i+1 for i, m in enumerate(months_short)}
-            if all(str(k) in name_to_idx for k in x.keys()):
-                return {name_to_idx[str(k)]: float(v) for k, v in x.items()}, False, None
-            raise ValueError("delta_T dict keys must be 1..12 or month names.")
-        raise TypeError("delta_T must be scalar, list(12), or dict.")
-    deltaT_map, is_scalar, scalar_val = to_month_map_12(delta_T)
+#     # Detect scalar vs monthly ΔT
+#     months_short = ["Jan", "Feb", "Mar", "Apr", "Mei", "Jun", "Jul", "Aug", "Sep", "Okt", "Nov", "Dec"]
+#     def to_month_map_12(x):
+#         if np.isscalar(x):
+#             return None, True, float(x)
+#         if isinstance(x, (list, tuple, np.ndarray, pd.Series)):
+#             if len(x) != 12:
+#                 raise ValueError("delta_T list-like must have length 12.")
+#             return {i+1: float(x[i]) for i in range(12)}, False, None
+#         if isinstance(x, dict):
+#             if all(k in range(1, 13) for k in x.keys()):
+#                 return {int(k): float(v) for k, v in x.items()}, False, None
+#             name_to_idx = {m: i+1 for i, m in enumerate(months_short)}
+#             if all(str(k) in name_to_idx for k in x.keys()):
+#                 return {name_to_idx[str(k)]: float(v) for k, v in x.items()}, False, None
+#             raise ValueError("delta_T dict keys must be 1..12 or month names.")
+#         raise TypeError("delta_T must be scalar, list(12), or dict.")
+#     deltaT_map, is_scalar, scalar_val = to_month_map_12(delta_T)
 
-    # Create figure
-    fig, ax1 = plt.subplots(1, 1, figsize=(s1, s2))
-    fig.suptitle(f'\n Analyse watertemperatuur en draaiuren\n{titel}',
-                 fontsize=fontsize, x=0.5, ha='center', weight='bold')
-    ax1.set_title('Watertemperatuur', size=fontsize-2)
+#     # Create figure
+#     fig, ax1 = plt.subplots(1, 1, figsize=(s1, s2))
+#     fig.suptitle(f'\n Analyse watertemperatuur en draaiuren\n{titel}',
+#                  fontsize=fontsize, x=0.5, ha='center', weight='bold')
+#     ax1.set_title('Watertemperatuur', size=fontsize-2)
 
-    # Plot temperature data
-    ax1.scatter(df.index, df['temperatuur'], s=0.5, alpha=1, label='Gemeten watertemperatuur')
-    ax1.plot(df_month_rolling['temperatuur'], color='red', lw=1.5, label='Maandelijks gemiddelde')
-    df['Lozingstemperatuur'].plot(ax=ax1, label='Lozingstemperatuur', linestyle='-', color='g', linewidth=1.5)
+#     # Plot temperature data
+#     ax1.scatter(df.index, df['temperatuur'], s=0.5, alpha=1, label='Gemeten watertemperatuur')
+#     ax1.plot(df_month_rolling['temperatuur'], color='red', lw=1.5, label='Maandelijks gemiddelde')
+#     df['Lozingstemperatuur'].plot(ax=ax1, label='Lozingstemperatuur', linestyle='-', color='g', linewidth=1.5)
 
-    # # Add ΔT lines
-    # if is_scalar:
-    #     ax1.axhline(y=scalar_val, xmin=start_date, xmax=end_date, color='orange', ls='--',
-    #                 label=f"ΔT max: {scalar_val} K")
-    # else:
-    #     # Draw per-month segments
-    #     for month, val in deltaT_map.items():
-    #         # Get start and end of this month in the data range
-    #         month_start = pd.Timestamp(year=df.index.min().year, month=month, day=1)
-    #         month_end = month_start + pd.offsets.MonthEnd(0)
-    #         # Clip to plot range
-    #         if month_end < start_date or month_start > end_date:
-    #             continue
-    #         x_start = max(month_start, start_date)
-    #         x_end = min(month_end, end_date)
-    #         ax1.hlines(y=val, xmin=x_start, xmax=x_end, color='orange', lw=2, alpha=0.7)
-    #     ax1.plot([], [], color='orange', lw=2, label='ΔT per maand')
+#     # # Add ΔT lines
+#     # if is_scalar:
+#     #     ax1.axhline(y=scalar_val, xmin=start_date, xmax=end_date, color='orange', ls='--',
+#     #                 label=f"ΔT max: {scalar_val} K")
+#     # else:
+#     #     # Draw per-month segments
+#     #     for month, val in deltaT_map.items():
+#     #         # Get start and end of this month in the data range
+#     #         month_start = pd.Timestamp(year=df.index.min().year, month=month, day=1)
+#     #         month_end = month_start + pd.offsets.MonthEnd(0)
+#     #         # Clip to plot range
+#     #         if month_end < start_date or month_start > end_date:
+#     #             continue
+#     #         x_start = max(month_start, start_date)
+#     #         x_end = min(month_end, end_date)
+#     #         ax1.hlines(y=val, xmin=x_start, xmax=x_end, color='orange', lw=2, alpha=0.7)
+#     #     ax1.plot([], [], color='orange', lw=2, label='ΔT per maand')
 
-    # Horizontal lines for min_loz and threshold
-    if np.isscalar(min_loz):
-        ax1.hlines(y=min_loz, xmin=start_date, xmax=end_date, ls='--', color='green',
-                   label=f'Min. lozingstemperatuur {min_loz} °C')
-    if np.isscalar(threshold_temp):
-        ax1.hlines(y=threshold_temp, xmin=start_date, xmax=end_date, ls=':', color='purple',
-                   label=f'Min. innametemperatuur {threshold_temp} °C')
-        ax1.fill_between(df.index, 0, threshold_temp, color='blue', alpha=0.1)
+#     # Horizontal lines for min_loz and threshold
+#     if np.isscalar(min_loz):
+#         ax1.hlines(y=min_loz, xmin=start_date, xmax=end_date, ls='--', color='green',
+#                    label=f'Min. lozingstemperatuur {min_loz} °C')
+#     if np.isscalar(threshold_temp):
+#         ax1.hlines(y=threshold_temp, xmin=start_date, xmax=end_date, ls=':', color='purple',
+#                    label=f'Min. innametemperatuur {threshold_temp} °C')
+#         ax1.fill_between(df.index, 0, threshold_temp, color='blue', alpha=0.1)
 
-    if scalar_val is not None and np.isfinite(float(scalar_val)):
-        ax1.axhline(
-            y=float(scalar_val),
-            color='orange',
-            ls='--',
-            linewidth=0.8,
-            label=f"ΔT max: {float(scalar_val):.1f} K",
-        )
-    else:
-        # Draw per-month segments
-        for month, val in deltaT_map.items():
-            # Get start and end of this month in the data range
-            month_start = pd.Timestamp(year=df.index.min().year, month=month, day=1)
-            month_end = month_start + pd.offsets.MonthEnd(0)
-            # Clip to plot range
-            if month_end < start_date or month_start > end_date:
-                continue
-            x_start = max(month_start, start_date)
-            x_end = min(month_end, end_date)
-            ax1.hlines(y=val, xmin=x_start, xmax=x_end, color='orange', lw=2, alpha=0.7)
-        ax1.plot([], [], color='orange', lw=2, label='ΔT per maand')
+#     if scalar_val is not None and np.isfinite(float(scalar_val)):
+#         ax1.axhline(
+#             y=float(scalar_val),
+#             color='orange',
+#             ls='--',
+#             linewidth=0.8,
+#             label=f"ΔT max: {float(scalar_val):.1f} K",
+#         )
+#     else:
+#         # Draw per-month segments
+#         for month, val in deltaT_map.items():
+#             # Get start and end of this month in the data range
+#             month_start = pd.Timestamp(year=df.index.min().year, month=month, day=1)
+#             month_end = month_start + pd.offsets.MonthEnd(0)
+#             # Clip to plot range
+#             if month_end < start_date or month_start > end_date:
+#                 continue
+#             x_start = max(month_start, start_date)
+#             x_end = min(month_end, end_date)
+#             ax1.hlines(y=val, xmin=x_start, xmax=x_end, color='orange', lw=2, alpha=0.7)
+#         ax1.plot([], [], color='orange', lw=2, label='ΔT per maand')
 
-    # Format axes
-    ax1.xaxis.set_major_locator(mdates.YearLocator())
-    ax1.xaxis.set_minor_locator(mdates.MonthLocator())
-    ax1.xaxis.set_major_formatter(mdates.DateFormatter('%Y-%b'))
-    ax1.xaxis.set_minor_formatter(mdates.DateFormatter('%b'))
-    plt.setp(ax1.get_xticklabels(which='major'), fontsize=fontsize-2, rotation=90)
-    ax1.set_ylim(t_lim)
+#     # Format axes
+#     ax1.xaxis.set_major_locator(mdates.YearLocator())
+#     ax1.xaxis.set_minor_locator(mdates.MonthLocator())
+#     ax1.xaxis.set_major_formatter(mdates.DateFormatter('%Y-%b'))
+#     ax1.xaxis.set_minor_formatter(mdates.DateFormatter('%b'))
+#     plt.setp(ax1.get_xticklabels(which='major'), fontsize=fontsize-2, rotation=90)
+#     ax1.set_ylim(t_lim)
     
     
-    # if scalar_val is not None and np.isfinite(float(scalar_val)):
-    #     x_min, x_max = ax1.get_xlim()  # data coords (numbers, even for datetime axis)
-    #     ax1.hlines(
-    #         y=float(scalar_val), xmin=x_min, xmax=x_max,
-    #         colors='orange', linestyles='--', linewidth=0.8,
-    #         label=f"ΔT max: {float(scalar_val):.1f} K",
-    #     )
-    # else:
-    #     # Draw per-month segments
-    #     for month, val in deltaT_map.items():
-    #         # Get start and end of this month in the data range
-    #         month_start = pd.Timestamp(year=df.index.min().year, month=month, day=1)
-    #         month_end = month_start + pd.offsets.MonthEnd(0)
-    #         # Clip to plot range
-    #         if month_end < start_date or month_start > end_date:
-    #             continue
-    #         x_start = max(month_start, start_date)
-    #         x_end = min(month_end, end_date)
-    #         ax1.hlines(y=val, xmin=x_start, xmax=x_end, color='orange', lw=2, alpha=0.7)
-    #     ax1.plot([], [], color='orange', lw=2, label='ΔT per maand')
+#     # if scalar_val is not None and np.isfinite(float(scalar_val)):
+#     #     x_min, x_max = ax1.get_xlim()  # data coords (numbers, even for datetime axis)
+#     #     ax1.hlines(
+#     #         y=float(scalar_val), xmin=x_min, xmax=x_max,
+#     #         colors='orange', linestyles='--', linewidth=0.8,
+#     #         label=f"ΔT max: {float(scalar_val):.1f} K",
+#     #     )
+#     # else:
+#     #     # Draw per-month segments
+#     #     for month, val in deltaT_map.items():
+#     #         # Get start and end of this month in the data range
+#     #         month_start = pd.Timestamp(year=df.index.min().year, month=month, day=1)
+#     #         month_end = month_start + pd.offsets.MonthEnd(0)
+#     #         # Clip to plot range
+#     #         if month_end < start_date or month_start > end_date:
+#     #             continue
+#     #         x_start = max(month_start, start_date)
+#     #         x_end = min(month_end, end_date)
+#     #         ax1.hlines(y=val, xmin=x_start, xmax=x_end, color='orange', lw=2, alpha=0.7)
+#     #     ax1.plot([], [], color='orange', lw=2, label='ΔT per maand')
 
-    ax1.grid(True)
+#     ax1.grid(True)
 
-    # Summary stats
-    avg_draaiuren = df[df['Draaiuren'] > 0].groupby(df.index.year)['Draaiuren'].max().mean()
-    avg_delta_T_all_years = df.groupby(df.index.year)['Yearly_Avg_delta_T'].mean().mean()
-    avg_bron = df['Average_bron'].mean()
+#     # Summary stats
+#     avg_draaiuren = df[df['Draaiuren'] > 0].groupby(df.index.year)['Draaiuren'].max().mean()
+#     avg_delta_T_all_years = df.groupby(df.index.year)['Yearly_Avg_delta_T'].mean().mean()
+#     avg_bron = df['Average_bron'].mean()
 
-    # ΔT label for text
-    if is_scalar:
-        deltaT_label = f"{scalar_val} K"
-    else:
-        vals = np.array(list(deltaT_map.values()))
-        deltaT_label = f"variabel per maand (gem. {vals.mean():.2f} K; min {vals.min()} – max {vals.max()})"
+#     # ΔT label for text
+#     if is_scalar:
+#         deltaT_label = f"{scalar_val} K"
+#     else:
+#         vals = np.array(list(deltaT_map.values()))
+#         deltaT_label = f"variabel per maand (gem. {vals.mean():.2f} K; min {vals.min()} – max {vals.max()})"
 
-    text_content = (
-        f"$\\bf{{TEO}}$\n"
-        f"$\\bf{{Uitgangspunten}}$\n"
-        f"ΔT max: {deltaT_label}\n"
-        f"Aantal draaiuren = {avg_draaiuren:,.0f}".replace(',', '.') + "\n"
-        f"ΔT gem = {avg_delta_T_all_years:.2f}".replace('.', ',') + " K\n"
-        f"Innametemperatuur gem = {avg_bron:.2f}".replace('.', ',') + " °C"
-    )
-    if not alleen_temp:
-        fig.text(0.88, 0.90, text_content, fontsize=fontsize-2,
-                 bbox=dict(facecolor='k', alpha=0.1, edgecolor='black'), ha='center')
+#     text_content = (
+#         f"$\\bf{{TEO}}$\n"
+#         f"$\\bf{{Uitgangspunten}}$\n"
+#         f"ΔT max: {deltaT_label}\n"
+#         f"Aantal draaiuren = {avg_draaiuren:,.0f}".replace(',', '.') + "\n"
+#         f"ΔT gem = {avg_delta_T_all_years:.2f}".replace('.', ',') + " K\n"
+#         f"Innametemperatuur gem = {avg_bron:.2f}".replace('.', ',') + " °C"
+#     )
+#     if not alleen_temp:
+#         fig.text(0.88, 0.90, text_content, fontsize=fontsize-2,
+#                  bbox=dict(facecolor='k', alpha=0.1, edgecolor='black'), ha='center')
 
-    ax1.legend(loc='upper left', fontsize=fontsize-2)
-    fig.tight_layout()
-    return fig, ax1
+#     ax1.legend(loc='upper left', fontsize=fontsize-2)
+#     fig.tight_layout()
+#     return fig, ax1
 
 
 
