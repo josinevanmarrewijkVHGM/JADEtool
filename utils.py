@@ -815,23 +815,23 @@ def plot_monthly_temperature_v2(
     ax1.plot(df_month_rolling['temperatuur'], color='red', lw=1.5, label='Maandelijks gemiddelde')
     df['Lozingstemperatuur'].plot(ax=ax1, label='Lozingstemperatuur', linestyle='-', color='g', linewidth=1.5)
 
-    # Add ΔT lines
-    if is_scalar:
-        ax1.axhline(y=scalar_val, xmin=start_date, xmax=end_date, color='orange', ls='--',
-                    label=f"ΔT max: {scalar_val} K")
-    else:
-        # Draw per-month segments
-        for month, val in deltaT_map.items():
-            # Get start and end of this month in the data range
-            month_start = pd.Timestamp(year=df.index.min().year, month=month, day=1)
-            month_end = month_start + pd.offsets.MonthEnd(0)
-            # Clip to plot range
-            if month_end < start_date or month_start > end_date:
-                continue
-            x_start = max(month_start, start_date)
-            x_end = min(month_end, end_date)
-            ax1.hlines(y=val, xmin=x_start, xmax=x_end, color='orange', lw=2, alpha=0.7)
-        ax1.plot([], [], color='orange', lw=2, label='ΔT per maand')
+    # # Add ΔT lines
+    # if is_scalar:
+    #     ax1.axhline(y=scalar_val, xmin=start_date, xmax=end_date, color='orange', ls='--',
+    #                 label=f"ΔT max: {scalar_val} K")
+    # else:
+    #     # Draw per-month segments
+    #     for month, val in deltaT_map.items():
+    #         # Get start and end of this month in the data range
+    #         month_start = pd.Timestamp(year=df.index.min().year, month=month, day=1)
+    #         month_end = month_start + pd.offsets.MonthEnd(0)
+    #         # Clip to plot range
+    #         if month_end < start_date or month_start > end_date:
+    #             continue
+    #         x_start = max(month_start, start_date)
+    #         x_end = min(month_end, end_date)
+    #         ax1.hlines(y=val, xmin=x_start, xmax=x_end, color='orange', lw=2, alpha=0.7)
+    #     ax1.plot([], [], color='orange', lw=2, label='ΔT per maand')
 
     # Horizontal lines for min_loz and threshold
     if np.isscalar(min_loz):
@@ -849,6 +849,29 @@ def plot_monthly_temperature_v2(
     ax1.xaxis.set_minor_formatter(mdates.DateFormatter('%b'))
     plt.setp(ax1.get_xticklabels(which='major'), fontsize=fontsize-2, rotation=90)
     ax1.set_ylim(t_lim)
+    
+        
+    if scalar_val is not None and np.isfinite(float(scalar_val)):
+        x_min, x_max = ax1.get_xlim()  # data coords (numbers, even for datetime axis)
+        ax1.hlines(
+            y=float(scalar_val), xmin=x_min, xmax=x_max,
+            colors='orange', linestyles='--', linewidth=0.8,
+            label=f"ΔT max: {float(scalar_val):.1f} K",
+        )
+    else:
+        # Draw per-month segments
+        for month, val in deltaT_map.items():
+            # Get start and end of this month in the data range
+            month_start = pd.Timestamp(year=df.index.min().year, month=month, day=1)
+            month_end = month_start + pd.offsets.MonthEnd(0)
+            # Clip to plot range
+            if month_end < start_date or month_start > end_date:
+                continue
+            x_start = max(month_start, start_date)
+            x_end = min(month_end, end_date)
+            ax1.hlines(y=val, xmin=x_start, xmax=x_end, color='orange', lw=2, alpha=0.7)
+        ax1.plot([], [], color='orange', lw=2, label='ΔT per maand')
+
     ax1.grid(True)
 
     # Summary stats
