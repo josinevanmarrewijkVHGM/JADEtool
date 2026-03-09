@@ -924,6 +924,9 @@ def plot_monthly_temperature_v1(
     fig.tight_layout()
     return fig, ax1
 
+
+
+
 def plot_monthly_temperature_v2(
     df_final, start_date, end_date, delta_T, min_loz, min_dif, threshold_temp,
     maintenance_factor, alleen_temp, titel='naam',
@@ -1143,8 +1146,15 @@ def plot_monthly_temperature_v2(
 
     ax1.legend(loc='upper left', fontsize=fontsize-2)
     fig.tight_layout()
-
-    return fig, ax1
+    results_data = {
+        "Gem. aantal draaiuren": [avg_draaiuren],
+        "Ontwerp draaiuren": [avg_draaiuren / (1 + maintenance_factor)],
+        "Gem. ΔT (Kelvin)": [avg_delta_T_all_years],
+        "Gem. innametemperatuur (°C)": [avg_bron]
+    # "E (MWh/jaar)": [MWH]
+        }
+    results_df = pd.DataFrame(results_data)
+    return fig, ax1, results_df
         
 from PIL import Image
 
